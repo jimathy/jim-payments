@@ -25,7 +25,8 @@ AddEventHandler('jim-payments:Tickets:Sell', function(data)
 	else
 		tickets = Player.Functions.GetItemByName("payticket").amount
 		Player.Functions.RemoveItem('payticket', tickets)
-		Player.Functions.AddMoney('bank', (tickets * Confing.Jobs[Player.PlayerData.job.name].PayPerTicket), 'ticket-payment')
+		pay = (tickets * Confing.Jobs[Player.PlayerData.job.name].PayPerTicket)
+		Player.Functions.AddMoney('bank', pay, 'ticket-payment')
 		TriggerClientEvent('inventory:client:ItemBox', source, QBCore.Shared.Items['payticket'], "remove", tickets)
 		TriggerClientEvent('QBCore:Notify', source, "Tickets: "..tickets.." Total: $"..pay, 'success')
 	end

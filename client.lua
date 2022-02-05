@@ -23,7 +23,7 @@ AddEventHandler('QBCore:Client:SetDuty', function(duty)
 end)
 
 --Keeps track of duty on script restarts
-AddEventHandler('onResourceStart', function(resource) if GetCurrentResourceName() == resource then QBCore.Functions.GetPlayerData(function(PlayerData) PlayerJob = PlayerData.job end) end end)
+AddEventHandler('onResourceStart', function(resource) if GetCurrentResourceName() == resource then QBCore.Functions.GetPlayerData(function(PlayerData) PlayerJob = PlayerData.job onDuty = PlayerJob.onduty end) end end)
 
 Citizen.CreateThread(function()
 	local jobroles = {}

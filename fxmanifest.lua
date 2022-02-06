@@ -1,12 +1,13 @@
 name "Jim-Payments"
 author "Jimathy"
-version "v1.0"
+version "v1.1"
 description "Payment Script By Jimathy"
 fx_version "cerulean"
 game "gta5"
 
 dependencies {
 	'qb-input',
+	'qb-target'
 }
 
 client_scripts {

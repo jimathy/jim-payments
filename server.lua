@@ -68,9 +68,10 @@ QBCore.Functions.CreateCallback('jim-payments:server:GetCurrentPlayers', functio
 	local SPlayer = QBCore.Functions.GetPlayer(source)
 	for k, v in pairs(QBCore.Functions.GetPlayers()) do
 		local Player = QBCore.Functions.GetPlayer(v)
-		if Player ~= nil and v ~= source then
+		if Player ~= nil then
 			local dist = #(vector3(Player.PlayerData.position.x, Player.PlayerData.position.y, Player.PlayerData.position.z) - vector3(SPlayer.PlayerData.position.x, SPlayer.PlayerData.position.y, SPlayer.PlayerData.position.z))
-			if dist < Config.PaymentRadius then onlineList[#onlineList+1] = { value = tonumber(v), text = "["..v.."] - "..Player.PlayerData.charinfo.firstname..' '..Player.PlayerData.charinfo.lastname } end
+			if dist <= Config.PaymentRadius then onlineList[#onlineList+1] = { value = tonumber(v), text = "["..v.."] - "..Player.PlayerData.charinfo.firstname..' '..Player.PlayerData.charinfo.lastname..' ('..dist..'m)' }
+			elseif dist > Config.PaymentRadius then end
 		end
 	end
 	cb(onlineList)

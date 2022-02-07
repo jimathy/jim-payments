@@ -1,6 +1,10 @@
 # jim-payments
 QBCore based payment system
 
+--------------
+If you use a different phone/invoice system let me know and I will add support for it as best I can!
+--------------
+
 Enchanced QB-Input payment system from my other scripts now free on its own
 
 ![General](https://i.imgur.com/37d2mE3.jpeg) ![General](https://i.imgur.com/ICbQyeQ.jpeg)
@@ -41,3 +45,7 @@ Go to [qb] > qb-phone > client > main.lua
 - Add this line:
 
 ```TriggerServerEvent('jim-payments:Tickets:Give', amount, society)```
+
+--------------
+
+NOTE: If you are converting from my older job scripts, I recommend removing the previous triggers from qb-phone

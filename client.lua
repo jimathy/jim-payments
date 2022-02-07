@@ -28,7 +28,7 @@ if GetCurrentResourceName() == resource then QBCore.Functions.GetPlayerData(func
 Citizen.CreateThread(function()
 	local jobroles = {}
 	for k, v in pairs(Config.Jobs) do jobroles[tostring(k)] = 0 end
-	exports['qb-target']:AddBoxZone("JimBank", vector3(251.75, 222.17, 106.2), 0.6, 2.0, { name="JimBank", heading = 340.0, debugPoly=true, minZ = 105.75, maxZ = 107.29, }, 
+	exports['qb-target']:AddBoxZone("JimBank", vector3(251.75, 222.17, 106.2), 0.6, 2.0, { name="JimBank", heading = 340.0, debugPoly=false, minZ = 105.75, maxZ = 107.29, }, 
 		{ options = { { event = "jim-payments:Tickets:Menu", icon = "fas fa-receipt", label = "Cash in Receipts", job = jobroles } },
 		  distance = 2.0
 	})

@@ -1,4 +1,4 @@
-print("Jim-Payments v1.1 - Payments Script by Jimathy")
+print("Jim-Payments v1.2 - Payments Script by Jimathy")
 
 -- If you need support I now have a discord available, it helps me keep track of issues and give better support.
 

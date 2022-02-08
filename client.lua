@@ -39,7 +39,7 @@ RegisterNetEvent('jim-payments:client:Charge', function()
 	local playerList = {}
 	for k,v in pairs(QBCore.Functions.GetPlayersFromCoords(GetEntityCoords(PlayerPedId()), Config.PaymentRadius)) do
 		dist = #(GetEntityCoords(GetPlayerPed(v)) - GetEntityCoords(PlayerPedId()))
-		TriggerEvent("QBCore:Notify", "["..GetPlayerServerId(v).."] - "..GetPlayerName(v).." ("..math.floor(dist+0.5).."m)", "error")
+		--TriggerEvent("QBCore:Notify", "["..GetPlayerServerId(v).."] - "..GetPlayerName(v).." ("..math.floor(dist+0.5).."m)", "error")
 		if v ~= PlayerId() then
 			playerList[#playerList+1] = { value = GetPlayerServerId(v), text = "["..GetPlayerServerId(v).."] - "..GetPlayerName(v).." ("..math.floor(dist+0.5).."m)" }
 		end

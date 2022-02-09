@@ -1,7 +1,7 @@
 # jim-payments
 QBCore based payment system
 
---------------
+
 If you use a different phone/invoice system let me know and I will add support for it as best I can!
 --------------
 

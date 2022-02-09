@@ -32,6 +32,12 @@ AddEventHandler('jim-payments:Tickets:Sell', function(data)
 	end
 end)
 
+QBCore.Functions.CreateCallback('jim-payments:Ticket:Count', function(source, cb) 
+	if QBCore.Functions.GetPlayer(source).Functions.GetItemByName('payticket') == nil then amount = 0
+	else amount = QBCore.Functions.GetPlayer(source).Functions.GetItemByName('payticket').amount end 
+	cb(amount) 
+end)
+
 RegisterServerEvent("jim-payments:server:Charge", function(citizen, price, billtype)
     local biller = QBCore.Functions.GetPlayer(source)
     local billed = QBCore.Functions.GetPlayer(tonumber(citizen))
@@ -40,7 +46,7 @@ RegisterServerEvent("jim-payments:server:Charge", function(citizen, price, billt
 
 	if billed ~= nil then
 		if billtype == "cash" then balance = billed.Functions.GetMoney(billtype)
-			if source == tonumber(citizen) then TriggerClientEvent('QBCore:Notify', source, 'You Cannot Bill Yourself', 'error') return end
+			--if source == tonumber(citizen) then TriggerClientEvent('QBCore:Notify', source, 'You Cannot Bill Yourself', 'error') return end
 			if balance >= amount then
 				billed.Functions.RemoveMoney('cash', amount) TriggerEvent("qb-bossmenu:server:addAccountMoney", tostring(biller.PlayerData.job.name), amount)
 				TriggerEvent('jim-payments:Tickets:Give', amount, tostring(biller.PlayerData.job.name))
@@ -49,7 +55,7 @@ RegisterServerEvent("jim-payments:server:Charge", function(citizen, price, billt
 				TriggerClientEvent("QBCore:Notify", tonumber(citizen), "You don't have enough cash to pay", "error")
 			end
 		elseif billtype == "card" then	
-			if biller.PlayerData.citizenid == billed.PlayerData.citizenid then TriggerClientEvent('QBCore:Notify', source, 'You Cannot Bill Yourself', 'error') return end
+			--if biller.PlayerData.citizenid == billed.PlayerData.citizenid then TriggerClientEvent('QBCore:Notify', source, 'You Cannot Bill Yourself', 'error') return end
 			if amount and amount > 0 then
 				MySQL.Async.insert(
 					'INSERT INTO phone_invoices (citizenid, amount, society, sender, sendercitizenid) VALUES (?, ?, ?, ?, ?)',
@@ -61,4 +67,10 @@ RegisterServerEvent("jim-payments:server:Charge", function(citizen, price, billt
 			else TriggerClientEvent('QBCore:Notify', source, 'Must Be A Valid Amount Above 0', 'error')	end
 		end
 	else TriggerClientEvent('QBCore:Notify', source, 'Player Not Online', 'error') end
+end)
+
+QBCore.Functions.CreateCallback('jim-payments:Name:Find', function(source, cb, user)
+	local Player = QBCore.Functions.GetPlayer(tonumber(user))
+	name = Player.PlayerData.charinfo.firstname..' '..Player.PlayerData.charinfo.lastname
+	cb(name) 
 end)

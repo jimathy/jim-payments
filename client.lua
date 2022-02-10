@@ -49,7 +49,7 @@ RegisterNetEvent('jim-payments:client:Charge', function()
 		--TriggerEvent("QBCore:Notify", "["..GetPlayerServerId(v).."] - "..name.." ("..math.floor(dist+0.5).."m)", "error") 
 		
 		if v ~= PlayerId() then
-			playerList[#playerList+1] = { value = GetPlayerServerId(v), text = "["..GetPlayerServerId(v).."] - "..name.." ("..math.floor(dist+0.5).."m)" }
+			playerList[#playerList+1] = { value = GetPlayerServerId(v), text = "["..GetPlayerServerId(v).."] - "..GetPlayerName(v).." ("..math.floor(dist+0.5).."m)" }
 		end
 	end
 	

@@ -18,8 +18,7 @@ AddEventHandler('jim-payments:Tickets:Give', function(amount, job)
     end
 end)
 
-RegisterServerEvent('jim-payments:Tickets:Sell')
-AddEventHandler('jim-payments:Tickets:Sell', function(data)
+RegisterServerEvent('jim-payments:Tickets:Sell', function()
     local Player = QBCore.Functions.GetPlayer(source)
 	if Player.Functions.GetItemByName("payticket") == nil then TriggerClientEvent('QBCore:Notify', source, "No tickets to trade", 'error') return
 	else
@@ -28,7 +27,7 @@ AddEventHandler('jim-payments:Tickets:Sell', function(data)
 		pay = (tickets * Config.Jobs[Player.PlayerData.job.name].PayPerTicket)
 		Player.Functions.AddMoney('bank', pay, 'ticket-payment')
 		TriggerClientEvent('inventory:client:ItemBox', source, QBCore.Shared.Items['payticket'], "remove", tickets)
-		TriggerClientEvent('QBCore:Notify', source, "Tickets: "..tickets.." Total: $"..pay, 'success')
+		TriggerClientEvent('QBCore:Notify', source, "Tickets traded: "..tickets.." Total: $"..pay, 'success')
 	end
 end)
 
@@ -44,9 +43,8 @@ RegisterServerEvent("jim-payments:server:Charge", function(citizen, price, billt
     local amount = tonumber(price)
 	local billtype = string.lower(tostring(billtype))
 
-	if billed ~= nil then
+	if amount and amount > 0 then
 		if billtype == "cash" then balance = billed.Functions.GetMoney(billtype)
-			--if source == tonumber(citizen) then TriggerClientEvent('QBCore:Notify', source, 'You Cannot Bill Yourself', 'error') return end
 			if balance >= amount then
 				billed.Functions.RemoveMoney('cash', amount) TriggerEvent("qb-bossmenu:server:addAccountMoney", tostring(biller.PlayerData.job.name), amount)
 				TriggerEvent('jim-payments:Tickets:Give', amount, tostring(biller.PlayerData.job.name))
@@ -54,23 +52,20 @@ RegisterServerEvent("jim-payments:server:Charge", function(citizen, price, billt
 				TriggerClientEvent("QBCore:Notify", source, "Customer doesn't have enough cash to pay", "error")
 				TriggerClientEvent("QBCore:Notify", tonumber(citizen), "You don't have enough cash to pay", "error")
 			end
-		elseif billtype == "card" then	
-			--if biller.PlayerData.citizenid == billed.PlayerData.citizenid then TriggerClientEvent('QBCore:Notify', source, 'You Cannot Bill Yourself', 'error') return end
-			if amount and amount > 0 then
-				MySQL.Async.insert(
-					'INSERT INTO phone_invoices (citizenid, amount, society, sender, sendercitizenid) VALUES (?, ?, ?, ?, ?)',
-					{billed.PlayerData.citizenid, amount, biller.PlayerData.job.name,
-					 biller.PlayerData.charinfo.firstname, biller.PlayerData.citizenid})
-				TriggerClientEvent('qb-phone:RefreshPhone', billed.PlayerData.source)
-				TriggerClientEvent('QBCore:Notify', source, 'Invoice Successfully Sent', 'success')
-				TriggerClientEvent('QBCore:Notify', billed.PlayerData.source, 'New Invoice Received')
-			else TriggerClientEvent('QBCore:Notify', source, 'Must Be A Valid Amount Above 0', 'error')	end
+		elseif billtype == "card" then
+			MySQL.Async.insert(
+				'INSERT INTO phone_invoices (citizenid, amount, society, sender, sendercitizenid) VALUES (?, ?, ?, ?, ?)',
+				{billed.PlayerData.citizenid, amount, biller.PlayerData.job.name,
+				 biller.PlayerData.charinfo.firstname, biller.PlayerData.citizenid})
+			TriggerClientEvent('qb-phone:RefreshPhone', billed.PlayerData.source)
+			TriggerClientEvent('QBCore:Notify', source, 'Invoice Successfully Sent', 'success')
+			TriggerClientEvent('QBCore:Notify', billed.PlayerData.source, 'New Invoice Received')
 		end
-	else TriggerClientEvent('QBCore:Notify', source, 'Player Not Online', 'error') end
+	else TriggerClientEvent('QBCore:Notify', source, "You can't charge $0", 'error') return end
 end)
 
-QBCore.Functions.CreateCallback('jim-payments:Name:Find', function(source, cb, user)
-	local Player = QBCore.Functions.GetPlayer(tonumber(user))
-	name = Player.PlayerData.charinfo.firstname..' '..Player.PlayerData.charinfo.lastname
+QBCore.Functions.CreateCallback('jim-payments:Name:Find', function(source, cb, userid)
+	local Player = QBCore.Functions.GetPlayer(tonumber(userid))
+	local name = Player.PlayerData.charinfo.firstname..' '..Player.PlayerData.charinfo.lastname
 	cb(name) 
 end)

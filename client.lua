@@ -53,12 +53,12 @@ RegisterNetEvent('jim-payments:client:Charge', function()
 		end
 	end
 	
-	if playerList[1] == nil then TriggerEvent("QBCore:Notify", "No one near by to charge", "error") return end
+	if playerList[#playerList] == nil then TriggerEvent("QBCore:Notify", "No one near by to charge", "error") return end
 	local dialog = exports['qb-input']:ShowInput({ header = PlayerJob.label.." Cash Register", submitText = "Send",
 	inputs = {
-			{ text = "Charge Customer:", name = "citizen", type = "select", options = playerList    },                
-			{ type = 'number', isRequired = true, name = 'price', text = 'Amount to Charge' },
-			{ type = 'radio', name = 'billtype', text = 'Payment Type', options = { { value = "cash", text = "Cash" }, { value = "card", text = "Card" } } }, }
+			{ text = " ", name = "citizen", type = "select", options = playerList    },                
+			{ type = 'radio', name = 'billtype', text = 'Payment Type', options = { { value = "cash", text = "Cash" }, { value = "card", text = "Card" } } }, 
+			{ type = 'number', isRequired = true, name = 'price', text = '💵  Amount to Charge' },}
 	})
 	if dialog then
 		if not dialog.citizen or not dialog.price then return end
@@ -71,7 +71,7 @@ RegisterNetEvent('jim-payments:Tickets:Menu', function()
 	while amount == nil do QBCore.Functions.TriggerCallback('jim-payments:Ticket:Count', function(cb) amount = cb end) Citizen.Wait(1) end
 	for k, v in pairs(Config.Jobs) do if k ~= PlayerJob.name then 
 		else exports['qb-menu']:openMenu({
-			{ isMenuHeader = true, header = PlayerJob.label.." Ticket Payment", txt = "Do you want trade your tickets for payment?" },
+			{ isMenuHeader = true, header = "🧾 "..PlayerJob.label.." Receipts 🧾", txt = "Do you want trade your receipts for payment?" },
 			{ isMenuHeader = true, header = "", txt = "Amount of Tickets: "..amount.."<br>Total Payment: $"..(Config.Jobs[PlayerJob.name].PayPerTicket * amount) },
 			{ header = "Yes", txt = "", params = { event = "jim-payments:Tickets:Sell:yes" } },
 			{ header = "No", txt = "", params = { event = "jim-payments:Tickets:Sell:no" } }, })

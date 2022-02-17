@@ -67,7 +67,8 @@ end)
 QBCore.Functions.CreateCallback('jim-payments:MakePlayerList', function(source, cb)
 	local onlineList = {}
 	for k, v in pairs(QBCore.Functions.GetPlayers()) do
-		onlineList[#onlineList+1] = { value = tonumber(v), text = "["..v.."] - "..QBCore.Players[v].PlayerData.charinfo.firstname..' '..QBCore.Players[v].PlayerData.charinfo.lastname }
+		local P = QBCore.Functions.GetPlayer(v)
+		onlineList[#onlineList+1] = { value = tonumber(v), text = "["..v.."] - "..P.PlayerData.charinfo.firstname..' '..P.PlayerData.charinfo.lastname  }
 	end
 	cb(onlineList) 
 end)

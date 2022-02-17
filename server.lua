@@ -64,8 +64,10 @@ RegisterServerEvent("jim-payments:server:Charge", function(citizen, price, billt
 	else TriggerClientEvent('QBCore:Notify', source, "You can't charge $0", 'error') return end
 end)
 
-QBCore.Functions.CreateCallback('jim-payments:Name:Find', function(source, cb, userid)
-	local Player = QBCore.Functions.GetPlayer(tonumber(userid))
-	local name = Player.PlayerData.charinfo.firstname..' '..Player.PlayerData.charinfo.lastname
-	cb(name) 
+QBCore.Functions.CreateCallback('jim-payments:MakePlayerList', function(source, cb)
+	local onlineList = {}
+	for k, v in pairs(QBCore.Functions.GetPlayers()) do
+		onlineList[#onlineList+1] = { value = tonumber(v), text = "["..v.."] - "..QBCore.Players[v].PlayerData.charinfo.firstname..' '..QBCore.Players[v].PlayerData.charinfo.lastname }
+	end
+	cb(onlineList) 
 end)

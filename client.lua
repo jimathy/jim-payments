@@ -40,35 +40,35 @@ end)
 
 RegisterNetEvent('jim-payments:client:Charge', function()
 	if not onDuty then TriggerEvent("QBCore:Notify", "Not Clocked in!", "error") return end  -- Require to be on duty when making a payment
-	local playerList = { }
-	local name = nil
-	for k,v in pairs(QBCore.Functions.GetPlayersFromCoords(GetEntityCoords(PlayerPedId()), Config.PaymentRadius)) do
-		--Distance info, cosmetic for adding the "(5m)" when opening the register
-		local dist = #(GetEntityCoords(GetPlayerPed(v)) - GetEntityCoords(PlayerPedId()))
-		while name == nil do 
-			QBCore.Functions.TriggerCallback('jim-payments:Name:Find', function(cb) name = cb
-				--Debugging notification, this shows the info it finds regardless of it adds to the list or not
-				--TriggerEvent("QBCore:Notify", "Table Number: "..#playerList.." ["..GetPlayerServerId(v).."] - "..name.." ("..math.floor(dist+0.5).."m)", "error")			
-				if v ~= PlayerId() then
-					playerList[#playerList+1] = { value = GetPlayerServerId(v), text = "["..GetPlayerServerId(v).."] - "..name.." ("..math.floor(dist+0.5).."m)" }
+	local onlineList = {}
+	local nearbyList = {}
+	QBCore.Functions.TriggerCallback('jim-payments:MakePlayerList', function(cb) onlineList = cb if onlineList[1] == nil then Wait(200) end
+		for k, v in pairs(QBCore.Functions.GetPlayersFromCoords(GetEntityCoords(PlayerPedId()), Config.PaymentRadius)) do
+			local dist = #(GetEntityCoords(GetPlayerPed(v)) - GetEntityCoords(PlayerPedId()))
+			for i = 1, #onlineList do
+				if onlineList[i].value == GetPlayerServerId(v) then
+					if v ~= PlayerId() then
+						nearbyList[#nearbyList+1] = onlineList[i]
+						nearbyList[#nearbyList].text = nearbyList[#nearbyList].text..' ('..math.floor(dist+0.05)..'m)'
+					end
 				end
-			end, GetPlayerServerId(v))
-			Citizen.Wait(100)
+			end
+			dist = nil
 		end
-		name,dist = nil
-	end
-	
-	if playerList[#playerList] == nil then TriggerEvent("QBCore:Notify", "No one near by to charge", "error") return end
-	local dialog = exports['qb-input']:ShowInput({ header = PlayerJob.label.." Cash Register", submitText = "Send",
-	inputs = {
-			{ text = " ", name = "citizen", type = "select", options = playerList    },                
-			{ type = 'radio', name = 'billtype', text = 'Payment Type', options = { { value = "cash", text = "Cash" }, { value = "card", text = "Card" } } }, 
-			{ type = 'number', isRequired = true, name = 'price', text = '💵  Amount to Charge' },}
-	})
-	if dialog then
-		if not dialog.citizen or not dialog.price then return end
-		TriggerServerEvent('jim-payments:server:Charge', dialog.citizen, dialog.price, dialog.billtype)
-	end
+
+
+		if nearbyList[#nearbyList] == nil then TriggerEvent("QBCore:Notify", "No one near by to charge", "error") return end
+		local dialog = exports['qb-input']:ShowInput({ header = PlayerJob.label.." Cash Register", submitText = "Send",
+		inputs = {
+				{ text = " ", name = "citizen", type = "select", options = nearbyList },                
+				{ type = 'radio', name = 'billtype', text = 'Payment Type', options = { { value = "cash", text = "Cash" }, { value = "card", text = "Card" } } }, 
+				{ type = 'number', isRequired = true, name = 'price', text = '💵  Amount to Charge' },}
+		})
+		if dialog then
+			if not dialog.citizen or not dialog.price then return end
+			TriggerServerEvent('jim-payments:server:Charge', dialog.citizen, dialog.price, dialog.billtype)
+		end
+	end)
 end)
 
 RegisterNetEvent('jim-payments:Tickets:Menu', function()
@@ -85,4 +85,4 @@ RegisterNetEvent('jim-payments:Tickets:Menu', function()
 end)
 
 RegisterNetEvent('jim-payments:Tickets:Sell:yes', function() TriggerServerEvent('jim-payments:Tickets:Sell') end)
-RegisterNetEvent('jim-payments:Tickets:Sell:no', function()	exports['qb-menu']:closeMenu() end)
+RegisterNetEvent('jim-payments:Tickets:Sell:no', function() exports['qb-menu']:closeMenu() end)

@@ -1,9 +1,11 @@
 # jim-payments
 QBCore based payment system
 
+If you think I did a good job here, consider donating as it keeps by lights on and my cat fat:
+https://ko-fi.com/jixelpatterns
+--------------
 
 If you use a different phone/invoice system let me know and I will add support for it as best I can!
---------------
 
 Enchanced QB-Input payment system from my other scripts now free on its own
 
@@ -49,3 +51,13 @@ Go to [qb] > qb-phone > client > main.lua
 --------------
 
 NOTE: If you are converting from my older job scripts, I recommend removing the previous triggers from qb-phone
+
+
+--------------
+
+The latest banking systems are very simple to use and add,
+simply look in the atms.lua and change the config options at the top
+
+Choose wether to use atm's, choose wether to use banking locations
+Choose wether to add bank blips (if you want to disable qb-banking)
+Choose wether to add ATM blips (if you like $ signs)

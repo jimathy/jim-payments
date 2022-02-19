@@ -1,4 +1,4 @@
-print("Jim-Payments v1.2 - Payments Script by Jimathy")
+print("Jim-Payments v2 - Payments Script by Jimathy")
 
 -- If you need support I now have a discord available, it helps me keep track of issues and give better support.
 
@@ -8,6 +8,8 @@ Config = {}
 
 Config.PaymentRadius = 30 -- This is how far the player list will check
 
+-- MinAmountforTicket should be your cheapest item
+-- PayPerTicket should never be higher than MinAmountforTicket
 Config.Jobs = {
 	['popsdiner'] = { MinAmountforTicket = 50, PayPerTicket = 50 },
 	['henhouse'] = { MinAmountforTicket = 50, PayPerTicket = 50 },

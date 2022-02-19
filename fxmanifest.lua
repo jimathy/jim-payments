@@ -1,6 +1,6 @@
 name "Jim-Payments"
 author "Jimathy"
-version "v1.2"
+version "v2"
 description "Payment Script By Jimathy"
 fx_version "cerulean"
 game "gta5"
@@ -11,12 +11,14 @@ dependencies {
 }
 
 client_scripts {
-    'client.lua'
+    'client.lua',
+	'atms.lua'
 }
 
 server_scripts {
     '@oxmysql/lib/MySQL.lua',
-    'server.lua'
+    'server.lua',
+	'atmserver.lua'
 }
 
 shared_scripts {

@@ -11,7 +11,7 @@ local function cv(amount)
     return formatted
 end
 
-QBCore.Commands.Add("cashregister", "Use mobile cash register", {}, false, function(source) TriggerClientEvent("jim-payments:client:Charge", source, true) end)
+--QBCore.Commands.Add("cashregister", "Use mobile cash register", {}, false, function(source) TriggerClientEvent("jim-payments:client:Charge", source, true) end)
 
 RegisterServerEvent('jim-payments:Tickets:Give', function(amount, job)
 	if Config.TicketSystem then

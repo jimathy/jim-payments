@@ -1,21 +1,35 @@
 local QBCore = exports['qb-core']:GetCoreObject()
 
-RegisterServerEvent('jim-payments:Tickets:Give')
-AddEventHandler('jim-payments:Tickets:Give', function(amount, job)
-    for k, v in pairs(QBCore.Functions.GetPlayers()) do
-        local Player = QBCore.Functions.GetPlayer(v)
-        if Player ~= nil then
-            if Player.PlayerData.job.name == job and Player.PlayerData.job.onduty then
-				if amount >= Config.Jobs[job].MinAmountforTicket then
-					Player.Functions.AddItem('payticket', 1, false, {["quality"] = nil})
-					TriggerClientEvent('QBCore:Notify', Player.PlayerData.source, 'Receipt received', 'success')
-					TriggerClientEvent('inventory:client:ItemBox', Player.PlayerData.source, QBCore.Shared.Items['payticket'], "add", 1) 
-				elseif amount < Config.Jobs[job].MinAmountforTicket then
-					TriggerClientEvent("QBCore:Notify", Player.PlayerData.source, "Amount too low, didn't receive a receipt", "error")
-				end
-			end
+local function cv(amount)
+    local formatted = amount
+    while true do
+        formatted, k = string.gsub(formatted, "^(-?%d+)(%d%d%d)", '%1,%2')
+        if (k==0) then
+            break
         end
     end
+    return formatted
+end
+
+QBCore.Commands.Add("cashregister", "Use mobile cash register", {}, false, function(source) TriggerClientEvent("jim-payments:client:Charge", source, true) end)
+
+RegisterServerEvent('jim-payments:Tickets:Give', function(amount, job)
+	if Config.TicketSystem then
+		for k, v in pairs(QBCore.Functions.GetPlayers()) do
+			local Player = QBCore.Functions.GetPlayer(v)
+			if Player ~= nil then
+				if Player.PlayerData.job.name == job and Player.PlayerData.job.onduty then
+					if amount >= Config.Jobs[job].MinAmountforTicket then
+						Player.Functions.AddItem('payticket', 1, false, {["quality"] = nil})
+						TriggerClientEvent('QBCore:Notify', Player.PlayerData.source, 'Receipt received', 'success')
+						TriggerClientEvent('inventory:client:ItemBox', Player.PlayerData.source, QBCore.Shared.Items['payticket'], "add", 1) 
+					elseif amount < Config.Jobs[job].MinAmountforTicket then
+						TriggerClientEvent("QBCore:Notify", Player.PlayerData.source, "Amount too low, didn't receive a receipt", "error")
+					end
+				end
+			end
+		end
+	end
 end)
 
 RegisterServerEvent('jim-payments:Tickets:Sell', function()
@@ -27,7 +41,7 @@ RegisterServerEvent('jim-payments:Tickets:Sell', function()
 		pay = (tickets * Config.Jobs[Player.PlayerData.job.name].PayPerTicket)
 		Player.Functions.AddMoney('bank', pay, 'ticket-payment')
 		TriggerClientEvent('inventory:client:ItemBox', source, QBCore.Shared.Items['payticket'], "remove", tickets)
-		TriggerClientEvent('QBCore:Notify', source, "Tickets traded: "..tickets.." Total: $"..pay, 'success')
+		TriggerClientEvent('QBCore:Notify', source, "Tickets traded: "..tickets.." Total: $"..cv(pay), 'success')
 	end
 end)
 
@@ -41,7 +55,6 @@ RegisterServerEvent("jim-payments:server:Charge", function(citizen, price, billt
     local biller = QBCore.Functions.GetPlayer(source)
     local billed = QBCore.Functions.GetPlayer(tonumber(citizen))
     local amount = tonumber(price)
-	local billtype = string.lower(tostring(billtype))
 
 	if amount and amount > 0 then
 		if billtype == "cash" then balance = billed.Functions.GetMoney(billtype)

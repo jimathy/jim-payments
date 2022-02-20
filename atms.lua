@@ -142,7 +142,7 @@ RegisterNetEvent('QBCore:Client:OnPlayerLoaded', function() createBlips() end)
 
 Citizen.CreateThread(function()
 		local bossroles = {}
-		for k, v in pairs(Config.Jobs) do 
+		for k, v in pairs(QBCore.Shared.Jobs) do 
 			for l, b in pairs(QBCore.Shared.Jobs[tostring(k)].grades) do
 				if QBCore.Shared.Jobs[tostring(k)].grades[l].isboss == true then
 					if bossroles[tostring(k)] ~= nil then

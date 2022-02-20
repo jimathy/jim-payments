@@ -6,7 +6,7 @@ local QBCore = exports['qb-core']:GetCoreObject()
 -- If Config.useATM = false, then none of this load
 
 --Specific to ATM config options
-Config.useATM = true
+Config.useATM = false
 Config.useBanks = true
 Config.BankBlips = true
 Config.ATMBlips = false
@@ -107,19 +107,6 @@ local function cv(amount)
 end
 local function createBlips()
 	if Config.useATM then
-		if Config.BankBlips then
-			for k, v in pairs(Config.BankLocations) do
-				blip = AddBlipForCoord(v)
-				SetBlipSprite(blip, 108)
-				SetBlipDisplay(blip, 4)
-				SetBlipScale(blip, 0.55)
-				SetBlipColour(blip, 2)
-				SetBlipAsShortRange(blip, true)
-				BeginTextCommandSetBlipName("STRING")
-				AddTextComponentString("Bank")
-				EndTextCommandSetBlipName(blip)
-			end
-		end
 		if Config.ATMBlips then
 			for k, v in pairs(Config.ATMLocations) do
 				blip = AddBlipForCoord(v)
@@ -134,6 +121,21 @@ local function createBlips()
 			end
 		end
 	end
+	if Config.useBanks then
+		if Config.BankBlips then
+			for k, v in pairs(Config.BankLocations) do
+				blip = AddBlipForCoord(v)
+				SetBlipSprite(blip, 108)
+				SetBlipDisplay(blip, 4)
+				SetBlipScale(blip, 0.55)
+				SetBlipColour(blip, 2)
+				SetBlipAsShortRange(blip, true)
+				BeginTextCommandSetBlipName("STRING")
+				AddTextComponentString("Bank")
+				EndTextCommandSetBlipName(blip)
+			end
+		end
+	end
 end
 
 AddEventHandler('onResourceStart', function(resource) if GetCurrentResourceName() == resource then createBlips() end end)
@@ -141,6 +143,7 @@ AddEventHandler('onResourceStart', function(resource) if GetCurrentResourceName(
 RegisterNetEvent('QBCore:Client:OnPlayerLoaded', function() createBlips() end)
 
 Citizen.CreateThread(function()
+	if Config.useATM or Config.useBanks then
 		local bossroles = {}
 		for k, v in pairs(QBCore.Shared.Jobs) do 
 			for l, b in pairs(QBCore.Shared.Jobs[tostring(k)].grades) do
@@ -166,7 +169,7 @@ Citizen.CreateThread(function()
 				end	
 			end
 		end
-		
+	end
 	if Config.useATM then
 		exports['qb-target']:AddTargetModel(Config.ATMModels, { options = { { event = "jim-payments:Client:ATM:use", icon = "fas fa-money-check-alt", label = "Use ATM", id = "atm" },}, distance = 1.5, })
 		for k,v in pairs(Config.ATMLocations) do

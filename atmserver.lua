@@ -82,7 +82,7 @@ RegisterServerEvent('jim-payments:server:ATM:use', function(amount, billtype, ba
 				TriggerClientEvent("QBCore:Notify", src, "Deposited $"..cv(amount).." into the "..Player.PlayerData.job.label.." account", "success")
 			end
 		end
-	-- Transfers between players --
+	-- Transfer from boss account to players --
 	elseif account == "societytransfer" then
 		local bannedCharacters = {'%','$',';'}
 		local newAmount = tostring(amount)
@@ -97,10 +97,10 @@ RegisterServerEvent('jim-payments:server:ATM:use', function(amount, billtype, ba
 		local Player = QBCore.Functions.GetPlayer(src)
 		if (society - amount) >= 0 then
 			local query = '%"account":"' .. baccount .. '"%'
-			local result = exports.oxmysql:executeSync('SELECT * FROM players WHERE charinfo LIKE ?', {query})
+			local result = MySQL.Sync.fetchAll('SELECT * FROM players WHERE charinfo LIKE ?', {query})
 			if result[1] ~= nil then
 				local Reciever = QBCore.Functions.GetPlayerByCitizenId(result[1].citizenid)
-				TriggerEvent("qb-gangmenu:server:removeAccountMoney", tostring(Player.PlayerData.gang.name), amount)
+				TriggerEvent("qb-bossmenu:server:removeAccountMoney", tostring(Player.PlayerData.job.name), amount)
 				if Reciever ~= nil then
 					Reciever.Functions.AddMoney('bank', amount)
 					TriggerClientEvent("QBCore:Notify", src, "Sent $"..amount.." to "..Reciever.PlayerData.charinfo.firstname.." "..Reciever.PlayerData.charinfo.lastname, "success")
@@ -108,14 +108,13 @@ RegisterServerEvent('jim-payments:server:ATM:use', function(amount, billtype, ba
 				else
 					local RecieverMoney = json.decode(result[1].money)
 					RecieverMoney.bank = (RecieverMoney.bank + amount)
-					exports.oxmysql:execute('UPDATE players SET money = ? WHERE citizenid = ?', {json.encode(RecieverMoney), result[1].citizenid})
+					MySQL.Async.execute('UPDATE players SET money = ? WHERE citizenid = ?', {json.encode(RecieverMoney), result[1].citizenid})
 				end
 			elseif result[1] == nil then TriggerClientEvent("QBCore:Notify", src, "Error: Account '"..baccount.."' not found", "error")
-
 			end
 		end
 	
-	--Simple transfers from society account to bank --
+	--Simple transfers from gang society account to bank --
 	elseif account == "gang" then
 		if billtype == "withdraw" then
 			if tonumber(gsociety) < amount then TriggerClientEvent("QBCore:Notify", src, "Society balance too low", "error")
@@ -132,7 +131,7 @@ RegisterServerEvent('jim-payments:server:ATM:use', function(amount, billtype, ba
 				TriggerClientEvent("QBCore:Notify", src, "Deposited $"..cv(amount).." into the "..Player.PlayerData.gang.label.." account", "success")
 			end
 		end
-	-- Transfers between players --
+	-- Transfer from gang account to players --
 	elseif account == "gangtransfer" then
 		local bannedCharacters = {'%','$',';'}
 		local newAmount = tostring(amount)
@@ -147,7 +146,7 @@ RegisterServerEvent('jim-payments:server:ATM:use', function(amount, billtype, ba
 		local Player = QBCore.Functions.GetPlayer(src)
 		if (gsociety - amount) >= 0 then
 			local query = '%"account":"' .. baccount .. '"%'
-			local result = exports.oxmysql:executeSync('SELECT * FROM players WHERE charinfo LIKE ?', {query})
+			local result = MySQL.Sync.fetchAll('SELECT * FROM players WHERE charinfo LIKE ?', {query})
 			if result[1] ~= nil then
 				local Reciever = QBCore.Functions.GetPlayerByCitizenId(result[1].citizenid)
 				TriggerEvent("qb-bossmenu:server:removeAccountMoney", tostring(Player.PlayerData.gang.name), amount)
@@ -158,7 +157,7 @@ RegisterServerEvent('jim-payments:server:ATM:use', function(amount, billtype, ba
 				else
 					local RecieverMoney = json.decode(result[1].money)
 					RecieverMoney.bank = (RecieverMoney.bank + amount)
-					exports.oxmysql:execute('UPDATE players SET money = ? WHERE citizenid = ?', {json.encode(RecieverMoney), result[1].citizenid})
+					MySQL.Async.execute('UPDATE players SET money = ? WHERE citizenid = ?', {json.encode(RecieverMoney), result[1].citizenid})
 				end
 			elseif result[1] == nil then TriggerClientEvent("QBCore:Notify", src, "Error: Account '"..baccount.."' not found", "error")
 
@@ -180,7 +179,7 @@ RegisterServerEvent('jim-payments:server:ATM:use', function(amount, billtype, ba
 		local Player = QBCore.Functions.GetPlayer(src)
 		if (Player.PlayerData.money.bank - amount) >= 0 then
 			local query = '%"account":"' .. baccount .. '"%'
-			local result = exports.oxmysql:executeSync('SELECT * FROM players WHERE charinfo LIKE ?', {query})
+			local result = MySQL.Sync.fetchAll('SELECT * FROM players WHERE charinfo LIKE ?', {query})
 			if result[1] ~= nil then
 				local Reciever = QBCore.Functions.GetPlayerByCitizenId(result[1].citizenid)
 				Player.Functions.RemoveMoney('bank', amount)
@@ -191,7 +190,7 @@ RegisterServerEvent('jim-payments:server:ATM:use', function(amount, billtype, ba
 				else
 					local RecieverMoney = json.decode(result[1].money)
 					RecieverMoney.bank = (RecieverMoney.bank + amount)
-					exports.oxmysql:execute('UPDATE players SET money = ? WHERE citizenid = ?', {json.encode(RecieverMoney), result[1].citizenid})
+					MySQL.Async.execute('UPDATE players SET money = ? WHERE citizenid = ?', {json.encode(RecieverMoney), result[1].citizenid})
 				end
 			elseif result[1] == nil then TriggerClientEvent("QBCore:Notify", src, "Error: Account '"..baccount.."' not found", "error")
 

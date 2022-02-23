@@ -55,10 +55,9 @@ RegisterNetEvent('jim-payments:client:Charge', function()
 			end
 			dist = nil
 		end
-
-
+		if data.img ~= nil then img = data.img else img = "" end
 		if nearbyList[#nearbyList] == nil then TriggerEvent("QBCore:Notify", "No one near by to charge", "error") return end
-		local dialog = exports['qb-input']:ShowInput({ header = PlayerJob.label.." Cash Register", submitText = "Send",
+		local dialog = exports['qb-input']:ShowInput({ header = img..PlayerJob.label.." Cash Register", submitText = "Send",
 		inputs = {
 				{ text = " ", name = "citizen", type = "select", options = nearbyList },                
 				{ type = 'radio', name = 'billtype', text = 'Payment Type', options = { { value = "cash", text = "Cash" }, { value = "card", text = "Card" } } }, 

@@ -12,13 +12,13 @@ dependencies {
 
 client_scripts {
     'client.lua',
-	'atms.lua'
+	-- 'atms.lua'
 }
 
 server_scripts {
     '@oxmysql/lib/MySQL.lua',
     'server.lua',
-	'atmserver.lua'
+	-- 'atmserver.lua'
 }
 
 shared_scripts {

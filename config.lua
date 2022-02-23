@@ -6,7 +6,7 @@ print("Jim-Payments v2 - Payments Script by Jimathy")
 
 Config = {}
 
-Config.TicketSystem = true -- Enable this if you want to use the ticket system
+Config.TicketSystem = false -- Enable this if you want to use the ticket system
 
 Config.PaymentRadius = 30 -- This is how far the player list will check
 

@@ -38,7 +38,7 @@ Citizen.CreateThread(function()
 		{ options = { { event = "jim-payments:Tickets:Menu", icon = "fas fa-receipt", label = "Cash in Receipts", job = jobroles } }, distance = 2.0 })
 end)
 
-RegisterNetEvent('jim-payments:client:Charge', function()
+RegisterNetEvent('jim-payments:client:Charge', function(data)
 	if not onDuty then TriggerEvent("QBCore:Notify", "Not Clocked in!", "error") return end  -- Require to be on duty when making a payment
 	local onlineList = {}
 	local nearbyList = {}
@@ -48,14 +48,13 @@ RegisterNetEvent('jim-payments:client:Charge', function()
 			for i = 1, #onlineList do
 				if onlineList[i].value == GetPlayerServerId(v) then
 					if v ~= PlayerId() then
-						nearbyList[#nearbyList+1] = onlineList[i]
-						nearbyList[#nearbyList].text = nearbyList[#nearbyList].text..' ('..math.floor(dist+0.05)..'m)'
+						nearbyList[#nearbyList+1] = { value = onlineList[i].value, text = onlineList[i].text..' ('..math.floor(dist+0.05)..'m)' }
 					end
 				end
 			end
 			dist = nil
 		end
-		if data.img ~= nil then img = data.img else img = "" end
+		if data.img == nil then img = "" else img = data.img end
 		if nearbyList[#nearbyList] == nil then TriggerEvent("QBCore:Notify", "No one near by to charge", "error") return end
 		local dialog = exports['qb-input']:ShowInput({ header = img..PlayerJob.label.." Cash Register", submitText = "Send",
 		inputs = {

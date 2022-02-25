@@ -14,6 +14,7 @@ Config.PaymentRadius = 30 -- This is how far the player list will check
 -- PayPerTicket should never be higher than MinAmountforTicket
 Config.Jobs = {
 	['popsdiner'] = { MinAmountforTicket = 50, PayPerTicket = 50 },
+	['beanmachine'] = { MinAmountforTicket = 50, PayPerTicket = 50 },
 	['henhouse'] = { MinAmountforTicket = 50, PayPerTicket = 50 },
 	['pizzathis'] = { MinAmountforTicket = 50, PayPerTicket = 50 },
 	['burgershot'] = { MinAmountforTicket = 50, PayPerTicket = 50 },

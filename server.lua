@@ -59,7 +59,8 @@ RegisterServerEvent("jim-payments:server:Charge", function(citizen, price, billt
 	if amount and amount > 0 then
 		if billtype == "cash" then balance = billed.Functions.GetMoney(billtype)
 			if balance >= amount then
-				billed.Functions.RemoveMoney('cash', amount) TriggerEvent("qb-bossmenu:server:addAccountMoney", tostring(biller.PlayerData.job.name), amount)
+				billed.Functions.RemoveMoney('cash', amount) 
+				TriggerEvent('qb-banking:society:server:DepositMoney', source, amount, tostring(biller.PlayerData.job.name))
 				TriggerEvent('jim-payments:Tickets:Give', amount, tostring(biller.PlayerData.job.name))
 			elseif balance < amount then
 				TriggerClientEvent("QBCore:Notify", source, "Customer doesn't have enough cash to pay", "error")

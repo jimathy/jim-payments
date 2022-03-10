@@ -8,7 +8,12 @@ Config = {}
 
 Config.TicketSystem = true -- Enable this if you want to use the ticket system
 
-Config.PaymentRadius = 30 -- This is how far the player list will check
+Config.PaymentRadius = 30 -- This is how far the playerlist will check for nearby players (based on the person charging)
+
+Config.useATM = true -- Enable this to use my ATM's
+Config.useBanks = true -- Enable this to use my banking stuff
+Config.BankBlips = true -- Enable this if you disabled qb-banking and need bank locations
+Config.ATMBlips = false -- Enable this if you are a pyscho and need every ATM to be on the map too
 
 -- MinAmountforTicket should be your cheapest item
 -- PayPerTicket should never be higher than MinAmountforTicket

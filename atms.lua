@@ -5,12 +5,6 @@ local QBCore = exports['qb-core']:GetCoreObject()
 -- This requires QB-Target and has the location of every ATM, ATM prop and bank window
 -- If Config.useATM = false, then none of this load
 
---Specific to ATM config options
-Config.useATM = false
-Config.useBanks = true
-Config.BankBlips = true
-Config.ATMBlips = false
-
 Config.ATMModels = {"prop_atm_01", "prop_atm_02", "prop_atm_03", "prop_fleeca_atm" }
 
 Config.ATMLocations = {

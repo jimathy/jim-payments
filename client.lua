@@ -3,33 +3,13 @@ local QBCore = exports['qb-core']:GetCoreObject()
 PlayerJob = {}
 local onDuty = false
 
-RegisterNetEvent('QBCore:Client:OnPlayerLoaded')
-AddEventHandler('QBCore:Client:OnPlayerLoaded', function()
-    QBCore.Functions.GetPlayerData(function(PlayerData)
-        PlayerJob = PlayerData.job
-        PlayerGang = PlayerData.gang
-    end)
-end)
-
-RegisterNetEvent('QBCore:Client:OnJobUpdate')
-AddEventHandler('QBCore:Client:OnJobUpdate', function(JobInfo)
-    PlayerJob = JobInfo
-    onDuty = PlayerJob.onduty
-end)
-
-RegisterNetEvent('QBCore:Client:SetDuty')
-AddEventHandler('QBCore:Client:SetDuty', function(duty)
-    onDuty = duty
-end)
-
-RegisterNetEvent('QBCore:Client:OnGangUpdate')
-AddEventHandler('QBCore:Client:OnGangUpdate', function(GangInfo)
-    PlayerGang = GangInfo
-end)
+RegisterNetEvent('QBCore:Client:OnPlayerLoaded') AddEventHandler('QBCore:Client:OnPlayerLoaded', function() QBCore.Functions.GetPlayerData(function(PlayerData) PlayerJob = PlayerData.job PlayerGang = PlayerData.gang end) end)
+RegisterNetEvent('QBCore:Client:OnJobUpdate') AddEventHandler('QBCore:Client:OnJobUpdate', function(JobInfo) PlayerJob = JobInfo onDuty = PlayerJob.onduty end)
+RegisterNetEvent('QBCore:Client:SetDuty') AddEventHandler('QBCore:Client:SetDuty', function(duty) onDuty = duty end)
+RegisterNetEvent('QBCore:Client:OnGangUpdate') AddEventHandler('QBCore:Client:OnGangUpdate', function(GangInfo) PlayerGang = GangInfo end)
 
 --Keeps track of duty on script restarts
-AddEventHandler('onResourceStart', function(resource) 
-if GetCurrentResourceName() == resource then QBCore.Functions.GetPlayerData(function(PlayerData) PlayerJob = PlayerData.job PlayerGang = PlayerData.gang onDuty = PlayerJob.onduty end) end end)
+AddEventHandler('onResourceStart', function(resource) if GetCurrentResourceName() == resource then QBCore.Functions.GetPlayerData(function(PlayerData) PlayerJob = PlayerData.job PlayerGang = PlayerData.gang onDuty = PlayerJob.onduty end) end end)
 
 Citizen.CreateThread(function()
 	local jobroles = {}
@@ -76,10 +56,18 @@ RegisterNetEvent('jim-payments:Tickets:Menu', function()
 		else exports['qb-menu']:openMenu({
 			{ isMenuHeader = true, header = "🧾 "..PlayerJob.label.." Receipts 🧾", txt = "Do you want trade your receipts for payment?" },
 			{ isMenuHeader = true, header = "", txt = "Amount of Tickets: "..amount.."<br>Total Payment: $"..(Config.Jobs[PlayerJob.name].PayPerTicket * amount) },
-			{ header = "Yes", txt = "", params = { event = "jim-payments:Tickets:Sell:yes" } },
-			{ header = "No", txt = "", params = { event = "jim-payments:Tickets:Sell:no" } }, })
+			{ header = "✅ Yes", txt = "", params = { event = "jim-payments:Tickets:Sell:yes" } },
+			{ header = "❌ No", txt = "", params = { event = "jim-payments:Tickets:Sell:no" } }, })
 		end
 	end
+end)
+
+RegisterNetEvent("jim-payments:client:PayPopup", function(amount, biller, billtype)
+	exports['qb-menu']:openMenu({
+		{ isMenuHeader = true, header = "🧾 "..PlayerJob.label.." Payment 🧾", txt = "Do you want accept the payment?" },
+		{ isMenuHeader = true, header = "", txt = billtype:gsub("^%l", string.upper).." Payment: $"..amount },
+		{ header = "✅ Yes", txt = "", params = { isServer = true, event = "jim-payments:server:PayPopup", args = { accept = true, amount = amount, biller = biller, billtype = billtype } } },
+		{ header = "❌ No", txt = "", params = { isServer = true, event = "jim-payments:server:PayPopup", args = { accept = false, amount = amount, biller = biller, billtype = billtype } } }, })
 end)
 
 RegisterNetEvent('jim-payments:Tickets:Sell:yes', function() TriggerServerEvent('jim-payments:Tickets:Sell') end)

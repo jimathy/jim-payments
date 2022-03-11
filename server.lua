@@ -52,29 +52,44 @@ QBCore.Functions.CreateCallback('jim-payments:Ticket:Count', function(source, cb
 end)
 
 RegisterServerEvent("jim-payments:server:Charge", function(citizen, price, billtype)
-    local biller = QBCore.Functions.GetPlayer(source)
+	local src = source
+    local biller = QBCore.Functions.GetPlayer(src)
     local billed = QBCore.Functions.GetPlayer(tonumber(citizen))
     local amount = tonumber(price)
-
 	if amount and amount > 0 then
 		if billtype == "cash" then balance = billed.Functions.GetMoney(billtype)
 			if balance >= amount then
-				billed.Functions.RemoveMoney('cash', amount) TriggerEvent("qb-bossmenu:server:addAccountMoney", tostring(biller.PlayerData.job.name), amount)
-				TriggerEvent('jim-payments:Tickets:Give', amount, tostring(biller.PlayerData.job.name))
+				TriggerClientEvent("jim-payments:client:PayPopup", billed.PlayerData.source, amount, src, billtype)
 			elseif balance < amount then
-				TriggerClientEvent("QBCore:Notify", source, "Customer doesn't have enough cash to pay", "error")
+				TriggerClientEvent("QBCore:Notify", src, "Customer doesn't have enough cash to pay", "error")
 				TriggerClientEvent("QBCore:Notify", tonumber(citizen), "You don't have enough cash to pay", "error")
 			end
 		elseif billtype == "card" then
-			MySQL.Async.insert(
-				'INSERT INTO phone_invoices (citizenid, amount, society, sender, sendercitizenid) VALUES (?, ?, ?, ?, ?)',
-				{billed.PlayerData.citizenid, amount, biller.PlayerData.job.name,
-				 biller.PlayerData.charinfo.firstname, biller.PlayerData.citizenid})
-			TriggerClientEvent('qb-phone:RefreshPhone', billed.PlayerData.source)
-			TriggerClientEvent('QBCore:Notify', source, 'Invoice Successfully Sent', 'success')
-			TriggerClientEvent('QBCore:Notify', billed.PlayerData.source, 'New Invoice Received')
+			if Config.PhoneBank == false then
+				TriggerClientEvent("jim-payments:client:PayPopup", billed.PlayerData.source, amount, src, billtype)
+			else
+				MySQL.Async.insert(
+					'INSERT INTO phone_invoices (citizenid, amount, society, sender, sendercitizenid) VALUES (?, ?, ?, ?, ?)',
+					{billed.PlayerData.citizenid, amount, biller.PlayerData.job.name, biller.PlayerData.charinfo.firstname, biller.PlayerData.citizenid})
+				TriggerClientEvent('qb-phone:RefreshPhone', billed.PlayerData.source)
+				TriggerClientEvent('QBCore:Notify', src, 'Invoice Successfully Sent', 'success')
+				TriggerClientEvent('QBCore:Notify', billed.PlayerData.source, 'New Invoice Received')
+			end
 		end
 	else TriggerClientEvent('QBCore:Notify', source, "You can't charge $0", 'error') return end
+end)
+
+RegisterServerEvent("jim-payments:server:PayPopup", function(data)
+	local src = source
+    local billed = QBCore.Functions.GetPlayer(src)
+    local biller = QBCore.Functions.GetPlayer(tonumber(data.biller))
+	if data.accept == true then
+		billed.Functions.RemoveMoney(tostring(data.billtype), data.amount) TriggerEvent("qb-bossmenu:server:addAccountMoney", tostring(biller.PlayerData.job.name), data.amount)
+		TriggerEvent('jim-payments:Tickets:Give', data.amount, tostring(billed.PlayerData.job.name))
+	elseif data.accept == false then
+		TriggerClientEvent("QBCore:Notify", src, "You declined the payment")
+		TriggerClientEvent("QBCore:Notify", data.biller, billed.PlayerData.charinfo.firstname.." declined the payment", "error")
+	end
 end)
 
 QBCore.Functions.CreateCallback('jim-payments:MakePlayerList', function(source, cb)

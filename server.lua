@@ -81,7 +81,7 @@ end)
 
 RegisterServerEvent("jim-payments:server:PayPopup", function(data)
 	local src = source
-	local billtype = data/billtype
+	local billtype = data.billtype
 	local billed = QBCore.Functions.GetPlayer(src)
 	local biller = QBCore.Functions.GetPlayer(tonumber(data.biller))
 		if billtype == "card" then billtype = "bank" end

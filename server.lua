@@ -81,10 +81,12 @@ end)
 
 RegisterServerEvent("jim-payments:server:PayPopup", function(data)
 	local src = source
-    local billed = QBCore.Functions.GetPlayer(src)
-    local biller = QBCore.Functions.GetPlayer(tonumber(data.biller))
+	local billtype = data/billtype
+	local billed = QBCore.Functions.GetPlayer(src)
+	local biller = QBCore.Functions.GetPlayer(tonumber(data.biller))
+		if billtype == "card" then billtype = "bank" end
 	if data.accept == true then
-		billed.Functions.RemoveMoney(tostring(data.billtype), data.amount) TriggerEvent("qb-bossmenu:server:addAccountMoney", tostring(biller.PlayerData.job.name), data.amount)
+		billed.Functions.RemoveMoney(tostring(billtype), data.amount) TriggerEvent("qb-bossmenu:server:addAccountMoney", tostring(biller.PlayerData.job.name), data.amount)
 		TriggerEvent('jim-payments:Tickets:Give', data.amount, tostring(biller.PlayerData.job.name))
 	elseif data.accept == false then
 		TriggerClientEvent("QBCore:Notify", src, "You declined the payment")

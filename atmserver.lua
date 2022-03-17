@@ -233,7 +233,7 @@ RegisterServerEvent("jim-payments:server:ATM:give", function(citizen, price)
 			Player.Functions.RemoveMoney('cash', amount)
 			TriggerClientEvent("QBCore:Notify", source, "You gave "..Reciever.PlayerData.charinfo.firstname.." $"..cv(amount), "success")
 			Reciever.Functions.AddMoney('cash', amount)
-			TriggerClientEvent("QBCore:Notify", tonumber(citizen), "You got $"..cv(amount).." from "..Reciever.PlayerData.charinfo.firstname, "success")
+			TriggerClientEvent("QBCore:Notify", tonumber(citizen), "You got $"..cv(amount).." from "..Player.PlayerData.charinfo.firstname, "success")
 		elseif balance < amount then
 			TriggerClientEvent("QBCore:Notify", source, "You don't have enough cash to give", "error")
 		end

@@ -17,9 +17,6 @@ QBCore.Functions.CreateCallback('jim-payments:ManageWrapper', function(source, c
 	local result = nil
 	if type == "GetAccount" then result = exports["qb-management"]:GetAccount(account) end
 	if type == "GetGangAccount" then result = exports["qb-management"]:GetGangAccount(account) end
-	
-	print(type.." "..account.." "..result)
-
 	cb(result) 
 end)
 

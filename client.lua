@@ -27,9 +27,9 @@ RegisterNetEvent('jim-payments:client:Charge', function(data)
 			local dist = #(GetEntityCoords(GetPlayerPed(v)) - GetEntityCoords(PlayerPedId()))
 			for i = 1, #onlineList do
 				if onlineList[i].value == GetPlayerServerId(v) then
-					-- if v ~= PlayerId() then
+					if v ~= PlayerId() then
 						nearbyList[#nearbyList+1] = { value = onlineList[i].value, text = onlineList[i].text..' ('..math.floor(dist+0.05)..'m)' }
-					-- end
+					end
 				end
 			end
 			dist = nil
@@ -38,7 +38,7 @@ RegisterNetEvent('jim-payments:client:Charge', function(data)
 		if nearbyList[#nearbyList] == nil then TriggerEvent("QBCore:Notify", "No one near by to charge", "error") return end
 		local dialog = exports['qb-input']:ShowInput({ header = img..PlayerJob.label.." Cash Register", submitText = "Send",
 		inputs = {
-				{ text = " ", name = "citizen", type = "select", options = nearbyList },                
+				{ text = " ", name = "citizen", type = "select", options = nearbyList },
 				{ type = 'radio', name = 'billtype', text = 'Payment Type', options = { { value = "cash", text = "Cash" }, { value = "card", text = "Card" } } }, 
 				{ type = 'number', isRequired = true, name = 'price', text = '💵  Amount to Charge' },}
 		})

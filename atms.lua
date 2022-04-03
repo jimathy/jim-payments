@@ -3,7 +3,6 @@ local QBCore = exports['qb-core']:GetCoreObject()
 -- This script is a simple replacement for QB-Banking and QB-ATMs
 -- It uses QB-Input and server callbacks to retreive info about accounts and cash
 -- This requires QB-Target and has the location of every ATM, ATM prop and bank window
--- If Config.useATM = false, then none of this load
 
 Config.ATMModels = {"prop_atm_01", "prop_atm_02", "prop_atm_03", "prop_fleeca_atm" }
 
@@ -88,7 +87,6 @@ Config.BankLocations = {
 	--vector3(252.41, 221.41, 106.29)
 }
 
-
 local function cv(amount)
     local formatted = amount
     while true do
@@ -161,14 +159,15 @@ Citizen.CreateThread(function()
 					end
 				end	
 			end
-		end
+			end
 	end
 	if Config.useATM then
 		exports['qb-target']:AddTargetModel(Config.ATMModels, { options = { { event = "jim-payments:Client:ATM:use", icon = "fas fa-money-check-alt", label = "Use ATM", id = "atm" },}, distance = 1.5, })
 		for k,v in pairs(Config.ATMLocations) do
 			exports['qb-target']:AddCircleZone("jimatm"..k, vector3(tonumber(v.x), tonumber(v.y), tonumber(v.z)+0.2), 0.5, { name="jimatm"..k, debugPoly=false, useZ=true, }, 
 			{ options = { { event = "jim-payments:Client:ATM:use", icon = "fas fa-money-check-alt", label = "Use ATM", id = "atm" },
-						  --[[{ event = "jim-payments:Client:ATM:use", icon = "fas fa-arrow-right-arrow-left", label = "Transfer Money", id = "transfer" },]] }, distance = 1.5 })
+						  --[[{ event = "jim-payments:Client:ATM:use", icon = "fas fa-arrow-right-arrow-left", label = "Transfer Money", id = "transfer" },]]
+						  }, distance = 1.5 })
 		end
 	end
 	if Config.useBanks then
@@ -198,26 +197,29 @@ local function PlayATMAnimation(animation)
 	end
 end
 
+local function GrabAccount(type, job)
+	local p = promise.new()
+	QBCore.Functions.TriggerCallback('jim-payments:ManageWrapper', function(cb) p:resolve(cb) end, type, job)
+	return Citizen.Await(p)
+end
+
 RegisterNetEvent('jim-payments:Client:ATM:use', function(data)
 	--this grabs all the info from names to savings account numbers in the databases
 	while name == nil do 
 	QBCore.Functions.TriggerCallback('jim-payments:ATM:Find', function(cb1, cb2, cb3, cb4, cb5, cb6, cb7) name = cb1 cash = cb2 bank = cb3 account = cb4 cid = cb5 savbal = cb6 aid = cb7 end) 
 		Citizen.Wait(100) 
 	end
-	while society == nil do 
-	QBCore.Functions.TriggerCallback('qb-bossmenu:server:GetAccount', function(cb) society = cb end, PlayerJob.name)
-		Citizen.Wait(100) 
-	end	
-	while gsociety == nil do 
-	QBCore.Functions.TriggerCallback('qb-gangmenu:server:GetAccount', function(cb) gsociety = cb end, PlayerGang.name)
-		Citizen.Wait(100) 
-	end
+	
+	society = GrabAccount("GetAccount", PlayerJob.name) 
+	Wait(200)
+	gsociety = GrabAccount("GetGangAccount", PlayerGang.name)
+	
 	local atmbartime = 2500
 	local setoptions = {}
 
 	if data.id == "atm" then
 		setoptions = { { value = "withdraw", text = "Withdrawl" }, }
-		setview = "Welcome back, "..name.."<br><br>- Citizen ID -<br>"..cid.."<br><br>- Balances -<br>🏦Bank - $"..cv(bank).."<br>💵Cash - $"..cv(cash)..'<br><br>- Options -'
+		setview = "<center><img src=https://static.wikia.nocookie.net/gtawiki/images/b/bd/Fleeca-GTAV-Logo.png width=200px></center><br>Welcome back, "..name.."<br><br>- Citizen ID -<br>"..cid.."<br><br>- Balances -<br>🏦Bank - $"..cv(bank).."<br>💵Cash - $"..cv(cash)..'<br><br>- Options -'
 		setheader = "💵 ATM Banking 💵"
 		setinputs = { { type = 'radio', name = 'billtype', text = setview, options = setoptions },
 					  { type = 'number', isRequired = true, name = 'amount', text = '💵 Amount to transfer' }, }

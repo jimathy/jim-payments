@@ -11,6 +11,9 @@ local function cv(amount)
     return formatted
 end
 
+AddEventHandler('onResourceStart', function(resource) if GetCurrentResourceName() == resource then
+	print(exports["qb-management"]:GetAccount("police")) end end)
+
 --QBCore.Commands.Add("cashregister", "Use mobile cash register", {}, false, function(source) TriggerClientEvent("jim-payments:client:Charge", source, true) end)
 
 RegisterServerEvent('jim-payments:Tickets:Give', function(amount, job)
@@ -51,7 +54,7 @@ QBCore.Functions.CreateCallback('jim-payments:Ticket:Count', function(source, cb
 	cb(amount) 
 end)
 
-RegisterServerEvent("jim-payments:server:Charge", function(citizen, price, billtype)
+RegisterServerEvent("jim-payments:server:Charge", function(citizen, price, billtype, img)
 	local src = source
     local biller = QBCore.Functions.GetPlayer(src)
     local billed = QBCore.Functions.GetPlayer(tonumber(citizen))
@@ -59,14 +62,14 @@ RegisterServerEvent("jim-payments:server:Charge", function(citizen, price, billt
 	if amount and amount > 0 then
 		if billtype == "cash" then balance = billed.Functions.GetMoney(billtype)
 			if balance >= amount then
-				TriggerClientEvent("jim-payments:client:PayPopup", billed.PlayerData.source, amount, src, billtype)
+				TriggerClientEvent("jim-payments:client:PayPopup", billed.PlayerData.source, amount, src, billtype, img)
 			elseif balance < amount then
 				TriggerClientEvent("QBCore:Notify", src, "Customer doesn't have enough cash to pay", "error")
 				TriggerClientEvent("QBCore:Notify", tonumber(citizen), "You don't have enough cash to pay", "error")
 			end
 		elseif billtype == "card" then
 			if Config.PhoneBank == false then
-				TriggerClientEvent("jim-payments:client:PayPopup", billed.PlayerData.source, amount, src, billtype)
+				TriggerClientEvent("jim-payments:client:PayPopup", billed.PlayerData.source, amount, src, billtype, img)
 			else
 				MySQL.Async.insert(
 					'INSERT INTO phone_invoices (citizenid, amount, society, sender, sendercitizenid) VALUES (?, ?, ?, ?, ?)',
@@ -81,13 +84,13 @@ end)
 
 RegisterServerEvent("jim-payments:server:PayPopup", function(data)
 	local src = source
-	local billtype = data.billtype
-	local billed = QBCore.Functions.GetPlayer(src)
-	local biller = QBCore.Functions.GetPlayer(tonumber(data.biller))
-		if billtype == "card" then billtype = "bank" end
+    local billed = QBCore.Functions.GetPlayer(src)
+    local biller = QBCore.Functions.GetPlayer(tonumber(data.biller))
 	if data.accept == true then
-		billed.Functions.RemoveMoney(tostring(billtype), data.amount) TriggerEvent("qb-bossmenu:server:addAccountMoney", tostring(biller.PlayerData.job.name), data.amount)
-		TriggerEvent('jim-payments:Tickets:Give', data.amount, tostring(biller.PlayerData.job.name))
+		billed.Functions.RemoveMoney(tostring(data.billtype), data.amount) 
+		exports["qb-management"]:AddMoney(tostring(biller.PlayerData.job.name), data.amount)
+		--TriggerEvent("qb-bossmenu:server:addAccountMoney", tostring(biller.PlayerData.job.name), data.amount)
+		TriggerEvent('jim-payments:Tickets:Give', data.amount, tostring(billed.PlayerData.job.name))
 		TriggerClientEvent("QBCore:Notify", data.biller, billed.PlayerData.charinfo.firstname.." accepted the payment", "success")
 	elseif data.accept == false then
 		TriggerClientEvent("QBCore:Notify", src, "You declined the payment")

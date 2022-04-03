@@ -27,9 +27,9 @@ RegisterNetEvent('jim-payments:client:Charge', function(data)
 			local dist = #(GetEntityCoords(GetPlayerPed(v)) - GetEntityCoords(PlayerPedId()))
 			for i = 1, #onlineList do
 				if onlineList[i].value == GetPlayerServerId(v) then
-					if v ~= PlayerId() then
+					-- if v ~= PlayerId() then
 						nearbyList[#nearbyList+1] = { value = onlineList[i].value, text = onlineList[i].text..' ('..math.floor(dist+0.05)..'m)' }
-					end
+					-- end
 				end
 			end
 			dist = nil
@@ -44,7 +44,7 @@ RegisterNetEvent('jim-payments:client:Charge', function(data)
 		})
 		if dialog then
 			if not dialog.citizen or not dialog.price then return end
-			TriggerServerEvent('jim-payments:server:Charge', dialog.citizen, dialog.price, dialog.billtype)
+			TriggerServerEvent('jim-payments:server:Charge', dialog.citizen, dialog.price, dialog.billtype, data.img)
 		end
 	end)
 end)
@@ -62,9 +62,9 @@ RegisterNetEvent('jim-payments:Tickets:Menu', function()
 	end
 end)
 
-RegisterNetEvent("jim-payments:client:PayPopup", function(amount, biller, billtype)
+RegisterNetEvent("jim-payments:client:PayPopup", function(amount, biller, billtype, img)
 	exports['qb-menu']:openMenu({
-		{ isMenuHeader = true, header = "🧾 "..PlayerJob.label.." Payment 🧾", txt = "Do you want accept the payment?" },
+		{ isMenuHeader = true, header = img.."🧾 "..PlayerJob.label.." Payment 🧾", txt = "Do you want accept the payment?" },
 		{ isMenuHeader = true, header = "", txt = billtype:gsub("^%l", string.upper).." Payment: $"..amount },
 		{ header = "✅ Yes", txt = "", params = { isServer = true, event = "jim-payments:server:PayPopup", args = { accept = true, amount = amount, biller = biller, billtype = billtype } } },
 		{ header = "❌ No", txt = "", params = { isServer = true, event = "jim-payments:server:PayPopup", args = { accept = false, amount = amount, biller = biller, billtype = billtype } } }, })

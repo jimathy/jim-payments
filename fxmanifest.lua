@@ -7,7 +7,8 @@ game "gta5"
 
 dependencies {
 	'qb-input',
-	'qb-target'
+	'qb-target',
+	'qb-management'
 }
 
 client_scripts {

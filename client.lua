@@ -63,6 +63,7 @@ RegisterNetEvent('jim-payments:Tickets:Menu', function()
 end)
 
 RegisterNetEvent("jim-payments:client:PayPopup", function(amount, biller, billtype, img)
+	if img == nil then img = "" end
 	exports['qb-menu']:openMenu({
 		{ isMenuHeader = true, header = img.."🧾 "..PlayerJob.label.." Payment 🧾", txt = "Do you want accept the payment?" },
 		{ isMenuHeader = true, header = "", txt = billtype:gsub("^%l", string.upper).." Payment: $"..amount },

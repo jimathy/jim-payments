@@ -39,7 +39,7 @@ RegisterNetEvent('jim-payments:client:Charge', function(data)
 		local dialog = exports['qb-input']:ShowInput({ header = img..PlayerJob.label.." Cash Register", submitText = "Send",
 		inputs = {
 				{ text = " ", name = "citizen", type = "select", options = nearbyList },
-				{ type = 'radio', name = 'billtype', text = 'Payment Type', options = { { value = "cash", text = "Cash" }, { value = "card", text = "Card" } } }, 
+				{ type = 'radio', name = 'billtype', text = 'Payment Type', options = { { value = "cash", text = "Cash" }, { value = "bank", text = "Card" } } }, 
 				{ type = 'number', isRequired = true, name = 'price', text = '💵  Amount to Charge' },}
 		})
 		if dialog then

@@ -46,12 +46,7 @@ Go to [qb] > qb-phone > client > main.lua
 
 - Add this line:
 
-```TriggerServerEvent('jim-payments:Tickets:Give', amount, society)```
-
---------------
-
-NOTE: If you are converting from my older job scripts, I recommend removing the previous triggers from qb-phone
-
+```TriggerServerEvent('jim-payments:Tickets:Give', data)```
 
 --------------
 
@@ -61,3 +56,15 @@ simply look in the atms.lua and change the config options at the top
 Choose wether to use atm's, choose wether to use banking locations
 Choose wether to add bank blips (if you want to disable qb-banking)
 Choose wether to add ATM blips (if you like $ signs)
+
+
+--------------
+
+New Commission system added
+
+This brings more config options to find tune the script
+
+Choose wether people get commission from every sale
+Choose if EVERY worker gets Commission that is on duty
+Choose if Commission is limited by MinAmountForTicket
+Choose if the worker charging the customer gets double commission

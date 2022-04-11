@@ -51,7 +51,7 @@ end)
 
 RegisterNetEvent('jim-payments:Tickets:Menu', function()
 	local amount = nil
-	while amount == nil do QBCore.Functions.TriggerCallback('jim-payments:Ticket:Count', function(cb) amount = cb end) Citizen.Wait(1) end
+	local p = promise.new() QBCore.Functions.TriggerCallback('jim-payments:Ticket:Count', function(cb) p:resolve(cb) end) amount = Citizen.Await(p)
 	for k, v in pairs(Config.Jobs) do if k ~= PlayerJob.name then 
 		else exports['qb-menu']:openMenu({
 			{ isMenuHeader = true, header = "🧾 "..PlayerJob.label.." Receipts 🧾", txt = "Do you want trade your receipts for payment?" },

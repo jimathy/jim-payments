@@ -91,10 +91,10 @@ RegisterServerEvent("jim-payments:server:Charge", function(citizen, price, billt
 			return
 		end
 		if billtype == "cash" then 
-			TriggerClientEvent("jim-payments:client:PayPopup", billed.PlayerData.source, amount, src, billtype, img)
+			TriggerClientEvent("jim-payments:client:PayPopup", billed.PlayerData.source, amount, src, billtype, img, biller.PlayerData.job.label)
 		elseif billtype == "bank" then
 			if Config.PhoneBank == false then
-				TriggerClientEvent("jim-payments:client:PayPopup", billed.PlayerData.source, amount, src, billtype, img)
+				TriggerClientEvent("jim-payments:client:PayPopup", billed.PlayerData.source, amount, src, billtype, img, biller.PlayerData.job.label)
 			else
 				MySQL.Async.insert(
 					'INSERT INTO phone_invoices (citizenid, amount, society, sender, sendercitizenid) VALUES (?, ?, ?, ?, ?)',

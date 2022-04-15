@@ -36,12 +36,12 @@ RegisterNetEvent('jim-payments:client:Charge', function(data)
 		end
 		if data.img == nil then img = "" else img = data.img end
 		if nearbyList[#nearbyList] == nil then TriggerEvent("QBCore:Notify", "No one near by to charge", "error") return end
-		local dialog = exports['qb-input']:ShowInput({ header = img..PlayerJob.label.." Cash Register", submitText = "Send",
-		inputs = {
-				{ text = " ", name = "citizen", type = "select", options = nearbyList },
-				{ type = 'radio', name = 'billtype', text = 'Payment Type', options = { { value = "cash", text = "Cash" }, { value = "bank", text = "Card" } } }, 
-				{ type = 'number', isRequired = true, name = 'price', text = '💵  Amount to Charge' },}
-		})
+		local newinputs = {}
+		if Config.List then newinputs[#newinputs+1] = { text = " ", name = "citizen", type = "select", options = nearbyList } end
+		if not Config.List then newinputs[#newinputs+1] = { type = 'text', isRequired = true, name = 'citizen', text = '# Customer ID #' } end
+		newinputs[#newinputs+1] = { type = 'radio', name = 'billtype', text = 'Payment Type', options = { { value = "cash", text = "Cash" }, { value = "bank", text = "Card" } } }
+		newinputs[#newinputs+1] = { type = 'number', isRequired = true, name = 'price', text = '💵  Amount to Charge' }
+		local dialog = exports['qb-input']:ShowInput({ header = img..PlayerJob.label.." Cash Register", submitText = "Send", inputs = newinputs})
 		if dialog then
 			if not dialog.citizen or not dialog.price then return end
 			TriggerServerEvent('jim-payments:server:Charge', dialog.citizen, dialog.price, dialog.billtype, data.img)

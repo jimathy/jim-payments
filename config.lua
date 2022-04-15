@@ -1,4 +1,4 @@
-print("Jim-Payments v2.2 - Payments Script by Jimathy")
+print("Jim-Payments v2.3 - Payments Script by Jimathy")
 
 -- If you need support I now have a discord available, it helps me keep track of issues and give better support.
 
@@ -6,8 +6,12 @@ print("Jim-Payments v2.2 - Payments Script by Jimathy")
 
 Config = {}
 
-Config.TicketSystem = true -- Enable this if you want to use the ticket system
+Config.Manage = true -- "true" if using qb-management
+					 -- "false" if using qb-bossmenu
+					
+Config.TicketSystem = true -- Enable this if you want to use the ticket system false
 
+Config.List = true -- "true" to use nearby player list feature in the cash registers, "false" for manual id entry
 Config.PaymentRadius = 30 -- This is how far the playerlist will check for nearby players (based on the person charging)
 
 Config.useATM = true -- Enable this to use my ATM's

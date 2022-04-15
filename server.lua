@@ -21,6 +21,7 @@ RegisterServerEvent('jim-payments:Tickets:Give', function(data, biller)
 			if Player.PlayerData.citizenid == data.senderCitizenId then	biller = Player	end
 		end
 	end
+	-- If ticket system enabled, do this
 	if Config.TicketSystem then
 		if data.amount >= Config.Jobs[data.society].MinAmountforTicket then
 			for k, v in pairs(QBCore.Functions.GetPlayers()) do
@@ -113,9 +114,9 @@ RegisterServerEvent("jim-payments:server:PayPopup", function(data)
     local biller = QBCore.Functions.GetPlayer(tonumber(data.biller))
 	local newdata = { senderCitizenId = biller.PlayerData.citizenid, society = biller.PlayerData.job.name, amount = data.amount }
 	if data.accept == true then
-		billed.Functions.RemoveMoney(tostring(data.billtype), data.amount) 
-		exports["qb-management"]:AddMoney(tostring(biller.PlayerData.job.name), data.amount)
-		--TriggerEvent("qb-bossmenu:server:addAccountMoney", tostring(biller.PlayerData.job.name), data.amount)
+		billed.Functions.RemoveMoney(tostring(data.billtype), data.amount)
+		if Config.Manage then exports["qb-management"]:AddMoney(tostring(biller.PlayerData.job.name), data.amount)
+		else TriggerEvent("qb-bossmenu:server:addAccountMoney", tostring(biller.PlayerData.job.name), data.amount) end
 		TriggerEvent('jim-payments:Tickets:Give', newdata, biller)
 		TriggerClientEvent("QBCore:Notify", data.biller, billed.PlayerData.charinfo.firstname.." accepted the payment", "success")
 	elseif data.accept == false then

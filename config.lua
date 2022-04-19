@@ -6,6 +6,8 @@ print("Jim-Payments v2.3 - Payments Script by Jimathy")
 
 Config = {}
 
+Config.Debug = true
+
 Config.Manage = true -- "true" if using qb-management
 					 -- "false" if using qb-bossmenu
 					
@@ -31,6 +33,9 @@ Config.CommissionLimit = false -- If true, this limits the Commission to only be
 -- MinAmountforTicket should be your cheapest item
 -- PayPerTicket should never be higher than MinAmountforTicket
 -- Commission is a percentage eg "0.10" becomes 10%
+
+--Config.CashInLocation = vector3(251.75, 222.17, 106.2) -- Default Third Window along in Pacific Bank
+Config.CashInLocation = vector3(269.28, 217.24, 106.28) -- Default Third Window along in Pacific Bank (Gabz)
 
 Config.Jobs = {
 	['beanmachine'] = { MinAmountforTicket = 50, PayPerTicket = 50, Commission = 0.10, },

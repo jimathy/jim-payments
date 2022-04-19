@@ -4,11 +4,13 @@ local QBCore = exports['qb-core']:GetCoreObject()
 -- It uses QB-Input and server callbacks to retreive info about accounts and cash
 -- This requires QB-Target and has the location of every ATM, ATM prop and bank window
 
+local Targets = {}
+
 Config.ATMModels = {"prop_atm_01", "prop_atm_02", "prop_atm_03", "prop_fleeca_atm" }
 
 Config.ATMLocations = {
-  --PACIFIC BANK 10 ATMS
-	vector3(265.9, 213.86, 106.28),	
+--PACIFIC BANK 10 ATMS
+	vector3(265.9, 213.86, 106.28),
 	vector3(265.56, 212.98, 106.28),
 	vector3(265.19, 211.91, 106.28),
 	vector3(264.86, 211.03, 106.28),
@@ -19,7 +21,18 @@ Config.ATMLocations = {
 	vector3(237.93, 216.94, 106.29),
 	vector3(238.36, 216.03, 106.29),
 	
-	--WALL ATMS
+--PACIFIC BANK 8 ATMS (GABZ)
+	--[[vector3(239.02, 212.37, 106.28),
+	vector3(239.46, 213.6, 106.28),
+	vector3(239.9, 214.82, 106.28),
+	vector3(240.35, 216.03, 106.28),
+	vector3(241.42, 218.96, 106.28),
+	vector3(241.86, 220.16, 106.28),
+	vector3(242.3, 221.41, 106.28),
+	vector3(242.76, 222.63, 106.28),]]
+	
+	
+--WALL ATMS
 	vector3(-386.54, 6046.29, 31.5),
 	vector3(-282.82, 6226.24, 31.49),
 	vector3(-132.74, 6366.79, 31.48),
@@ -75,16 +88,27 @@ Config.ATMLocations = {
 }
 
 Config.BankLocations = {
-    vector3(149.9, -1040.46, 29.37),
-    vector3(314.23, -278.83, 54.17),
-    vector3(-350.8, -49.57, 49.04),
-    vector3(-1213.0, -330.39, 37.79),
-    vector3(-2962.71, 483.0, 15.7),
-    vector3(1175.07, 2706.41, 38.09),
-    vector3(247.44, 223.22, 106.29),
-    vector3(-113.22, 6470.03, 31.63),
-	vector3(242.25, 225.15, 106.29)
-	--vector3(252.41, 221.41, 106.29)
+	vector3(149.74, -1040.77, 29.37), -- Legion Fleeca
+	vector3(314.23, -278.83, 54.17), -- Hawick Fleeca
+	vector3(-350.91, -50.01, 49.04), -- Vinewood Fleeca
+	vector3(-1212.75, -330.87, 37.79), -- Del Perro Fleeca
+	vector3(-2962.48, 482.9, 15.7), -- Route 1 Fleeca
+	vector3(1175.07, 2706.41, 38.09), -- Route 68 Fleeca
+
+	vector3(-113.22, 6470.03, 31.63), -- Paleto Bank
+	
+	--vector3(-110.71, 6469.83, 31.63), -- Paleto Bank (GABZ) - 1
+	--vector3(-108.97, 6471.57, 31.63), -- Paleto Bank (GABZ) - 2
+
+	vector3(242.25, 225.15, 106.29) -- Pacific Bank Window 1
+	vector3(247.44, 223.22, 106.29), -- Pacific Bank Window 2
+	
+	--vector3(258.11, 226.73, 106.28), -- Pacficic Gabz 1+2
+	--vector3(262.91, 224.98, 106.28), -- Pacficic Gabz 3+4
+	--vector3(267.57, 223.28, 106.28), -- Pacficic Gabz 5+6
+	--vector3(264.06, 213.57, 106.28), -- Pacficic Gabz 7+8
+	--vector3(259.33, 215.32, 106.28), -- Pacficic Gabz 9+10
+	--vector3(254.63, 217.01, 106.28), -- Pacficic Gabz 11+12
 }
 
 local function cv(amount)
@@ -164,7 +188,8 @@ Citizen.CreateThread(function()
 	if Config.useATM then
 		exports['qb-target']:AddTargetModel(Config.ATMModels, { options = { { event = "jim-payments:Client:ATM:use", icon = "fas fa-money-check-alt", label = "Use ATM", id = "atm" },}, distance = 1.5, })
 		for k,v in pairs(Config.ATMLocations) do
-			exports['qb-target']:AddCircleZone("jimatm"..k, vector3(tonumber(v.x), tonumber(v.y), tonumber(v.z)+0.2), 0.5, { name="jimatm"..k, debugPoly=false, useZ=true, }, 
+			Targets["jimatm"..k] =
+			exports['qb-target']:AddCircleZone("jimatm"..k, vector3(tonumber(v.x), tonumber(v.y), tonumber(v.z)+0.2), 0.5, { name="jimatm"..k, debugPoly=Config.Debug, useZ=true, }, 
 			{ options = { { event = "jim-payments:Client:ATM:use", icon = "fas fa-money-check-alt", label = "Use ATM", id = "atm" },
 						  --[[{ event = "jim-payments:Client:ATM:use", icon = "fas fa-arrow-right-arrow-left", label = "Transfer Money", id = "transfer" },]]
 						  }, distance = 1.5 })
@@ -172,7 +197,8 @@ Citizen.CreateThread(function()
 	end
 	if Config.useBanks then
 		for k,v in pairs(Config.BankLocations) do
-			exports['qb-target']:AddCircleZone("jimbank"..k, vector3(tonumber(v.x), tonumber(v.y), tonumber(v.z)), 2.0, { name="jimbank"..k, debugPoly=false, useZ=true, }, 
+			Targets["jimbank"..k] =
+			exports['qb-target']:AddCircleZone("jimbank"..k, vector3(tonumber(v.x), tonumber(v.y), tonumber(v.z)), 2.0, { name="jimbank"..k, debugPoly=Config.Debug, useZ=true, }, 
 			{ options = { { event = "jim-payments:Client:ATM:use", icon = "fas fa-piggy-bank", label = "Use Bank", id = "bank" },
 						  { event = "jim-payments:Client:ATM:use", icon = "fas fa-arrow-right-arrow-left", label = "Transfer Money", id = "transfer" },
 						  { event = "jim-payments:Client:ATM:use", icon = "fas fa-money-check-dollar", label = "Access Savings", id = "savings" },
@@ -374,4 +400,12 @@ RegisterNetEvent('jim-payments:client:ATM:give', function()
 			TriggerServerEvent('jim-payments:server:ATM:give', dialog.citizen, dialog.price)
 		end
 	end)
+end)
+
+AddEventHandler('onResourceStop', function(resource) 
+	if resource == GetCurrentResourceName() then 
+		for k, v in pairs(Targets) do
+			exports['qb-target']:RemoveZone(k)
+		end
+	end
 end)

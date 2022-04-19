@@ -6,7 +6,7 @@ print("Jim-Payments v2.3 - Payments Script by Jimathy")
 
 Config = {}
 
-Config.Debug = true
+Config.Debug = false
 
 Config.Manage = true -- "true" if using qb-management
 					 -- "false" if using qb-bossmenu

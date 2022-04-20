@@ -2,7 +2,7 @@ local QBCore = exports['qb-core']:GetCoreObject()
 
 PlayerJob = {}
 local onDuty = false
-
+local BankPed = nil
 RegisterNetEvent('QBCore:Client:OnPlayerLoaded') AddEventHandler('QBCore:Client:OnPlayerLoaded', function() QBCore.Functions.GetPlayerData(function(PlayerData) PlayerJob = PlayerData.job PlayerGang = PlayerData.gang end) end)
 RegisterNetEvent('QBCore:Client:OnJobUpdate') AddEventHandler('QBCore:Client:OnJobUpdate', function(JobInfo) PlayerJob = JobInfo onDuty = PlayerJob.onduty end)
 RegisterNetEvent('QBCore:Client:SetDuty') AddEventHandler('QBCore:Client:SetDuty', function(duty) onDuty = duty end)
@@ -15,8 +15,14 @@ Citizen.CreateThread(function()
 	local jobroles = {}
 	for k, v in pairs(Config.Jobs) do jobroles[tostring(k)] = 0 end
 	--exports['qb-target']:AddBoxZone("JimBank", Config.CashInLocation, 0.6, 2.0, { name="JimBank", heading = 340.0, debugPoly=Config.Debug, minZ = 105.75, maxZ = 107.29, }, 
-	exports['qb-target']:AddCircleZone("JimBank", Config.CashInLocation, 2.0, { name="JimBank", debugPoly=Config.Debug, useZ=true, }, 
+	exports['qb-target']:AddCircleZone("JimBank", vector3(Config.CashInLocation.x, Config.CashInLocation.y, Config.CashInLocation.z), 2.0, { name="JimBank", debugPoly=Config.Debug, useZ=true, }, 
 		{ options = { { event = "jim-payments:Tickets:Menu", icon = "fas fa-receipt", label = "Cash in Receipts", job = jobroles } }, distance = 2.0 })
+	if Config.Peds then
+		local i = math.random(1, #Config.PedPool)
+		RequestModel(Config.PedPool[i]) while not HasModelLoaded(Config.PedPool[i]) do Wait(0) end
+		if BankPed == nil then BankPed = CreatePed(0, Config.PedPool[i], Config.CashInLocation, Config.CashInLocation[4], false, false) end
+		if Config.Debug then print("Ped Created for Ticket Trade") end
+	end
 end)
 
 RegisterNetEvent('jim-payments:client:Charge', function(data)
@@ -76,5 +82,5 @@ RegisterNetEvent('jim-payments:Tickets:Sell:yes', function() TriggerServerEvent(
 RegisterNetEvent('jim-payments:Tickets:Sell:no', function() exports['qb-menu']:closeMenu() end)
 
 AddEventHandler('onResourceStop', function(resource) 
-	if resource == GetCurrentResourceName() then exports['qb-target']:RemoveZone("JimBank")	end 
+	if resource == GetCurrentResourceName() then exports['qb-target']:RemoveZone("JimBank") DeletePed(BankPed) end 
 end)

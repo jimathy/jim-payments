@@ -226,6 +226,7 @@ QBCore.Functions.CreateCallback('jim-payments:ATM:Find', function(source, cb)
         savbal = getSavingsAccount[1].amount
 	else 
 		MySQL.Async.insert('INSERT INTO bank_accounts (citizenid, amount, account_type) VALUES (?, ?, ?)', { Player.PlayerData.citizenid, 0, 'Savings' }, function() completed = true end) repeat Wait(0) until completed == true
+		local getSavingsAccount = MySQL.Sync.fetchAll('SELECT * FROM bank_accounts WHERE citizenid = ? AND account_type = ?', { Player.PlayerData.citizenid, 'Savings' })
 		aid = getSavingsAccount[1].record_id
 		savbal = getSavingsAccount[1].amount
     end

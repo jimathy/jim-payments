@@ -5,111 +5,10 @@ local QBCore = exports['qb-core']:GetCoreObject()
 -- This requires QB-Target and has the location of every ATM, ATM prop and bank window
 
 local Targets = {}
+local Peds = {}
 
-Config.ATMModels = {"prop_atm_01", "prop_atm_02", "prop_atm_03", "prop_fleeca_atm" }
-
-Config.ATMLocations = {
---PACIFIC BANK 10 ATMS
-	vector3(265.9, 213.86, 106.28),
-	vector3(265.56, 212.98, 106.28),
-	vector3(265.19, 211.91, 106.28),
-	vector3(264.86, 211.03, 106.28),
-	vector3(264.52, 210.06, 106.28),
-	vector3(236.64, 219.72, 106.29),
-	vector3(237.04, 218.72, 106.29),
-	vector3(237.5, 217.87, 106.29),
-	vector3(237.93, 216.94, 106.29),
-	vector3(238.36, 216.03, 106.29),
-	
---PACIFIC BANK 8 ATMS (GABZ)
-	--[[vector3(239.02, 212.37, 106.28),
-	vector3(239.46, 213.6, 106.28),
-	vector3(239.9, 214.82, 106.28),
-	vector3(240.35, 216.03, 106.28),
-	vector3(241.42, 218.96, 106.28),
-	vector3(241.86, 220.16, 106.28),
-	vector3(242.3, 221.41, 106.28),
-	vector3(242.76, 222.63, 106.28),]]
-	
-	
---WALL ATMS
-	vector3(-386.54, 6046.29, 31.5),
-	vector3(-282.82, 6226.24, 31.49),
-	vector3(-132.74, 6366.79, 31.48),
-	vector3(-95.76, 6457.41, 31.46),
-	vector3(-97.52, 6455.65, 31.47),
-	vector3(155.95, 6642.99, 31.6),
-	vector3(173.92, 6638.16, 31.57),
-	vector3(2558.65, 350.92, 108.62),
-	vector3(1077.78, -776.64, 58.35),
-	vector3(1138.14, -468.88, 66.73),
-	vector3(1166.93, -455.96, 66.81),
-	vector3(285.37, 143.07, 104.17),
-	vector3(-165.43, 234.81, 94.92),
-	vector3(-165.4, 232.73, 94.92),
-	vector3(-1410.41, -98.76, 52.43),
-	vector3(-1409.85, -100.51, 52.38),
-	vector3(-1206.0, -324.94, 37.86),
-	vector3(-1205.23, -326.55, 37.86),
-	vector3(-2072.28, -317.27, 13.32),
-	vector3(-2974.7, 380.15, 15.0),
-	vector3(-2959.01, 487.45, 15.46),
-	vector3(-2956.87, 487.36, 15.46),
-	vector3(-3043.98, 594.32, 7.74),
-	vector3(-3241.35, 997.74, 12.55),
-	vector3(-1305.59, -706.64, 25.32),
-	vector3(-537.85, -854.69, 29.28),
-	vector3(-709.98, -818.71, 23.73),
-	vector3(-712.87, -818.71, 23.73),
-	vector3(-526.71, -1223.18, 18.45),
-	vector3(-256.47, -715.94, 33.55),
-	vector3(-259.13, -723.29, 33.54),
-	vector3(-203.82, -861.3, 30.27),
-	vector3(111.38, -774.96, 31.44),
-	vector3(114.56, -776.13, 31.42),
-	vector3(112.46, -819.65, 31.34),
-	vector3(118.93, -883.68, 31.12),
-	vector3(-846.97, -340.29, 38.68),
-	vector3(-846.41, -341.41, 38.68),
-	vector3(-262.21, -2012.17, 30.15),
-	vector3(-273.23, -2024.32, 30.15),
-	vector3(24.46, -945.94, 29.36),
-	vector3(-254.48, -692.74, 33.61),
-	vector3(-1569.95, -546.94, 34.96),
-	vector3(-1570.91, -547.63, 34.96),
-	vector3(289.14, -1282.29, 29.6),
-	vector3(289.18, -1256.84, 29.44),
-	vector3(296.04, -896.22, 29.24),
-	vector3(296.74, -894.26, 29.24),
-	vector3(-301.63, -829.73, 32.43),
-	vector3(-303.23, -829.44, 32.43),
-	vector3(5.27, -919.87, 29.56),
-	vector3(-1200.61, -885.62, 13.26),
-}
-
-Config.BankLocations = {
-	vector3(149.74, -1040.77, 29.37), -- Legion Fleeca
-	vector3(314.23, -278.83, 54.17), -- Hawick Fleeca
-	vector3(-350.91, -50.01, 49.04), -- Vinewood Fleeca
-	vector3(-1212.75, -330.87, 37.79), -- Del Perro Fleeca
-	vector3(-2962.48, 482.9, 15.7), -- Route 1 Fleeca
-	vector3(1175.07, 2706.41, 38.09), -- Route 68 Fleeca
-
-	vector3(-113.22, 6470.03, 31.63), -- Paleto Bank
-	
-	--vector3(-110.71, 6469.83, 31.63), -- Paleto Bank (GABZ) - 1
-	--vector3(-108.97, 6471.57, 31.63), -- Paleto Bank (GABZ) - 2
-
-	vector3(242.25, 225.15, 106.29) -- Pacific Bank Window 1
-	vector3(247.44, 223.22, 106.29), -- Pacific Bank Window 2
-	
-	--vector3(258.11, 226.73, 106.28), -- Pacficic Gabz 1+2
-	--vector3(262.91, 224.98, 106.28), -- Pacficic Gabz 3+4
-	--vector3(267.57, 223.28, 106.28), -- Pacficic Gabz 5+6
-	--vector3(264.06, 213.57, 106.28), -- Pacficic Gabz 7+8
-	--vector3(259.33, 215.32, 106.28), -- Pacficic Gabz 9+10
-	--vector3(254.63, 217.01, 106.28), -- Pacficic Gabz 11+12
-}
+local BankLoc = Config.VanBankLocations
+local ATMLoc = Config.VanATMLocations
 
 local function cv(amount)
     local formatted = amount
@@ -121,10 +20,23 @@ local function cv(amount)
     end
     return formatted
 end
+
 local function createBlips()
+	if Config.Gabz then BankLoc = Config.GabzBankLocations ATMLoc = Config.GabzATMLocations end
 	if Config.useATM then
 		if Config.ATMBlips then
-			for k, v in pairs(Config.ATMLocations) do
+			for k, v in pairs(Config.WallATMLocations) do
+				blip = AddBlipForCoord(v)
+				SetBlipSprite(blip, 108)
+				SetBlipDisplay(blip, 4)
+				SetBlipScale(blip, 0.55)
+				SetBlipColour(blip, 3)
+				SetBlipAsShortRange(blip, true)
+				BeginTextCommandSetBlipName("STRING")
+				AddTextComponentString("ATM")
+				EndTextCommandSetBlipName(blip)
+			end
+			for k, v in pairs(ATMLoc) do
 				blip = AddBlipForCoord(v)
 				SetBlipSprite(blip, 108)
 				SetBlipDisplay(blip, 4)
@@ -139,16 +51,19 @@ local function createBlips()
 	end
 	if Config.useBanks then
 		if Config.BankBlips then
-			for k, v in pairs(Config.BankLocations) do
-				blip = AddBlipForCoord(v)
-				SetBlipSprite(blip, 108)
-				SetBlipDisplay(blip, 4)
-				SetBlipScale(blip, 0.55)
-				SetBlipColour(blip, 2)
-				SetBlipAsShortRange(blip, true)
-				BeginTextCommandSetBlipName("STRING")
-				AddTextComponentString("Bank")
-				EndTextCommandSetBlipName(blip)
+			for k,v in pairs(BankLoc) do
+				for l, b in pairs(v) do
+					blip = AddBlipForCoord(b)
+					SetBlipSprite(blip, 108)
+					SetBlipDisplay(blip, 4)
+					SetBlipScale(blip, 0.55)
+					SetBlipColour(blip, 2)
+					SetBlipAsShortRange(blip, true)
+					BeginTextCommandSetBlipName("STRING")
+					AddTextComponentString("Bank")
+					EndTextCommandSetBlipName(blip)
+					break
+				end
 			end
 		end
 	end
@@ -183,31 +98,47 @@ Citizen.CreateThread(function()
 					end
 				end	
 			end
-			end
+		end
 	end
 	if Config.useATM then
 		exports['qb-target']:AddTargetModel(Config.ATMModels, { options = { { event = "jim-payments:Client:ATM:use", icon = "fas fa-money-check-alt", label = "Use ATM", id = "atm" },}, distance = 1.5, })
-		for k,v in pairs(Config.ATMLocations) do
+		for k,v in pairs(Config.WallATMLocations) do
+			Targets["jimwallatm"..k] =
+			exports['qb-target']:AddCircleZone("jimwallatm"..k, vector3(tonumber(v.x), tonumber(v.y), tonumber(v.z)+0.2), 0.5, { name="jimwallatm"..k, debugPoly=Config.Debug, useZ=true, }, 
+			{ options = { { event = "jim-payments:Client:ATM:use", icon = "fas fa-money-check-alt", label = "Use ATM", id = "atm" },
+						  --{ event = "jim-payments:Client:ATM:use", icon = "fas fa-arrow-right-arrow-left", label = "Transfer Money", id = "transfer" },
+			}, distance = 1.5 })
+		end
+		for k,v in pairs(ATMLoc) do
 			Targets["jimatm"..k] =
 			exports['qb-target']:AddCircleZone("jimatm"..k, vector3(tonumber(v.x), tonumber(v.y), tonumber(v.z)+0.2), 0.5, { name="jimatm"..k, debugPoly=Config.Debug, useZ=true, }, 
 			{ options = { { event = "jim-payments:Client:ATM:use", icon = "fas fa-money-check-alt", label = "Use ATM", id = "atm" },
-						  --[[{ event = "jim-payments:Client:ATM:use", icon = "fas fa-arrow-right-arrow-left", label = "Transfer Money", id = "transfer" },]]
-						  }, distance = 1.5 })
+						  --{ event = "jim-payments:Client:ATM:use", icon = "fas fa-arrow-right-arrow-left", label = "Transfer Money", id = "transfer" },
+			}, distance = 1.5 })
 		end
 	end
 	if Config.useBanks then
-		for k,v in pairs(Config.BankLocations) do
-			Targets["jimbank"..k] =
-			exports['qb-target']:AddCircleZone("jimbank"..k, vector3(tonumber(v.x), tonumber(v.y), tonumber(v.z)), 2.0, { name="jimbank"..k, debugPoly=Config.Debug, useZ=true, }, 
-			{ options = { { event = "jim-payments:Client:ATM:use", icon = "fas fa-piggy-bank", label = "Use Bank", id = "bank" },
-						  { event = "jim-payments:Client:ATM:use", icon = "fas fa-arrow-right-arrow-left", label = "Transfer Money", id = "transfer" },
-						  { event = "jim-payments:Client:ATM:use", icon = "fas fa-money-check-dollar", label = "Access Savings", id = "savings" },
-						  						  
-						  { event = "jim-payments:Client:ATM:use", icon = "fas fa-building", label = "Access Society Account", id = "society", job = bossroles },
-						  { event = "jim-payments:Client:ATM:use", icon = "fas fa-arrow-right-arrow-left", label = "Society Money Transfer", id = "societytransfer", job = bossroles },
-						  
-						  { event = "jim-payments:Client:ATM:use", icon = "fas fa-building", label = "Gang Society Account", id = "gang", gang = gangroles },
-						  { event = "jim-payments:Client:ATM:use", icon = "fas fa-arrow-right-arrow-left", label = "Gang Money Transfer", id = "gangtransfer", gang = gangroles }, }, distance = 2.5 })
+		for k,v in pairs(BankLoc) do
+			for l, b in pairs(v) do
+				Targets["jimbank"..k..l] =
+				exports['qb-target']:AddCircleZone("jimbank"..k..l, vector3(tonumber(b.x), tonumber(b.y), tonumber(b.z)+0.2), 2.0, { name="jimbank"..k..l, debugPoly=Config.Debug, useZ=true, }, 
+				{ options = { { event = "jim-payments:Client:ATM:use", icon = "fas fa-piggy-bank", label = "Use Bank", id = "bank" },
+							  { event = "jim-payments:Client:ATM:use", icon = "fas fa-arrow-right-arrow-left", label = "Transfer Money", id = "transfer" },
+							  { event = "jim-payments:Client:ATM:use", icon = "fas fa-money-check-dollar", label = "Access Savings", id = "savings" },
+													  
+							  { event = "jim-payments:Client:ATM:use", icon = "fas fa-building", label = "Access Society Account", id = "society", job = bossroles },
+							  { event = "jim-payments:Client:ATM:use", icon = "fas fa-arrow-right-arrow-left", label = "Society Money Transfer", id = "societytransfer", job = bossroles },
+							  
+							  { event = "jim-payments:Client:ATM:use", icon = "fas fa-building", label = "Gang Society Account", id = "gang", gang = gangroles },
+							  { event = "jim-payments:Client:ATM:use", icon = "fas fa-arrow-right-arrow-left", label = "Gang Money Transfer", id = "gangtransfer", gang = gangroles }, }, 
+				distance = 2.5 })
+				if Config.Peds then
+					local i = math.random(1, #Config.PedPool)
+					RequestModel(Config.PedPool[i]) while not HasModelLoaded(Config.PedPool[i]) do Wait(0) end
+					if Peds["jimbank"..k..l] == nil then Peds["jimbank"..k..l] = CreatePed(0, Config.PedPool[i], vector3(tonumber(b.x), tonumber(b.y), tonumber(b.z)), b[4], false, false) end
+					if Config.Debug then print("Ped Created - 'jimbank"..k..l.."'") end
+				end
+			end
 		end
 	end
 end)
@@ -404,8 +335,7 @@ end)
 
 AddEventHandler('onResourceStop', function(resource) 
 	if resource == GetCurrentResourceName() then 
-		for k, v in pairs(Targets) do
-			exports['qb-target']:RemoveZone(k)
-		end
+		for k, v in pairs(Targets) do exports['qb-target']:RemoveZone(k) end		
+		for k, v in pairs(Peds) do DeletePed(Peds[k]) end
 	end
 end)

@@ -54,7 +54,7 @@ Config.CommissionLimit = false -- If true, this limits the Commission to only be
 -- Commission is a percentage eg "0.10" becomes 10%
 
 Config.CashInLocation = vector4(252.23, 223.11, 106.29, 159.2) -- Default Third Window along in Pacific Bank
-if Config.Gabz then Config.CashInLocation = vector3(269.28, 217.24, 106.28, 69.0) end	-- Middle along in Pacific Bank (Gabz)
+if Config.Gabz then Config.CashInLocation = vector4(269.28, 217.24, 106.28, 69.0) end	-- Middle along in Pacific Bank (Gabz)
 
 Config.Jobs = {
 	['beanmachine'] = { MinAmountforTicket = 50, PayPerTicket = 50, Commission = 0.10, },

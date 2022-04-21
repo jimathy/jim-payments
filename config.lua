@@ -34,7 +34,7 @@ Config.PedPool = {
 	[14] = `U_F_M_CasinoShop_01`,
 }
 
-Config.Gabz = false -- "true" to enable Gabz Banking locations
+Config.Gabz = true -- "true" to enable Gabz Banking locations
 Config.useATM = true -- Enable this to use my ATM's
 Config.useBanks = true -- Enable this to use my banking stuff
 Config.BankBlips = true -- Enable this if you disabled qb-banking and need bank locations
@@ -43,6 +43,10 @@ Config.ATMBlips = false -- Enable this if you are a pyscho and need every ATM to
 Config.PhoneBank = true -- Set this to false to use the popup payment system FOR CARD/BANK PAYMENTS instead of using phone invoices
 						-- This doesn't affect Cash payments as they by default use confirmation now
 						-- This is helpful for phones that don't support invoices well
+						
+Config.PhoneType = "qb" -- Change this setting to make invoices work with your phone script [still testing this currently]
+						-- "qb" for qb-phone
+						-- "gks"" for GKSPhone
 
 Config.Commission = false -- Set this to true to enable Commissions and give the person charging a percentage of the total
 Config.CommissionAll = false -- Set this to true to give commission to workers clocked in
@@ -179,6 +183,7 @@ Config.VanBankLocations = {
 		vector4(247.08, 224.98, 106.29, 157.75), -- Pacific Bank Window 2
 	},
 }
+
 Config.GabzBankLocations = {
 	["legion"] = {
 		vector4(149.5, -1042.08, 29.37, 342.74), -- Legion Fleeca

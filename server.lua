@@ -97,10 +97,20 @@ RegisterServerEvent("jim-payments:server:Charge", function(citizen, price, billt
 			if Config.PhoneBank == false then
 				TriggerClientEvent("jim-payments:client:PayPopup", billed.PlayerData.source, amount, src, billtype, img, biller.PlayerData.job.label)
 			else
-				MySQL.Async.insert(
-					'INSERT INTO phone_invoices (citizenid, amount, society, sender, sendercitizenid) VALUES (?, ?, ?, ?, ?)',
-					{billed.PlayerData.citizenid, amount, biller.PlayerData.job.name, biller.PlayerData.charinfo.firstname, biller.PlayerData.citizenid})
-				TriggerClientEvent('qb-phone:RefreshPhone', billed.PlayerData.source)
+				if Config.PhoneType == "qb" then
+					MySQL.Async.insert(
+						'INSERT INTO phone_invoices (citizenid, amount, society, sender, sendercitizenid) VALUES (?, ?, ?, ?, ?)',
+						{billed.PlayerData.citizenid, amount, biller.PlayerData.job.name, biller.PlayerData.charinfo.firstname, biller.PlayerData.citizenid})
+					TriggerClientEvent('qb-phone:RefreshPhone', billed.PlayerData.source)
+				elseif Config.PhoneType == "gks" then
+					MySQL.Async.execute('INSERT INTO gksphone_invoices (citizenid, amount, society, sender, sendercitizenid) VALUES (@citizenid, @amount, @society, @sender, @sendercitizenid)', {
+							['@citizenid'] = billed.PlayerData.citizenid,
+							['@amount'] = amount,
+							['@society'] = biller.PlayerData.job.name,
+							['@sender'] = biller.PlayerData.charinfo.firstname,
+							['@sendercitizenid'] = biller.PlayerData.citizenid
+						})
+				end
 				TriggerClientEvent('QBCore:Notify', src, 'Invoice Successfully Sent', 'success')
 				TriggerClientEvent('QBCore:Notify', billed.PlayerData.source, 'New Invoice Received')
 			end

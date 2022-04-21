@@ -38,15 +38,33 @@ Add the ticket image to your inventory script
 --------------
 To get tickets from phone invoices you NEED to add it to the event when a payment is accepted:
 
+For QB-Phone:
 Go to [qb] > qb-phone > client > main.lua
 - Around line 645 there should be the PayInvoice NUICallBack
 - Directly under this line:
-
-```TriggerServerEvent('qb-phone:server:BillingEmail', data, true)```
+```lua
+TriggerServerEvent('qb-phone:server:BillingEmail', data, true)
+```
 
 - Add this line:
+```
+TriggerServerEvent('jim-payments:Tickets:Give', data)
+```
 
-```TriggerServerEvent('jim-payments:Tickets:Give', data)```
+For GKSPhone:
+Go to gks-phone > server > serverapi.lua
+
+- Search for the event: ```gksphone:faturapayBill```
+- Under this line:
+```lua
+  Ply.Functions.RemoveMoney('bank', amount, "paid-invoice")
+```
+
+- Add these lines:
+```lua
+  local data = { society = id.society, amount = amount }
+  TriggerServerEvent('jim-payments:Tickets:Give', data)
+```
 
 --------------
 

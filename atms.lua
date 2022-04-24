@@ -128,7 +128,7 @@ CreateThread(function()
 				if Config.Peds then
 					local i = math.random(1, #Config.PedPool)
 					RequestModel(Config.PedPool[i]) while not HasModelLoaded(Config.PedPool[i]) do Wait(0) end
-					if Peds["jimbank"..k..l] == nil then Peds["jimbank"..k..l] = CreatePed(0, Config.PedPool[i], vector3(tonumber(b.x), tonumber(b.y), tonumber(b.z)), b[4], false, false) end
+					if Peds["jimbank"..k..l] == nil then Peds["jimbank"..k..l] = CreatePed(0, Config.PedPool[i], vector3(tonumber(b.x), tonumber(b.y), tonumber(b.z)-1), b[4], false, false) end
 					if Config.Debug then print("Ped Created - 'jimbank"..k..l.."'") end
 				end
 			end

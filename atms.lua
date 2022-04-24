@@ -21,7 +21,9 @@ local function cv(amount)
     return formatted
 end
 
-local function createBlips()
+local bossroles = {}
+local gangroles = {}
+CreateThread(function()
 	if Config.Gabz then BankLoc = Config.GabzBankLocations ATMLoc = Config.GabzATMLocations end
 	if Config.useATM then
 		if Config.ATMBlips then
@@ -67,15 +69,6 @@ local function createBlips()
 			end
 		end
 	end
-end
-
-AddEventHandler('onResourceStart', function(resource) if GetCurrentResourceName() == resource then createBlips() end end)
-
-RegisterNetEvent('QBCore:Client:OnPlayerLoaded', function() createBlips() end)
-
-local bossroles = {}
-local gangroles = {}
-Citizen.CreateThread(function()
 	if Config.useATM or Config.useBanks then
 		for k, v in pairs(QBCore.Shared.Jobs) do ---Grabs the list of jobs
 			for l, b in pairs(QBCore.Shared.Jobs[tostring(k)].grades) do -- Grabs the list of grades

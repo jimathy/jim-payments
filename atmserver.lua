@@ -26,7 +26,6 @@ RegisterServerEvent('jim-payments:server:ATM:use', function(amount, billtype, ba
 	local cashB = Player.Functions.GetMoney("cash")
 	local bankB = Player.Functions.GetMoney("bank")
 	local amount = tonumber(amount)
-	--TriggerClientEvent("QBCore:Notify", src, tostring(account), "error")
 
 	--Simple transfers from bank to wallet --
 	if account == "bank" or account == "atm" then

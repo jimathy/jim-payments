@@ -34,7 +34,7 @@ Config.PedPool = {
 	[14] = `U_F_M_CasinoShop_01`,
 }
 
-Config.Gabz = true -- "true" to enable Gabz Banking locations
+Config.Gabz = false -- "true" to enable Gabz Banking locations
 Config.useATM = true -- Enable this to use my ATM's
 Config.useBanks = true -- Enable this to use my banking stuff
 Config.BankBlips = true -- Enable this if you disabled qb-banking and need bank locations

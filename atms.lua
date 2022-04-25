@@ -71,25 +71,29 @@ CreateThread(function()
 	end
 	if Config.useATM or Config.useBanks then
 		for k, v in pairs(QBCore.Shared.Jobs) do ---Grabs the list of jobs
-			for l, b in pairs(QBCore.Shared.Jobs[tostring(k)].grades) do -- Grabs the list of grades
-				if QBCore.Shared.Jobs[tostring(k)].grades[l].isboss == true then -- Checks the grade if is boss
-					if bossroles[tostring(k)] ~= nil then -- checks if the line exists
-						if bossroles[tostring(k)] > tonumber(l) then bossroles[tostring(k)] = tonumber(l) end -- the 
-					else bossroles[tostring(k)] = tonumber(l)
+			if QBCore.Shared.Jobs[tostring(k)] then
+				for l, b in pairs(QBCore.Shared.Jobs[tostring(k)].grades) do -- Grabs the list of grades
+					if QBCore.Shared.Jobs[tostring(k)].grades[l].isboss == true then -- Checks the grade if is boss
+						if bossroles[tostring(k)] ~= nil then -- checks if the line exists
+							if bossroles[tostring(k)] > tonumber(l) then bossroles[tostring(k)] = tonumber(l) end -- the 
+						else bossroles[tostring(k)] = tonumber(l)
+						end
 					end
 				end
 			end
 		end
 		for k, v in pairs(QBCore.Shared.Gangs) do 
-			for l, b in pairs(QBCore.Shared.Gangs[tostring(k)].grades) do
-				if tostring(k) ~= "none" then
-					if QBCore.Shared.Gangs[tostring(k)].grades[l].isboss == true then
-						if gangroles[tostring(k)] ~= nil then
-							if gangroles[tostring(k)] > tonumber(l) then gangroles[tostring(k)] = tonumber(l) end
-						else gangroles[tostring(k)] = tonumber(l)
+			if QBCore.Shared.Gangs[tostring(k)] then
+				for l, b in pairs(QBCore.Shared.Gangs[tostring(k)].grades) do
+					if tostring(k) ~= "none" then
+						if QBCore.Shared.Gangs[tostring(k)].grades[l].isboss == true then
+							if gangroles[tostring(k)] ~= nil then
+								if gangroles[tostring(k)] > tonumber(l) then gangroles[tostring(k)] = tonumber(l) end
+							else gangroles[tostring(k)] = tonumber(l)
+							end
 						end
-					end
-				end	
+					end	
+				end
 			end
 		end
 	end

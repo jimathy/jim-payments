@@ -132,7 +132,7 @@ CreateThread(function()
 				if Config.Peds then
 					local i = math.random(1, #Config.PedPool)
 					RequestModel(Config.PedPool[i]) while not HasModelLoaded(Config.PedPool[i]) do Wait(0) end
-					if Peds["jimbank"..k..l] == nil then Peds["jimbank"..k..l] = CreatePed(0, Config.PedPool[i], vector3(tonumber(b.x), tonumber(b.y), tonumber(b.z)-1), b[4], false, false) end
+					if Peds["jimbank"..k..l] == nil then Peds["jimbank"..k..l] = CreatePed(0, Config.PedPool[i], vector3(tonumber(b.x), tonumber(b.y), tonumber(b.z)), b[4], false, false) end
 					if Config.Debug then print("Ped Created - 'jimbank"..k..l.."'") end
 				end
 			end
@@ -159,15 +159,21 @@ end
 
 RegisterNetEvent('jim-payments:Client:ATM:use', function(data)
 	--this grabs all the info from names to savings account numbers in the databases
-	while name == nil do 
-	QBCore.Functions.TriggerCallback('jim-payments:ATM:Find', function(cb1, cb2, cb3, cb4, cb5, cb6, cb7) name = cb1 cash = cb2 bank = cb3 account = cb4 cid = cb5 savbal = cb6 aid = cb7 end) 
+	
+	while name == nil do
+	QBCore.Functions.TriggerCallback('jim-payments:ATM:Find', function(cb1, cb2, cb3, cb4, cb5, cb6, cb7) name = cb1 cash = cb2 bank = math.ceil(cb3) account = cb4 cid = cb5 savbal = cb6 aid = cb7 end) 
 		Citizen.Wait(100) 
 	end
-	
-	society = GrabAccount("GetAccount", PlayerJob.name) 
-	Wait(200)
-	gsociety = GrabAccount("GetGangAccount", PlayerGang.name)
-	
+	if Config.Manage then
+		society = GrabAccount("GetAccount", PlayerJob.name) 
+		Wait(200)
+		gsociety = GrabAccount("GetGangAccount", PlayerGang.name)
+	else
+		local p = promise.new()
+		QBCore.Functions.TriggerCallback('qb-bossmenu:server:GetAccount', function(cb) p:resolve(cb) end, PlayerJob.name) society = Citizen.Await(p) 
+		local p2 = promise.new()
+		QBCore.Functions.TriggerCallback('qb-gangmenu:server:GetAccount', function(cb) p2:resolve(cb) end, PlayerGang.name) gsociety = Citizen.Await(p2) 
+	end
 	local atmbartime = 2500
 	local setoptions = {}
 

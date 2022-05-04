@@ -2,12 +2,7 @@ local QBCore = exports['qb-core']:GetCoreObject()
 
 local function cv(amount)
     local formatted = amount
-    while true do
-        formatted, k = string.gsub(formatted, "^(-?%d+)(%d%d%d)", '%1,%2')
-        if (k==0) then
-            break
-        end
-    end
+    while true do formatted, k = string.gsub(formatted, "^(-?%d+)(%d%d%d)", '%1,%2') if (k==0) then break end Wait(0) end
     return formatted
 end
 
@@ -19,11 +14,16 @@ end)
 
 RegisterServerEvent('jim-payments:Tickets:Give', function(data, biller)
 	--Find the biller from their citizenid
-	if biller == nil then
+	if not biller then
 		for k, v in pairs(QBCore.Functions.GetPlayers()) do
 		local Player = QBCore.Functions.GetPlayer(v)
 			if Player.PlayerData.citizenid == data.senderCitizenId then	biller = Player	end
 		end
+	end
+	if Config.Manage then exports["qb-management"]:AddMoney(tostring(biller.PlayerData.job.name), data.amount) 
+		if Config.Debug then print("QB-Management: Adding $"..data.amount.." to account '"..tostring(biller.PlayerData.job.name).."'") end
+	else TriggerEvent("qb-bossmenu:server:addAccountMoney", tostring(biller.PlayerData.job.name), data.amount) 
+		if Config.Debug then print("QB-BossMenu: Adding $"..data.amount.." to account '"..tostring(biller.PlayerData.job.name).."'") end
 	end
 	-- If ticket system enabled, do this
 	if Config.TicketSystem then
@@ -62,6 +62,7 @@ RegisterServerEvent('jim-payments:Tickets:Give', function(data, biller)
 			end
 		end
 	end
+
 end)
 
 RegisterServerEvent('jim-payments:Tickets:Sell', function()
@@ -129,8 +130,6 @@ RegisterServerEvent("jim-payments:server:PayPopup", function(data)
 	local newdata = { senderCitizenId = biller.PlayerData.citizenid, society = biller.PlayerData.job.name, amount = data.amount }
 	if data.accept == true then
 		billed.Functions.RemoveMoney(tostring(data.billtype), data.amount)
-		if Config.Manage then exports["qb-management"]:AddMoney(tostring(biller.PlayerData.job.name), data.amount)
-		else TriggerEvent("qb-bossmenu:server:addAccountMoney", tostring(biller.PlayerData.job.name), data.amount) end
 		TriggerEvent('jim-payments:Tickets:Give', newdata, biller)
 		TriggerClientEvent("QBCore:Notify", data.biller, billed.PlayerData.charinfo.firstname.." accepted the payment", "success")
 	elseif data.accept == false then

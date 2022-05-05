@@ -24,35 +24,37 @@ CreateThread(function()
 	end
 end)
 
-RegisterNetEvent('jim-payments:client:Charge', function(data)
-	if not onDuty then TriggerEvent("QBCore:Notify", "Not Clocked in!", "error") return end  -- Require to be on duty when making a payment
+RegisterNetEvent('jim-payments:client:Charge', function(data, outside)
+	if outside == nil then outside = false end
+	if not outside and not onDuty then TriggerEvent("QBCore:Notify", "Not Clocked in!", "error") return end  -- Require to be on duty when making a payment
 	local onlineList = {}
 	local nearbyList = {}
-	QBCore.Functions.TriggerCallback('jim-payments:MakePlayerList', function(cb) onlineList = cb if onlineList[1] == nil then Wait(200) end
-		for k, v in pairs(QBCore.Functions.GetPlayersFromCoords(GetEntityCoords(PlayerPedId()), Config.PaymentRadius)) do
-			local dist = #(GetEntityCoords(GetPlayerPed(v)) - GetEntityCoords(PlayerPedId()))
-			for i = 1, #onlineList do
-				if onlineList[i].value == GetPlayerServerId(v) then
-					if v ~= PlayerId() then
-						nearbyList[#nearbyList+1] = { value = onlineList[i].value, text = onlineList[i].text..' ('..math.floor(dist+0.05)..'m)' }
-					end
+	local p = promise.new()
+	QBCore.Functions.TriggerCallback('jim-payments:MakePlayerList', function(cb) p:resolve(cb) end) 
+	onlineList = Citizen.Await(p)
+	for k, v in pairs(QBCore.Functions.GetPlayersFromCoords(GetEntityCoords(PlayerPedId()), Config.PaymentRadius)) do
+		local dist = #(GetEntityCoords(GetPlayerPed(v)) - GetEntityCoords(PlayerPedId()))
+		for i = 1, #onlineList do
+			if onlineList[i].value == GetPlayerServerId(v) then
+				if v ~= PlayerId() then
+					nearbyList[#nearbyList+1] = { value = onlineList[i].value, text = onlineList[i].text..' ('..math.floor(dist+0.05)..'m)' }
 				end
 			end
-			dist = nil
 		end
-		if data.img == nil then img = "" else img = data.img end
-		if nearbyList[#nearbyList] == nil then TriggerEvent("QBCore:Notify", "No one near by to charge", "error") return end
-		local newinputs = {}
-		if Config.List then newinputs[#newinputs+1] = { text = " ", name = "citizen", type = "select", options = nearbyList } end
-		if not Config.List then newinputs[#newinputs+1] = { type = 'text', isRequired = true, name = 'citizen', text = '# Customer ID #' } end
-		newinputs[#newinputs+1] = { type = 'radio', name = 'billtype', text = 'Payment Type', options = { { value = "cash", text = "Cash" }, { value = "bank", text = "Card" } } }
-		newinputs[#newinputs+1] = { type = 'number', isRequired = true, name = 'price', text = '💵  Amount to Charge' }
-		local dialog = exports['qb-input']:ShowInput({ header = img..PlayerJob.label.." Cash Register", submitText = "Send", inputs = newinputs})
-		if dialog then
-			if not dialog.citizen or not dialog.price then return end
-			TriggerServerEvent('jim-payments:server:Charge', dialog.citizen, dialog.price, dialog.billtype, data.img)
-		end
-	end)
+		dist = nil
+	end
+	if not data.img then img = "" else img = data.img end
+	if nearbyList[#nearbyList] == nil then TriggerEvent("QBCore:Notify", "No one near by to charge", "error") return end
+	local newinputs = {}
+	if Config.List then newinputs[#newinputs+1] = { text = " ", name = "citizen", type = "select", options = nearbyList } end
+	if not Config.List then newinputs[#newinputs+1] = { type = 'text', isRequired = true, name = 'citizen', text = '# Customer ID #' } end
+	newinputs[#newinputs+1] = { type = 'radio', name = 'billtype', text = 'Payment Type', options = { { value = "cash", text = "Cash" }, { value = "bank", text = "Card" } } }
+	newinputs[#newinputs+1] = { type = 'number', isRequired = true, name = 'price', text = '💵  Amount to Charge' }
+	local dialog = exports['qb-input']:ShowInput({ header = img..PlayerJob.label.." Cash Register", submitText = "Send", inputs = newinputs})
+	if dialog then
+		if not dialog.citizen or not dialog.price then return end
+		TriggerServerEvent('jim-payments:server:Charge', dialog.citizen, dialog.price, dialog.billtype, data.img, outside)
+	end
 end)
 
 RegisterNetEvent('jim-payments:Tickets:Menu', function()

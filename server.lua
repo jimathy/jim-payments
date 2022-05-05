@@ -10,7 +10,7 @@ AddEventHandler('onResourceStart', function(resource)
 	if GetCurrentResourceName() == resource then for k, v in pairs(Config.Jobs) do if not QBCore.Shared.Jobs[k] then print("Jim-Payments: Config.Jobs searched for job '"..k.."' and couldn't find it in the Shared") end end end
 end)
 
---QBCore.Commands.Add("cashregister", "Use mobile cash register", {}, false, function(source) TriggerClientEvent("jim-payments:client:Charge", source, true) end)
+QBCore.Commands.Add("cashregister", "Use mobile cash register", {}, false, function(source) TriggerClientEvent("jim-payments:client:Charge", source, {}, true) end)
 
 RegisterServerEvent('jim-payments:Tickets:Give', function(data, biller)
 	--Find the biller from their citizenid
@@ -20,13 +20,16 @@ RegisterServerEvent('jim-payments:Tickets:Give', function(data, biller)
 			if Player.PlayerData.citizenid == data.senderCitizenId then	biller = Player	end
 		end
 	end
+	-- Find out of person who sent the payment is on duty, this is then used to decide weather to give tickets or not
+	local duty = true
+	if biller.PlayerData.job.onduty then duty = true else duty = false end
 	if Config.Manage then exports["qb-management"]:AddMoney(tostring(biller.PlayerData.job.name), data.amount) 
 		if Config.Debug then print("QB-Management: Adding $"..data.amount.." to account '"..tostring(biller.PlayerData.job.name).."'") end
 	else TriggerEvent("qb-bossmenu:server:addAccountMoney", tostring(biller.PlayerData.job.name), data.amount) 
 		if Config.Debug then print("QB-BossMenu: Adding $"..data.amount.." to account '"..tostring(biller.PlayerData.job.name).."'") end
 	end
 	-- If ticket system enabled, do this
-	if Config.TicketSystem then
+	if duty and Config.TicketSystem then
 		if data.amount >= Config.Jobs[data.society].MinAmountforTicket then
 			for k, v in pairs(QBCore.Functions.GetPlayers()) do
 				local Player = QBCore.Functions.GetPlayer(v)

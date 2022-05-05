@@ -86,7 +86,7 @@ QBCore.Functions.CreateCallback('jim-payments:Ticket:Count', function(source, cb
 	cb(amount) 
 end)
 
-RegisterServerEvent("jim-payments:server:Charge", function(citizen, price, billtype, img, outside)
+RegisterServerEvent("jim-payments:server:Charge", function(citizen, price, billtype, img)
 	local src = source
     local biller = QBCore.Functions.GetPlayer(src)
     local billed = QBCore.Functions.GetPlayer(tonumber(citizen))

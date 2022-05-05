@@ -20,6 +20,7 @@ RegisterServerEvent('jim-payments:Tickets:Give', function(data, biller)
 			if Player.PlayerData.citizenid == data.senderCitizenId then	biller = Player	end
 		end
 	end
+	-- Find out of person who sent the payment is on duty, this is then used to decide weather to give tickets or not
 	local duty = true
 	if biller.PlayerData.job.onduty then duty = true else duty = false end
 	if Config.Manage then exports["qb-management"]:AddMoney(tostring(biller.PlayerData.job.name), data.amount) 

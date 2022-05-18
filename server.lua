@@ -19,8 +19,8 @@ RegisterServerEvent('jim-payments:Tickets:Give', function(data, biller)
 		local Player = QBCore.Functions.GetPlayer(v)
 			if Player.PlayerData.citizenid == data.senderCitizenId then	biller = Player	end
 		end
+		TriggerClientEvent('QBCore:Notify', biller.PlayerData.source, data.sender.." Paid their $"..data.amount.." invoice", "success")
 	end
-	-- Find out of person who sent the payment is on duty, this is then used to decide weather to give tickets or not
 	local duty = true
 	if biller.PlayerData.job.onduty then duty = true else duty = false end
 	if Config.Manage then exports["qb-management"]:AddMoney(tostring(biller.PlayerData.job.name), data.amount) 
@@ -87,7 +87,7 @@ QBCore.Functions.CreateCallback('jim-payments:Ticket:Count', function(source, cb
 	cb(amount) 
 end)
 
-RegisterServerEvent("jim-payments:server:Charge", function(citizen, price, billtype, img)
+RegisterServerEvent("jim-payments:server:Charge", function(citizen, price, billtype, img, outside)
 	local src = source
     local biller = QBCore.Functions.GetPlayer(src)
     local billed = QBCore.Functions.GetPlayer(tonumber(citizen))
@@ -134,10 +134,10 @@ RegisterServerEvent("jim-payments:server:PayPopup", function(data)
 	if data.accept == true then
 		billed.Functions.RemoveMoney(tostring(data.billtype), data.amount)
 		TriggerEvent('jim-payments:Tickets:Give', newdata, biller)
-		TriggerClientEvent("QBCore:Notify", data.biller, billed.PlayerData.charinfo.firstname.." accepted the payment", "success")
+		TriggerClientEvent("QBCore:Notify", data.biller, billed.PlayerData.charinfo.firstname.." accepted the $"..data.amount.." payment", "success")
 	elseif data.accept == false then
 		TriggerClientEvent("QBCore:Notify", src, "You declined the payment")
-		TriggerClientEvent("QBCore:Notify", data.biller, billed.PlayerData.charinfo.firstname.." declined the payment", "error")
+		TriggerClientEvent("QBCore:Notify", data.biller, billed.PlayerData.charinfo.firstname.." declined the $"..data.amount.." payment", "error")
 	end
 end)
 

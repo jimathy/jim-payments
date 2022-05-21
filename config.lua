@@ -1,4 +1,4 @@
-print("Jim-Payments v2.4 - Payments Script by Jimathy")
+print("Jim-Payments v2.5 - Payments Script by Jimathy")
 
 -- If you need support I now have a discord available, it helps me keep track of issues and give better support.
 
@@ -8,7 +8,7 @@ Config = {}
 
 Config.Debug = false
 
-Config.Manage = true -- "true" if using qb-management
+Config.Manage = false -- "true" if using qb-management
 					 -- "false" if using qb-bossmenu
 					
 Config.TicketSystem = true -- Enable this if you want to use the ticket system false
@@ -34,7 +34,7 @@ Config.PedPool = {
 	[14] = `U_F_M_CasinoShop_01`,
 }
 
-Config.Gabz = false -- "true" to enable Gabz Banking locations
+Config.Gabz = true -- "true" to enable Gabz Banking locations
 Config.useATM = true -- Enable this to use my ATM's
 Config.useBanks = true -- Enable this to use my banking stuff
 Config.BankBlips = true -- Enable this if you disabled qb-banking and need bank locations
@@ -75,7 +75,7 @@ Config.Jobs = {
 Config.ATMModels = {"prop_atm_01", "prop_atm_02", "prop_atm_03", "prop_fleeca_atm" }
 
 Config.GabzATMLocations = {
---PACIFIC BANK 8 ATMS (GABZ)
+--PACIFIC BANK 12 ATMS (GABZ)
 	vector3(239.02, 212.37, 106.28),
 	vector3(239.46, 213.6, 106.28),
 	vector3(239.9, 214.82, 106.28),
@@ -84,6 +84,10 @@ Config.GabzATMLocations = {
 	vector3(241.86, 220.16, 106.28),
 	vector3(242.3, 221.41, 106.28),
 	vector3(242.76, 222.63, 106.28),
+	vector3(263.46, 203.86, 106.28),
+	vector3(263.96, 205.03, 106.28),
+	vector3(264.37, 206.28, 106.28),
+	vector3(264.77, 207.51, 106.28),
 }
 
 Config.VanATMLocations = {
@@ -214,5 +218,5 @@ Config.GabzBankLocations = {
 		vector4(263.71, 212.63, 106.28, 337.53), -- Pacficic Gabz 7+8
 		vector4(259.02, 214.32, 106.28, 337.82), -- Pacficic Gabz 9+10
 		vector4(254.27, 216.06, 106.28, 336.37), -- Pacficic Gabz 11+12
-	}
+	},
 }

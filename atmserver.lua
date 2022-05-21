@@ -11,7 +11,6 @@ local function cv(amount)
     return formatted
 end
 
-
 ---- BANK STUFF
 QBCore.Functions.CreateCallback('jim-payments:ManageWrapper', function(source, cb, type, account)
 	local result = nil

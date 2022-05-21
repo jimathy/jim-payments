@@ -3,13 +3,15 @@ local QBCore = exports['qb-core']:GetCoreObject()
 PlayerJob = {}
 local onDuty = false
 local BankPed = {}
-RegisterNetEvent('QBCore:Client:OnPlayerLoaded') AddEventHandler('QBCore:Client:OnPlayerLoaded', function() QBCore.Functions.GetPlayerData(function(PlayerData) PlayerJob = PlayerData.job PlayerGang = PlayerData.gang end) end)
-RegisterNetEvent('QBCore:Client:OnJobUpdate') AddEventHandler('QBCore:Client:OnJobUpdate', function(JobInfo) PlayerJob = JobInfo onDuty = PlayerJob.onduty end)
-RegisterNetEvent('QBCore:Client:SetDuty') AddEventHandler('QBCore:Client:SetDuty', function(duty) onDuty = duty end)
-RegisterNetEvent('QBCore:Client:OnGangUpdate') AddEventHandler('QBCore:Client:OnGangUpdate', function(GangInfo) PlayerGang = GangInfo end)
+RegisterNetEvent('QBCore:Client:OnPlayerLoaded', function() QBCore.Functions.GetPlayerData(function(PlayerData) PlayerJob = PlayerData.job PlayerGang = PlayerData.gang end) end)
+RegisterNetEvent('QBCore:Client:OnJobUpdate', function(JobInfo) PlayerJob = JobInfo onDuty = PlayerJob.onduty end)
+RegisterNetEvent('QBCore:Client:SetDuty', function(duty) onDuty = duty end)
+RegisterNetEvent('QBCore:Client:OnGangUpdate', function(GangInfo) PlayerGang = GangInfo end)
 
 --Keeps track of duty on script restarts
-AddEventHandler('onResourceStart', function(resource) if GetCurrentResourceName() == resource then QBCore.Functions.GetPlayerData(function(PlayerData) PlayerJob = PlayerData.job PlayerGang = PlayerData.gang onDuty = PlayerJob.onduty end) end end)
+AddEventHandler('onResourceStart', function(resource) if GetCurrentResourceName() ~= resource then return end
+	QBCore.Functions.GetPlayerData(function(PlayerData) PlayerJob = PlayerData.job PlayerGang = PlayerData.gang onDuty = PlayerJob.onduty end)
+end)
 
 CreateThread(function()
 	local jobroles = {}
@@ -83,6 +85,6 @@ end)
 RegisterNetEvent('jim-payments:Tickets:Sell:yes', function() TriggerServerEvent('jim-payments:Tickets:Sell') end)
 RegisterNetEvent('jim-payments:Tickets:Sell:no', function() exports['qb-menu']:closeMenu() end)
 
-AddEventHandler('onResourceStop', function(resource) 
-	if resource == GetCurrentResourceName() then exports['qb-target']:RemoveZone("JimBank") DeletePed(BankPed[1]) end 
+AddEventHandler('onResourceStop', function(resource) if resource ~= GetCurrentResourceName() then return end
+	exports['qb-target']:RemoveZone("JimBank") DeletePed(BankPed[1])
 end)

@@ -6,8 +6,8 @@ local function cv(amount)
     return formatted
 end
 
-AddEventHandler('onResourceStart', function(resource)
-	if GetCurrentResourceName() == resource then for k, v in pairs(Config.Jobs) do if not QBCore.Shared.Jobs[k] then print("Jim-Payments: Config.Jobs searched for job '"..k.."' and couldn't find it in the Shared") end end end
+AddEventHandler('onResourceStart', function(resource) if GetCurrentResourceName() ~= resource then return end
+	for k, v in pairs(Config.Jobs) do if not QBCore.Shared.Jobs[k] then print("Jim-Payments: Config.Jobs searched for job '"..k.."' and couldn't find it in the Shared") end end
 end)
 
 QBCore.Commands.Add("cashregister", "Use mobile cash register", {}, false, function(source) TriggerClientEvent("jim-payments:client:Charge", source, {}, true) end)

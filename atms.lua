@@ -336,9 +336,7 @@ RegisterNetEvent('jim-payments:client:ATM:give', function()
 	end)
 end)
 
-AddEventHandler('onResourceStop', function(resource) 
-	if resource == GetCurrentResourceName() then 
-		for k, v in pairs(Targets) do exports['qb-target']:RemoveZone(k) end		
-		for k, v in pairs(Peds) do DeletePed(Peds[k]) end
-	end
+AddEventHandler('onResourceStop', function(resource) if resource ~= GetCurrentResourceName() then return end
+	for k, v in pairs(Targets) do exports['qb-target']:RemoveZone(k) end		
+	for k, v in pairs(Peds) do DeletePed(Peds[k]) end
 end)

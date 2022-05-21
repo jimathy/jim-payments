@@ -229,8 +229,15 @@ QBCore.Functions.CreateCallback('jim-payments:ATM:Find', function(source, cb)
 		aid = getSavingsAccount[1].record_id
 		savbal = getSavingsAccount[1].amount
     end
-	
-	cb(name, cash, bank, account, cid, savbal, aid) 
+	local data = {
+		name = name,
+		cash = cash,
+		bank = bank,
+		account = account,
+		cid = cid,
+		savbal = savbal,
+		aid = aid }
+	cb(data) 
 end)
 
 QBCore.Commands.Add("cashgive", "Pay a user nearby", {}, false, function(source) TriggerClientEvent("jim-payments:client:ATM:give", source) end)

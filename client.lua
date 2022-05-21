@@ -65,8 +65,8 @@ RegisterNetEvent('jim-payments:Tickets:Menu', function()
 		else exports['qb-menu']:openMenu({
 			{ isMenuHeader = true, header = "🧾 "..PlayerJob.label.." Receipts 🧾", txt = "Do you want trade your receipts for payment?" },
 			{ isMenuHeader = true, header = "", txt = "Amount of Tickets: "..amount.."<br>Total Payment: $"..(Config.Jobs[PlayerJob.name].PayPerTicket * amount) },
-			{ header = "✅ Yes", txt = "", params = { event = "jim-payments:Tickets:Sell:yes" } },
-			{ header = "❌ No", txt = "", params = { event = "jim-payments:Tickets:Sell:no" } }, })
+			{ icon = "fas fa-circle-check", header = "Yes", txt = "", params = { event = "jim-payments:Tickets:Sell:yes" } },
+			{ icon = "fas fa-circle-xmark", header = "No", txt = "", params = { event = "jim-payments:Tickets:Sell:no" } }, })
 		end
 	end
 end)
@@ -76,8 +76,8 @@ RegisterNetEvent("jim-payments:client:PayPopup", function(amount, biller, billty
 	exports['qb-menu']:openMenu({
 		{ isMenuHeader = true, header = img.."🧾 "..billerjob.." Payment 🧾", txt = "Do you want accept the payment?" },
 		{ isMenuHeader = true, header = "", txt = billtype:gsub("^%l", string.upper).." Payment: $"..amount },
-		{ header = "✅ Yes", txt = "", params = { isServer = true, event = "jim-payments:server:PayPopup", args = { accept = true, amount = amount, biller = biller, billtype = billtype } } },
-		{ header = "❌ No", txt = "", params = { isServer = true, event = "jim-payments:server:PayPopup", args = { accept = false, amount = amount, biller = biller, billtype = billtype } } }, })
+		{ icon = "fas fa-circle-check", header = "Yes", txt = "", params = { isServer = true, event = "jim-payments:server:PayPopup", args = { accept = true, amount = amount, biller = biller, billtype = billtype } } },
+		{ icon = "fas fa-circle-xmark", header = "No", txt = "", params = { isServer = true, event = "jim-payments:server:PayPopup", args = { accept = false, amount = amount, biller = biller, billtype = billtype } } }, })
 end)
 
 RegisterNetEvent('jim-payments:Tickets:Sell:yes', function() TriggerServerEvent('jim-payments:Tickets:Sell') end)

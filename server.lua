@@ -12,22 +12,24 @@ end)
 
 QBCore.Commands.Add("cashregister", "Use mobile cash register", {}, false, function(source) TriggerClientEvent("jim-payments:client:Charge", source, {}, true) end)
 
-RegisterServerEvent('jim-payments:Tickets:Give', function(data, biller)
-	--Find the biller from their citizenid
-	if not biller then
+RegisterServerEvent('jim-payments:Tickets:Give', function(data, biller, popup)
+	if biller then -- If this is found, it ISN'T a phone payment, so add money to society here
+		if Config.Manage then exports["qb-management"]:AddMoney(tostring(biller.PlayerData.job.name), data.amount) 
+			if Config.Debug then print("QB-Management: Adding $"..data.amount.." to account '"..tostring(biller.PlayerData.job.name).."'") end
+		else TriggerEvent("qb-bossmenu:server:addAccountMoney", tostring(biller.PlayerData.job.name), data.amount) 
+			if Config.Debug then print("QB-BossMenu: Adding $"..data.amount.." to account '"..tostring(biller.PlayerData.job.name).."'") end
+		end
+	elseif not biller then	--Find the biller from their citizenid
 		for k, v in pairs(QBCore.Functions.GetPlayers()) do
 		local Player = QBCore.Functions.GetPlayer(v)
 			if Player.PlayerData.citizenid == data.senderCitizenId then	biller = Player	end
 		end
 		TriggerClientEvent('QBCore:Notify', biller.PlayerData.source, data.sender.." Paid their $"..data.amount.." invoice", "success")
 	end
+
 	local duty = true
 	if biller.PlayerData.job.onduty then duty = true else duty = false end
-	if Config.Manage then exports["qb-management"]:AddMoney(tostring(biller.PlayerData.job.name), data.amount) 
-		if Config.Debug then print("QB-Management: Adding $"..data.amount.." to account '"..tostring(biller.PlayerData.job.name).."'") end
-	else TriggerEvent("qb-bossmenu:server:addAccountMoney", tostring(biller.PlayerData.job.name), data.amount) 
-		if Config.Debug then print("QB-BossMenu: Adding $"..data.amount.." to account '"..tostring(biller.PlayerData.job.name).."'") end
-	end
+
 	-- If ticket system enabled, do this
 	if duty and Config.TicketSystem then
 		if data.amount >= Config.Jobs[data.society].MinAmountforTicket then

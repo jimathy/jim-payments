@@ -20,10 +20,7 @@ RegisterServerEvent('jim-payments:Tickets:Give', function(data, biller, popup)
 			if Config.Debug then print("QB-BossMenu: Adding $"..data.amount.." to account '"..tostring(biller.PlayerData.job.name).."'") end
 		end
 	elseif not biller then	--Find the biller from their citizenid
-		for k, v in pairs(QBCore.Functions.GetPlayers()) do
-		local Player = QBCore.Functions.GetPlayer(v)
-			if Player.PlayerData.citizenid == data.senderCitizenId then	biller = Player	end
-		end
+		local biller = QBCore.Functions.GetPlayerByCitizenId(data.senderCitizenId)
 		TriggerClientEvent('QBCore:Notify', biller.PlayerData.source, data.sender.." Paid their $"..data.amount.." invoice", "success")
 	end
 

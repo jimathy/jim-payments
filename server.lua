@@ -1,204 +1,153 @@
 local QBCore = exports['qb-core']:GetCoreObject()
 
-AddEventHandler('onResourceStart', function(resource) if GetCurrentResourceName() == resource then TriggerEvent("jim-shops:MakeStash") end
-	for k, v in pairs(Config.Products) do
-		for i = 1, #v do
-			if not QBCore.Shared.Items[Config.Products[k][i].name] then
-				print("Config.Products['"..k.."'] can't find item: "..Config.Products[k][i].name)
-			end
-		end
-	end
-	for k, v in pairs(Config.Locations) do
-		if v["products"] == nil then
-			print("Config.Locations['"..k.."'] can't find its product table")
-		end
-	end
-end)
-
-local function GetStashItems(stashId)
-	local items = {}
-	local result = MySQL.Sync.fetchScalar('SELECT items FROM stashitems WHERE stash = ?', {stashId})
-	if result then
-		local stashItems = json.decode(result)
-		if stashItems then
-			for k, item in pairs(stashItems) do
-				local itemInfo = QBCore.Shared.Items[item.name:lower()]
-				if itemInfo then
-					items[item.slot] = {
-						name = itemInfo["name"],
-						amount = tonumber(item.amount),
-						info = item.info ~= nil and item.info or "",
-						label = itemInfo["label"],
-						description = itemInfo["description"] ~= nil and itemInfo["description"] or "",
-						weight = itemInfo["weight"],
-						type = itemInfo["type"],
-						unique = itemInfo["unique"],
-						useable = itemInfo["useable"],
-						image = itemInfo["image"],
-						slot = item.slot,
-					}
-				end
-			end
-		end
-	end
-	return items
+local function cv(amount)
+    local formatted = amount
+    while true do formatted, k = string.gsub(formatted, "^(-?%d+)(%d%d%d)", '%1,%2') if (k==0) then break end Wait(0) end
+    return formatted
 end
 
---Wrapper converting for opening shops externally
-RegisterServerEvent('jim-shops:ShopOpen', function(shop, name, shoptable)
-	local data = { shoptable = { products = shoptable.items, label = shoptable.label, }, custom = true }
-	TriggerClientEvent('jim-shops:ShopMenu', source, data, true)
+AddEventHandler('onResourceStart', function(resource) if GetCurrentResourceName() ~= resource then return end
+	for k, v in pairs(Config.Jobs) do if not QBCore.Shared.Jobs[k] then print("Jim-Payments: Config.Jobs searched for job '"..k.."' and couldn't find it in the Shared") end end
 end)
 
-RegisterServerEvent('jim-shops:GetItem', function(amount, billtype, item, shoptable, price, info, shop, num, nostash)
-	local src = source
-    local Player = QBCore.Functions.GetPlayer(src)
-	--Inventory space checks
-	local give = true
-	local totalWeight = QBCore.Player.GetTotalWeight(Player.PlayerData.items)
-    local maxWeight = QBCore.Config.Player.MaxWeight
-	local slots = 0
-	for k, v in pairs(Player.PlayerData.items) do slots = slots +1 end
-	slots = Config.MaxSlots - slots
-	local balance = Player.Functions.GetMoney(tostring(billtype))
-	-- If too heavy:
-	if (totalWeight + (QBCore.Shared.Items[item].weight * amount)) > maxWeight then 
-		TriggerClientEvent("QBCore:Notify", src, "Not enough space in inventory", "error") give = false
-	-- If unique and it would poof away:
-	elseif QBCore.Shared.Items[item].unique and (tonumber(slots) < tonumber(amount)) then
-		TriggerClientEvent("QBCore:Notify", src, "Not enough slots in inventory", "error") give = false
-	else
-		-- If its a weapon, do this:
-		if QBCore.Shared.Items[item].type == "weapon" then 
-			if QBCore.Shared.Items[item].unique then 
-				for i = 1, amount do
-					if Player.Functions.AddItem(item, 1) then
-					else TriggerClientEvent('QBCore:Notify', src, "Can't give item!", "error") give = false break end
-					Wait(10)
-				end
-			end
-		else
-			-- If item is unique:
-			if QBCore.Shared.Items[item].unique then
-				for i = 1, amount do
-					if Player.Functions.AddItem(item, 1, nil, info) then
-					else TriggerClientEvent('QBCore:Notify', src, "Can't give item!", "error") give = false break end
-					Wait(10)
-				end
-			else
-				if Player.Functions.AddItem(item, amount, false, info) then
-					TriggerClientEvent('inventory:client:ItemBox', src, QBCore.Shared.Items[item], "add", amount)
-				else
-					TriggerClientEvent('QBCore:Notify', source,  "Can't give item!", "error") give = false
-				end
-			end
-		end
+QBCore.Commands.Add("cashregister", "Use mobile cash register", {}, false, function(source) TriggerClientEvent("jim-payments:client:Charge", source, {}, true) end)
 
-		if Config.Limit and not nostash then
-			stashItems = GetStashItems("["..shop.."("..num..")]")
-			for i = 1, #stashItems do
-				if stashItems[i].name == item then
-					if (stashItems[i].amount - amount) <= 0 then stashItems[i].amount = 0 else stashItems[i].amount = stashItems[i].amount - amount end 
-					TriggerEvent('jim-shops:server:SaveStashItems', "["..shop.."("..num..")]", stashItems)
-					if Config.Debug then print("Removing "..QBCore.Shared.Items[item].label.." x"..amount.." from Shop's Stash: '["..shop.."("..num..")]") end
-				end
-			end
+RegisterServerEvent('jim-payments:Tickets:Give', function(data, biller, popup)
+	if biller then -- If this is found, it ISN'T a phone payment, so add money to society here
+		if Config.Manage then exports["qb-management"]:AddMoney(tostring(biller.PlayerData.job.name), data.amount) 
+			if Config.Debug then print("QB-Management: Adding $"..data.amount.." to account '"..tostring(biller.PlayerData.job.name).."'") end
+		else TriggerEvent("qb-bossmenu:server:addAccountMoney", tostring(biller.PlayerData.job.name), data.amount) 
+			if Config.Debug then print("QB-BossMenu: Adding $"..data.amount.." to account '"..tostring(biller.PlayerData.job.name).."'") end
 		end
-		--Money checks
-		if give then
-			if balance >= (tonumber(price) * tonumber(amount)) then 
-				Player.Functions.RemoveMoney(tostring(billtype), (tonumber(price) * tonumber(amount)), 'ticket-payment')
-			else 
-				TriggerClientEvent("QBCore:Notify", src, "Not enough money", "error") return
-			end
-		end
+	elseif not biller then	--Find the biller from their citizenid
+		local biller = QBCore.Functions.GetPlayerByCitizenId(data.senderCitizenId)
+		TriggerClientEvent('QBCore:Notify', biller.PlayerData.source, data.sender.." Paid their $"..data.amount.." invoice", "success")
 	end
-	--Make data to send back to main shop menu
-	local data = {}
-	data.shoptable = shoptable
-	custom = true
-	if Config.Limit and not nostash then
-		custom = nil
-		data.k = shop 
-		data.l = num
-	end
-	TriggerClientEvent('jim-shops:ShopMenu', src, data, custom)
-end)
 
-RegisterNetEvent("jim-shops:MakeStash", function()
-	for k, v in pairs(Config.Locations) do
-		local stashTable = {}
-		for l, b in pairs(v["coords"]) do
-			for i = 1, #v["products"] do
-				if Config.Debug then print("MakeStash - Searching for item '"..v["products"][i].name.."'")
-					if not QBCore.Shared.Items[v["products"][i].name:lower()] then 
-						print ("MakeStash - Can't find item '"..v["products"][i].name.."'")
+	local duty = true
+	if biller.PlayerData.job.onduty then duty = true else duty = false end
+
+	-- If ticket system enabled, do this
+	if duty and Config.TicketSystem then
+		if data.amount >= Config.Jobs[data.society].MinAmountforTicket then
+			for k, v in pairs(QBCore.Functions.GetPlayers()) do
+				local Player = QBCore.Functions.GetPlayer(v)
+				if Player ~= nil then
+					if Player.PlayerData.job.name == data.society and Player.PlayerData.job.onduty then
+						Player.Functions.AddItem('payticket', 1, false, {["quality"] = nil})
+						TriggerClientEvent('QBCore:Notify', Player.PlayerData.source, 'Receipt received', 'success')
+						TriggerClientEvent('inventory:client:ItemBox', Player.PlayerData.source, QBCore.Shared.Items['payticket'], "add", 1) 
 					end
 				end
-				local itemInfo = QBCore.Shared.Items[v["products"][i].name:lower()]
-				stashTable[i] = {
-					name = itemInfo["name"],
-					amount = tonumber(v["products"][i].amount),
-					info = {},
-					label = itemInfo["label"],
-					description = itemInfo["description"] ~= nil and itemInfo["description"] or "",
-					weight = itemInfo["weight"],
-					type = itemInfo["type"],
-					unique = itemInfo["unique"],
-					useable = itemInfo["useable"],
-					image = itemInfo["image"],
-					slot = i,
-				}
-			end
-		if Config.Limit then TriggerEvent('jim-shops:server:SaveStashItems', "["..k.."("..l..")]", stashTable)
-		elseif Config.Limit == false then stashname = "["..k.."("..l..")]" MySQL.Async.execute('DELETE FROM stashitems WHERE stash= ?', {stashname}) end 
-		end
-	end
-end)
-
---Compatability Wrapper Event for qb-truckerjob to refill shop stashes
-RegisterNetEvent("qb-shops:server:RestockShopItems", function(storeinfo)
-	local k, l = nil
-	local storename = storeinfo
-	if string.find(storename, "247supermarket") then k = "247supermarket"
-	elseif string.find(storename, "hardware") then k = "hardware"
-	elseif string.find(storename, "robsliquor") then k = "robsliquor"
-	elseif string.find(storename, "ltdgasoline") then k = "ltdgasoline"
-	end
-	l = storename:gsub(k,"") 
-	if l == "" then l = 1 end
-	local stashTable = {}
-	for i = 1, #Config.Locations[k]["products"] do
-		if Config.Debug then print("RestockShopItems - Searching for item '"..v["products"][i].name.."'")
-			if not QBCore.Shared.Items[v["products"][i].name:lower()] then 
-				print ("RestockShopItems - Can't find item '"..v["products"][i].name.."'")
 			end
 		end
-		local itemInfo = QBCore.Shared.Items[Config.Locations[k]["products"][i].name:lower()]
-		stashTable[i] = {
-			name = itemInfo["name"],
-			amount = tonumber(Config.Locations[k]["products"][i].amount),
-			info = {},
-			label = itemInfo["label"],
-			description = itemInfo["description"] ~= nil and itemInfo["description"] or "",
-			weight = itemInfo["weight"],
-			type = itemInfo["type"],
-			unique = itemInfo["unique"],
-			useable = itemInfo["useable"],
-			image = itemInfo["image"],
-			slot = i,
-		}
 	end
-	if Config.Limit then TriggerEvent('jim-shops:server:SaveStashItems', "["..k.."("..l..")]", stashTable) end
+	-- Commission section, does each config option separately
+	local comm = tonumber(Config.Jobs[data.society].Commission)
+	if Config.Commission and comm ~= 0 then
+		if Config.CommissionLimit and data.amount < Config.Jobs[data.society].MinAmountforTicket then return end
+		if Config.CommissionDouble then	
+			biller.Functions.AddMoney("bank", math.floor(tonumber(data.amount) * (comm *2)))
+			TriggerClientEvent("QBCore:Notify", biller.PlayerData.source, "Recieved $"..math.floor(tonumber(data.amount) * (comm *2)).." in Commission", "success")
+		else biller.Functions.AddMoney("bank",  math.floor(tonumber(data.amount) *comm))
+			TriggerClientEvent("QBCore:Notify", biller.PlayerData.source, "Recieved $"..math.floor(tonumber(data.amount) * comm).." in Commission", "success")
+		end
+		if Config.CommissionAll then
+			for k, v in pairs(QBCore.Functions.GetPlayers()) do
+				local Player = QBCore.Functions.GetPlayer(v)
+				if Player ~= nil and Player ~= biller then
+					if Player.PlayerData.job.name == data.society and Player.PlayerData.job.onduty then
+						Player.Functions.AddMoney("bank",  math.floor(tonumber(data.amount) * comm))
+						TriggerClientEvent("QBCore:Notify", Player.PlayerData.source, "Recieved $"..math.floor(tonumber(data.amount) * comm).." in Commission", "success")
+					end
+				end
+			end
+		end
+	end
+
 end)
 
-QBCore.Functions.CreateCallback('jim-shops:server:getLicenseStatus', function(source, cb)
-    local src = source
-    local Player = QBCore.Functions.GetPlayer(src)
-    local licenseTable = Player.PlayerData.metadata["licences"]
-    local licenseItem = Player.Functions.GetItemByName("weaponlicense")
-    cb(licenseTable.weapon, licenseItem)
+RegisterServerEvent('jim-payments:Tickets:Sell', function()
+    local Player = QBCore.Functions.GetPlayer(source)
+	if Player.Functions.GetItemByName("payticket") == nil then TriggerClientEvent('QBCore:Notify', source, "No tickets to trade", 'error') return
+	else
+		tickets = Player.Functions.GetItemByName("payticket").amount
+		Player.Functions.RemoveItem('payticket', tickets)
+		pay = (tickets * Config.Jobs[Player.PlayerData.job.name].PayPerTicket)
+		Player.Functions.AddMoney('bank', pay, 'ticket-payment')
+		TriggerClientEvent('inventory:client:ItemBox', source, QBCore.Shared.Items['payticket'], "remove", tickets)
+		TriggerClientEvent('QBCore:Notify', source, "Tickets traded: "..tickets.." Total: $"..cv(pay), 'success')
+	end
 end)
 
-QBCore.Functions.CreateCallback('jim-shops:server:GetStashItems', function(source, cb, stashId) cb(GetStashItems(stashId)) end)
-RegisterNetEvent('jim-shops:server:SaveStashItems', function(stashId, items) MySQL.Async.insert('INSERT INTO stashitems (stash, items) VALUES (:stash, :items) ON DUPLICATE KEY UPDATE items = :items', { ['stash'] = stashId, ['items'] = json.encode(items) }) end)
+QBCore.Functions.CreateCallback('jim-payments:Ticket:Count', function(source, cb) 
+	if QBCore.Functions.GetPlayer(source).Functions.GetItemByName('payticket') == nil then amount = 0
+	else amount = QBCore.Functions.GetPlayer(source).Functions.GetItemByName('payticket').amount end 
+	cb(amount) 
+end)
+
+RegisterServerEvent("jim-payments:server:Charge", function(citizen, price, billtype, img, outside)
+	local src = source
+    local biller = QBCore.Functions.GetPlayer(src)
+    local billed = QBCore.Functions.GetPlayer(tonumber(citizen))
+    local amount = tonumber(price)
+	local balance = billed.Functions.GetMoney(billtype)
+	if amount and amount > 0 then
+		if balance < amount then
+			TriggerClientEvent("QBCore:Notify", src, "Customer doesn't have enough cash to pay", "error")
+			TriggerClientEvent("QBCore:Notify", tonumber(citizen), "You don't have enough cash to pay", "error")
+			return
+		end
+		if billtype == "cash" then 
+			TriggerClientEvent("jim-payments:client:PayPopup", billed.PlayerData.source, amount, src, billtype, img, biller.PlayerData.job.label)
+		elseif billtype == "bank" then
+			if Config.PhoneBank == false then
+				TriggerClientEvent("jim-payments:client:PayPopup", billed.PlayerData.source, amount, src, billtype, img, biller.PlayerData.job.label)
+			else
+				if Config.PhoneType == "qb" then
+					MySQL.Async.insert(
+						'INSERT INTO phone_invoices (citizenid, amount, society, sender, sendercitizenid) VALUES (?, ?, ?, ?, ?)',
+						{billed.PlayerData.citizenid, amount, biller.PlayerData.job.name, biller.PlayerData.charinfo.firstname, biller.PlayerData.citizenid})
+					TriggerClientEvent('qb-phone:RefreshPhone', billed.PlayerData.source)
+				elseif Config.PhoneType == "gks" then
+					MySQL.Async.execute('INSERT INTO gksphone_invoices (citizenid, amount, society, sender, sendercitizenid, label) VALUES (@citizenid, @amount, @society, @sender, @sendercitizenid, @label)', {
+						['@citizenid'] = billed.PlayerData.citizenid,
+						['@amount'] = amount,
+						['@society'] = biller.PlayerData.job.name,
+						['@sender'] = biller.PlayerData.charinfo.firstname,
+						['@sendercitizenid'] = biller.PlayerData.citizenid,
+						['@label'] = biller.PlayerData.job.label,
+					})
+					TriggerClientEvent('gksphone:notifi', src, {title = 'Billing', message = 'Invoice Successfully Sent', img= '/html/static/img/icons/logo.png' })
+					TriggerClientEvent('gksphone:notifi', billed.PlayerData.source, {title = 'Billing', message = 'New Invoice Recieved', img= '/html/static/img/icons/logo.png' })
+				end
+				TriggerClientEvent('QBCore:Notify', src, 'Invoice Successfully Sent', 'success')
+				TriggerClientEvent('QBCore:Notify', billed.PlayerData.source, 'New Invoice Received')
+			end
+		end
+	else TriggerClientEvent('QBCore:Notify', source, "You can't charge $0", 'error') return end
+end)
+
+RegisterServerEvent("jim-payments:server:PayPopup", function(data)
+	local src = source
+    local billed = QBCore.Functions.GetPlayer(src)
+    local biller = QBCore.Functions.GetPlayer(tonumber(data.biller))
+	local newdata = { senderCitizenId = biller.PlayerData.citizenid, society = biller.PlayerData.job.name, amount = data.amount }
+	if data.accept == true then
+		billed.Functions.RemoveMoney(tostring(data.billtype), data.amount)
+		TriggerEvent('jim-payments:Tickets:Give', newdata, biller)
+		TriggerClientEvent("QBCore:Notify", data.biller, billed.PlayerData.charinfo.firstname.." accepted the $"..data.amount.." payment", "success")
+	elseif data.accept == false then
+		TriggerClientEvent("QBCore:Notify", src, "You declined the payment")
+		TriggerClientEvent("QBCore:Notify", data.biller, billed.PlayerData.charinfo.firstname.." declined the $"..data.amount.." payment", "error")
+	end
+end)
+
+QBCore.Functions.CreateCallback('jim-payments:MakePlayerList', function(source, cb)
+	local onlineList = {}
+	for k, v in pairs(QBCore.Functions.GetPlayers()) do
+		local P = QBCore.Functions.GetPlayer(v)
+		onlineList[#onlineList+1] = { value = tonumber(v), text = "["..v.."] - "..P.PlayerData.charinfo.firstname..' '..P.PlayerData.charinfo.lastname  }
+	end
+	cb(onlineList) 
+end)

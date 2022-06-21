@@ -37,7 +37,7 @@ RegisterServerEvent('jim-payments:Tickets:Give', function(data, biller, gang)
 	end
 
 	local duty = true
-	if not biller.PlayerData.job.onduty or not gang then duty = false end
+	if not biller.PlayerData.job.onduty or gang == nil then duty = false end
 
 	-- If ticket system enabled, do this
 	if duty and Config.TicketSystem then

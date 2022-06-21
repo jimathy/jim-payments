@@ -298,6 +298,7 @@ RegisterNetEvent('jim-payments:Client:ATM:use', function(data)
 		
 	Wait(atmbartime+500)
 	if not cancelled then
+		cancelled = false
 		local dialog = exports['qb-input']:ShowInput({ header = setheader, txt = "test", submitText = "Transfer", inputs = setinputs })
 		if dialog then
 			if not dialog.amount then return end

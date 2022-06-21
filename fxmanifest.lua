@@ -1,6 +1,6 @@
 name "Jim-Payments"
 author "Jimathy"
-version "v2.5"
+version "v2.6"
 description "Payment Script By Jimathy"
 fx_version "cerulean"
 game "gta5"

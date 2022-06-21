@@ -7,28 +7,37 @@ local function cv(amount)
 end
 
 AddEventHandler('onResourceStart', function(resource) if GetCurrentResourceName() ~= resource then return end
-	for k, v in pairs(Config.Jobs) do if not QBCore.Shared.Jobs[k] then print("Jim-Payments: Config.Jobs searched for job '"..k.."' and couldn't find it in the Shared") end end
+	for k, v in pairs(Config.Jobs) do
+		if not QBCore.Shared.Jobs[k] and not QBCore.Shared.Gangs[k] then
+			print("Jim-Payments: Config.Jobs searched for job/gang '"..k.."' and couldn't find it in the Shared")
+		end
+	end
 end)
 
 QBCore.Commands.Add("cashregister", "Use mobile cash register", {}, false, function(source) TriggerClientEvent("jim-payments:client:Charge", source, {}, true) end)
 
-RegisterServerEvent('jim-payments:Tickets:Give', function(data, biller, popup)
+RegisterServerEvent('jim-payments:Tickets:Give', function(data, biller, gang)
 	if biller then -- If this is found, it ISN'T a phone payment, so add money to society here
-		if Config.Manage then exports["qb-management"]:AddMoney(tostring(biller.PlayerData.job.name), data.amount) 
-			if Config.Debug then print("QB-Management: Adding $"..data.amount.." to account '"..tostring(biller.PlayerData.job.name).."'") end
-		else TriggerEvent("qb-bossmenu:server:addAccountMoney", tostring(biller.PlayerData.job.name), data.amount) 
-			if Config.Debug then print("QB-BossMenu: Adding $"..data.amount.." to account '"..tostring(biller.PlayerData.job.name).."'") end
+		if gang then
+			if Config.Manage then exports["qb-management"]:AddGangMoney(tostring(biller.PlayerData.gang.name), data.amount) 
+				if Config.Debug then print("QB-Management(Gang): Adding $"..data.amount.." to account '"..tostring(biller.PlayerData.gang.name).."'") end
+			else TriggerEvent("qb-gangmenu:server:addAccountMoney", tostring(biller.PlayerData.gang.name), data.amount) 
+				if Config.Debug then print("QB-GangMenu: Adding $"..data.amount.." to account '"..tostring(biller.PlayerData.gang.name).."'") end
+			end	
+		elseif not gang then
+			if Config.Manage then exports["qb-management"]:AddMoney(tostring(biller.PlayerData.job.name), data.amount) 
+				if Config.Debug then print("QB-Management(Job): Adding $"..data.amount.." to account '"..tostring(biller.PlayerData.job.name).."'") end
+			else TriggerEvent("qb-bossmenu:server:addAccountMoney", tostring(biller.PlayerData.job.name), data.amount) 
+				if Config.Debug then print("QB-BossMenu: Adding $"..data.amount.." to account '"..tostring(biller.PlayerData.job.name).."'") end
+			end
 		end
 	elseif not biller then	--Find the biller from their citizenid
-		for k, v in pairs(QBCore.Functions.GetPlayers()) do
-		local Player = QBCore.Functions.GetPlayer(v)
-			if Player.PlayerData.citizenid == data.senderCitizenId then	biller = Player	end
-		end
+		local biller = QBCore.Functions.GetPlayerByCitizenId(data.senderCitizenId)
 		TriggerClientEvent('QBCore:Notify', biller.PlayerData.source, data.sender.." Paid their $"..data.amount.." invoice", "success")
 	end
 
 	local duty = true
-	if biller.PlayerData.job.onduty then duty = true else duty = false end
+	if not biller.PlayerData.job.onduty or not gang then duty = false end
 
 	-- If ticket system enabled, do this
 	if duty and Config.TicketSystem then
@@ -41,6 +50,11 @@ RegisterServerEvent('jim-payments:Tickets:Give', function(data, biller, popup)
 						TriggerClientEvent('QBCore:Notify', Player.PlayerData.source, 'Receipt received', 'success')
 						TriggerClientEvent('inventory:client:ItemBox', Player.PlayerData.source, QBCore.Shared.Items['payticket'], "add", 1) 
 					end
+				end
+				if gang then
+					biller.Functions.AddItem('payticket', 1, false, {["quality"] = nil})
+					TriggerClientEvent('QBCore:Notify', biller.PlayerData.source, 'Receipt received', 'success')
+					TriggerClientEvent('inventory:client:ItemBox', biller.PlayerData.source, QBCore.Shared.Items['payticket'], "add", 1) 
 				end
 			end
 		end
@@ -67,7 +81,6 @@ RegisterServerEvent('jim-payments:Tickets:Give', function(data, biller, popup)
 			end
 		end
 	end
-
 end)
 
 RegisterServerEvent('jim-payments:Tickets:Sell', function()
@@ -89,7 +102,7 @@ QBCore.Functions.CreateCallback('jim-payments:Ticket:Count', function(source, cb
 	cb(amount) 
 end)
 
-RegisterServerEvent("jim-payments:server:Charge", function(citizen, price, billtype, img, outside)
+RegisterServerEvent("jim-payments:server:Charge", function(citizen, price, billtype, img, outside, gang)
 	local src = source
     local biller = QBCore.Functions.GetPlayer(src)
     local billed = QBCore.Functions.GetPlayer(tonumber(citizen))
@@ -101,32 +114,30 @@ RegisterServerEvent("jim-payments:server:Charge", function(citizen, price, billt
 			TriggerClientEvent("QBCore:Notify", tonumber(citizen), "You don't have enough cash to pay", "error")
 			return
 		end
-		if billtype == "cash" then 
-			TriggerClientEvent("jim-payments:client:PayPopup", billed.PlayerData.source, amount, src, billtype, img, biller.PlayerData.job.label)
-		elseif billtype == "bank" then
-			if Config.PhoneBank == false then
-				TriggerClientEvent("jim-payments:client:PayPopup", billed.PlayerData.source, amount, src, billtype, img, biller.PlayerData.job.label)
-			else
-				if Config.PhoneType == "qb" then
-					MySQL.Async.insert(
-						'INSERT INTO phone_invoices (citizenid, amount, society, sender, sendercitizenid) VALUES (?, ?, ?, ?, ?)',
-						{billed.PlayerData.citizenid, amount, biller.PlayerData.job.name, biller.PlayerData.charinfo.firstname, biller.PlayerData.citizenid})
-					TriggerClientEvent('qb-phone:RefreshPhone', billed.PlayerData.source)
-				elseif Config.PhoneType == "gks" then
-					MySQL.Async.execute('INSERT INTO gksphone_invoices (citizenid, amount, society, sender, sendercitizenid, label) VALUES (@citizenid, @amount, @society, @sender, @sendercitizenid, @label)', {
-						['@citizenid'] = billed.PlayerData.citizenid,
-						['@amount'] = amount,
-						['@society'] = biller.PlayerData.job.name,
-						['@sender'] = biller.PlayerData.charinfo.firstname,
-						['@sendercitizenid'] = biller.PlayerData.citizenid,
-						['@label'] = biller.PlayerData.job.label,
-					})
-					TriggerClientEvent('gksphone:notifi', src, {title = 'Billing', message = 'Invoice Successfully Sent', img= '/html/static/img/icons/logo.png' })
-					TriggerClientEvent('gksphone:notifi', billed.PlayerData.source, {title = 'Billing', message = 'New Invoice Recieved', img= '/html/static/img/icons/logo.png' })
-				end
-				TriggerClientEvent('QBCore:Notify', src, 'Invoice Successfully Sent', 'success')
-				TriggerClientEvent('QBCore:Notify', billed.PlayerData.source, 'New Invoice Received')
+		local label = biller.PlayerData.job.label
+		if gang == true then label = biller.PlayerData.gang.label end
+		if Config.PhoneBank == false or gang == true or billtype == "cash" then
+			TriggerClientEvent("jim-payments:client:PayPopup", billed.PlayerData.source, amount, src, billtype, img, label, gang)
+		else
+			if Config.PhoneType == "qb" then
+				MySQL.Async.insert(
+					'INSERT INTO phone_invoices (citizenid, amount, society, sender, sendercitizenid) VALUES (?, ?, ?, ?, ?)',
+					{billed.PlayerData.citizenid, amount, biller.PlayerData.job.name, biller.PlayerData.charinfo.firstname, biller.PlayerData.citizenid})
+				TriggerClientEvent('qb-phone:RefreshPhone', billed.PlayerData.source)
+			elseif Config.PhoneType == "gks" then
+				MySQL.Async.execute('INSERT INTO gksphone_invoices (citizenid, amount, society, sender, sendercitizenid, label) VALUES (@citizenid, @amount, @society, @sender, @sendercitizenid, @label)', {
+					['@citizenid'] = billed.PlayerData.citizenid,
+					['@amount'] = amount,
+					['@society'] = biller.PlayerData.job.name,
+					['@sender'] = biller.PlayerData.charinfo.firstname,
+					['@sendercitizenid'] = biller.PlayerData.citizenid,
+					['@label'] = biller.PlayerData.job.label,
+				})
+				TriggerClientEvent('gksphone:notifi', src, {title = 'Billing', message = 'Invoice Successfully Sent', img= '/html/static/img/icons/logo.png' })
+				TriggerClientEvent('gksphone:notifi', billed.PlayerData.source, {title = 'Billing', message = 'New Invoice Recieved', img= '/html/static/img/icons/logo.png' })
 			end
+			TriggerClientEvent('QBCore:Notify', src, 'Invoice Successfully Sent', 'success')
+			TriggerClientEvent('QBCore:Notify', billed.PlayerData.source, 'New Invoice Received')
 		end
 	else TriggerClientEvent('QBCore:Notify', source, "You can't charge $0", 'error') return end
 end)
@@ -136,9 +147,10 @@ RegisterServerEvent("jim-payments:server:PayPopup", function(data)
     local billed = QBCore.Functions.GetPlayer(src)
     local biller = QBCore.Functions.GetPlayer(tonumber(data.biller))
 	local newdata = { senderCitizenId = biller.PlayerData.citizenid, society = biller.PlayerData.job.name, amount = data.amount }
+	if data.gang == true then newdata.society = biller.PlayerData.gang.name end
 	if data.accept == true then
 		billed.Functions.RemoveMoney(tostring(data.billtype), data.amount)
-		TriggerEvent('jim-payments:Tickets:Give', newdata, biller)
+		TriggerEvent('jim-payments:Tickets:Give', newdata, biller, data.gang)
 		TriggerClientEvent("QBCore:Notify", data.biller, billed.PlayerData.charinfo.firstname.." accepted the $"..data.amount.." payment", "success")
 	elseif data.accept == false then
 		TriggerClientEvent("QBCore:Notify", src, "You declined the payment")

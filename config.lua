@@ -1,4 +1,4 @@
-print("Jim-Payments v2.5 - Payments Script by Jimathy")
+print("Jim-Payments v2.6 - Payments Script by Jimathy")
 
 -- If you need support I now have a discord available, it helps me keep track of issues and give better support.
 
@@ -8,7 +8,7 @@ Config = {}
 
 Config.Debug = false
 
-Config.Manage = false -- "true" if using qb-management
+Config.Manage = true -- "true" if using qb-management
 					 -- "false" if using qb-bossmenu
 					
 Config.TicketSystem = true -- Enable this if you want to use the ticket system false
@@ -48,7 +48,7 @@ Config.PhoneType = "qb" -- Change this setting to make invoices work with your p
 						-- "qb" for qb-phone
 						-- "gks"" for GKSPhone
 
-Config.Commission = false -- Set this to true to enable Commissions and give the person charging a percentage of the total
+Config.Commission = true -- Set this to true to enable Commissions and give the person charging a percentage of the total
 Config.CommissionAll = false -- Set this to true to give commission to workers clocked in
 Config.CommissionDouble = false -- Set this to true if you want the person charging to get double Commission
 Config.CommissionLimit = false -- If true, this limits the Commission to only be given if over the "MinAmountForTicket". If false, Commission will be given for any amount
@@ -70,6 +70,7 @@ Config.Jobs = {
 	['tequilala'] = { MinAmountforTicket = 50, PayPerTicket = 50, Commission = 0.10, },
 	['vanilla'] = { MinAmountforTicket = 50, PayPerTicket = 50, Commission = 0.10, },
 	['mechanic'] = { MinAmountforTicket = 1000, PayPerTicket = 500, Commission = 0.10, },
+	['lostmc'] = { MinAmountforTicket = 50, PayPerTicket = 50, Commission = 0.10, gang = true },
 }
 
 Config.ATMModels = {"prop_atm_01", "prop_atm_02", "prop_atm_03", "prop_fleeca_atm" }

@@ -15,9 +15,13 @@ end)
 
 CreateThread(function()
 	local jobroles = {}
-	for k, v in pairs(Config.Jobs) do jobroles[tostring(k)] = 0 end
+	local gangroles = {}
+	for k, v in pairs(Config.Jobs) do if v.gang then gangroles[tostring(k)] = 0 else jobroles[tostring(k)] = 0 end end
 	exports['qb-target']:AddCircleZone("JimBank", vector3(Config.CashInLocation.x, Config.CashInLocation.y, Config.CashInLocation.z), 2.0, { name="JimBank", debugPoly=Config.Debug, useZ=true, }, 
-		{ options = { { event = "jim-payments:Tickets:Menu", icon = "fas fa-receipt", label = "Cash in Receipts", job = jobroles } }, distance = 2.0 })
+		{ options = { 
+			{ event = "jim-payments:Tickets:Menu", icon = "fas fa-receipt", label = "Cash in Job Receipts", job = jobroles, },
+			{ event = "jim-payments:Tickets:Menu", icon = "fas fa-receipt", label = "Cash in Gang Receipts", gang = gangroles, } }, 
+		distance = 2.0 })
 	if Config.Peds then
 		local i = math.random(1, #Config.PedPool)
 		RequestModel(Config.PedPool[i]) while not HasModelLoaded(Config.PedPool[i]) do Wait(0) end
@@ -28,7 +32,7 @@ end)
 
 RegisterNetEvent('jim-payments:client:Charge', function(data, outside)
 	if outside == nil then outside = false end
-	if not outside and not onDuty then TriggerEvent("QBCore:Notify", "Not Clocked in!", "error") return end  -- Require to be on duty when making a payment
+	if not outside and not onDuty and data.gang == nil then TriggerEvent("QBCore:Notify", "Not Clocked in!", "error") return end  -- Require to be on duty when making a payment
 	local onlineList = {}
 	local nearbyList = {}
 	local p = promise.new()
@@ -38,7 +42,7 @@ RegisterNetEvent('jim-payments:client:Charge', function(data, outside)
 		local dist = #(GetEntityCoords(GetPlayerPed(v)) - GetEntityCoords(PlayerPedId()))
 		for i = 1, #onlineList do
 			if onlineList[i].value == GetPlayerServerId(v) then
-				if v ~= PlayerId() then
+				if v ~= PlayerId() or Config.Debug then
 					nearbyList[#nearbyList+1] = { value = onlineList[i].value, text = onlineList[i].text..' ('..math.floor(dist+0.05)..'m)' }
 				end
 			end
@@ -52,33 +56,50 @@ RegisterNetEvent('jim-payments:client:Charge', function(data, outside)
 	if not Config.List then newinputs[#newinputs+1] = { type = 'text', isRequired = true, name = 'citizen', text = '# Customer ID #' } end
 	newinputs[#newinputs+1] = { type = 'radio', name = 'billtype', text = 'Payment Type', options = { { value = "cash", text = "Cash" }, { value = "bank", text = "Card" } } }
 	newinputs[#newinputs+1] = { type = 'number', isRequired = true, name = 'price', text = '💵  Amount to Charge' }
-	local dialog = exports['qb-input']:ShowInput({ header = img..PlayerJob.label.." Cash Register", submitText = "Send", inputs = newinputs})
+	if data.job then label = PlayerJob.label gang = false elseif data.gang then label = PlayerGang.label gang = true end
+	local dialog = exports['qb-input']:ShowInput({ header = img..label.." Cash Register", submitText = "Send", inputs = newinputs})
 	if dialog then
 		if not dialog.citizen or not dialog.price then return end
-		TriggerServerEvent('jim-payments:server:Charge', dialog.citizen, dialog.price, dialog.billtype, data.img, outside)
+		TriggerServerEvent('jim-payments:server:Charge', dialog.citizen, dialog.price, dialog.billtype, data.img, outside, gang)
 	end
 end)
 
-RegisterNetEvent('jim-payments:Tickets:Menu', function()
+RegisterNetEvent('jim-payments:Tickets:Menu', function(data)
 	local amount = 0
 	local p = promise.new() QBCore.Functions.TriggerCallback('jim-payments:Ticket:Count', function(cb) p:resolve(cb) end) amount = Citizen.Await(p)
 	if amount == 0 or amount == nil then TriggerEvent("QBCore:Notify", "You don't have any tickets to trade", "error") return end
-	for k, v in pairs(Config.Jobs) do if k ~= PlayerJob.name then 
-		else exports['qb-menu']:openMenu({
-			{ isMenuHeader = true, header = "🧾 "..PlayerJob.label.." Receipts 🧾", txt = "Do you want trade your receipts for payment?" },
-			{ isMenuHeader = true, header = "", txt = "Amount of Tickets: "..amount.."<br>Total Payment: $"..(Config.Jobs[PlayerJob.name].PayPerTicket * amount) },
-			{ icon = "fas fa-circle-check", header = "Yes", txt = "", params = { event = "jim-payments:Tickets:Sell:yes" } },
+	local sellable = false
+	local name = "" local label = ""
+	for k, v in pairs(Config.Jobs) do
+		if data.gang then
+			if v.gang and k == PlayerGang.name then
+				name = k
+				label = PlayerGang.label
+				sellable = true
+			end
+		else
+			if not v.gang and k == PlayerJob.name then
+				name = k
+				label = PlayerJob.label
+				sellable = true
+			end
+		end
+		if sellable then
+			exports['qb-menu']:openMenu({
+				{ isMenuHeader = true, header = "🧾 "..label.." Receipts 🧾", txt = "Do you want trade your receipts for payment?" },
+				{ isMenuHeader = true, header = "", txt = "Amount of Tickets: "..amount.."<br>Total Payment: $"..(Config.Jobs[name].PayPerTicket * amount) },
+				{ icon = "fas fa-circle-check", header = "Yes", txt = "", params = { event = "jim-payments:Tickets:Sell:yes" } },
 			{ icon = "fas fa-circle-xmark", header = "No", txt = "", params = { event = "jim-payments:Tickets:Sell:no" } }, })
 		end
 	end
 end)
 
-RegisterNetEvent("jim-payments:client:PayPopup", function(amount, biller, billtype, img, billerjob)
+RegisterNetEvent("jim-payments:client:PayPopup", function(amount, biller, billtype, img, billerjob, gang)
 	if not img then img = "" end
 	exports['qb-menu']:openMenu({
 		{ isMenuHeader = true, header = img.."🧾 "..billerjob.." Payment 🧾", txt = "Do you want accept the payment?" },
 		{ isMenuHeader = true, header = "", txt = billtype:gsub("^%l", string.upper).." Payment: $"..amount },
-		{ icon = "fas fa-circle-check", header = "Yes", txt = "", params = { isServer = true, event = "jim-payments:server:PayPopup", args = { accept = true, amount = amount, biller = biller, billtype = billtype } } },
+		{ icon = "fas fa-circle-check", header = "Yes", txt = "", params = { isServer = true, event = "jim-payments:server:PayPopup", args = { accept = true, amount = amount, biller = biller, billtype = billtype, gang = gang } } },
 		{ icon = "fas fa-circle-xmark", header = "No", txt = "", params = { isServer = true, event = "jim-payments:server:PayPopup", args = { accept = false, amount = amount, biller = biller, billtype = billtype } } }, })
 end)
 

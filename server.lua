@@ -32,7 +32,10 @@ RegisterServerEvent('jim-payments:Tickets:Give', function(data, biller, gang)
 			end
 		end
 	elseif not biller then	--Find the biller from their citizenid
-		local biller = QBCore.Functions.GetPlayerByCitizenId(data.senderCitizenId)
+		for k, v in pairs(QBCore.Functions.GetPlayers()) do
+		local Player = QBCore.Functions.GetPlayer(v)
+			if Player.PlayerData.citizenid == data.senderCitizenId then	biller = Player	end
+		end
 		TriggerClientEvent('QBCore:Notify', biller.PlayerData.source, data.sender.." Paid their $"..data.amount.." invoice", "success")
 	end
 

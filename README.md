@@ -64,7 +64,7 @@ Go to gks-phone > server > serverapi.lua
 
 - Add these lines:
 ```lua
-TriggerEvent('jim-payments:Tickets:Give', { senderCitizenId = id.sendercitizenid, society = id.society, amount = amount })
+TriggerEvent('jim-payments:Tickets:Give', { sender = Ply.PlayerData.charinfo.firstname, senderCitizenId = data[1].sendercitizenid, society = data[1].society, amount = data[1].amount })
 ```
 
 --------------

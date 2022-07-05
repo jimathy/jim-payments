@@ -5,8 +5,8 @@ print("Jim-Payments v2.7 - Payments Script by Jimathy")
 -- https://discord.gg/xKgQZ6wZvS
 
 Config = {
-	Debug = true,
-	Manage = true, -- "true" if using qb-management
+	Debug = false,
+	Manage = true,		-- "true" if using qb-management
 				-- "false" if using qb-bossmenu
 	TicketSystem = true, -- Enable this if you want to use the ticket system false
 
@@ -51,7 +51,7 @@ Config = {
 	CommissionLimit = false, -- If true, this limits the Commission to only be given if over the "MinAmountForTicket".
 							 -- If false, Commission will be given for any amount
 
-	Gabz = true, -- "true" to enable Gabz Bank locations
+	Gabz = false, -- "true" to enable Gabz Bank locations
 
 	-- MinAmountforTicket should be your cheapest item
 	-- PayPerTicket should never be higher than MinAmountforTicket
@@ -75,7 +75,7 @@ Config = {
 		['police'] = { Commission = 0.25, },
 		['ambulance'] = { Commission = 0.25, },
 	},
-	FineJobConfirmation = true, --"true" makes it so fines need confirmation, "false" skips this ands just removes the money
+	FineJobConfirmation = false, --"true" makes it so fines need confirmation, "false" skips this ands just removes the money
 	FineJobList = true, -- "true" to use nearby player list feature in the cash registers, "false" for manual id entry
 
 	ATMModels = { "prop_atm_01", "prop_atm_02", "prop_atm_03", "prop_fleeca_atm" },

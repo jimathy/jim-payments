@@ -21,15 +21,17 @@ local function cv(amount)
     return formatted
 end
 
-local function loadModel(model) if Config.Debug then print("Debug: Loading Model: '"..model.."'") end RequestModel(model) while not HasModelLoaded(model) do Wait(0) end end
-local function unloadModel(model) if Config.Debug then print("Debug: Removing Model: '"..model.."'") end SetModelAsNoLongerNeeded(model) end
+local function loadModel(model) if not HasModelLoaded(model) then if Config.Debug then print("^5Debug^7: ^2Loading Model^7: '^6"..model.."^7'") end RequestModel(model) while not HasModelLoaded(model) do Wait(0) end end end
+local function unloadModel(model) if Config.Debug then print("^5Debug^7: ^2Removing Model^7: '^6"..model.."^7'") end SetModelAsNoLongerNeeded(model) end
+local function loadAnimDict(dict) if Config.Debug then print("^5Debug^7: ^2Loading Anim Dictionary^7: '^6"..dict.."^7'") end while not HasAnimDictLoaded(dict) do RequestAnimDict(dict) Wait(5) end end
+local function unloadAnimDict(dict) if Config.Debug then print("^5Debug^7: ^2Removing Anim Dictionary^7: '^6"..dict.."^7'") end RemoveAnimDict(dict) end
 
 local bossroles = {}
 local gangroles = {}
 CreateThread(function()
 	if Config.useATM then
 		if Config.ATMBlips then
-			for k, v in pairs(Config.WallATMLocations) do
+			for _, v in pairs(Config.WallATMLocations) do
 				blip = AddBlipForCoord(v)
 				SetBlipSprite(blip, 108)
 				SetBlipDisplay(blip, 4)
@@ -40,7 +42,7 @@ CreateThread(function()
 				AddTextComponentString("ATM")
 				EndTextCommandSetBlipName(blip)
 			end
-			for k, v in pairs(Config.ATMLocations) do
+			for _, v in pairs(Config.ATMLocations) do
 				blip = AddBlipForCoord(v)
 				SetBlipSprite(blip, 108)
 				SetBlipDisplay(blip, 4)
@@ -55,8 +57,8 @@ CreateThread(function()
 	end
 	if Config.useBanks then
 		if Config.BankBlips then
-			for k,v in pairs(Config.BankLocations) do
-				for l, b in pairs(v) do
+			for _, v in pairs(Config.BankLocations) do
+				for _, b in pairs(v) do
 					blip = AddBlipForCoord(b)
 					SetBlipSprite(blip, 108)
 					SetBlipDisplay(blip, 4)
@@ -72,9 +74,9 @@ CreateThread(function()
 		end
 	end
 	if Config.useATM or Config.useBanks then
-		for k, v in pairs(QBCore.Shared.Jobs) do ---Grabs the list of jobs
+		for k in pairs(QBCore.Shared.Jobs) do ---Grabs the list of jobs
 			if QBCore.Shared.Jobs[tostring(k)] then
-				for l, b in pairs(QBCore.Shared.Jobs[tostring(k)].grades) do -- Grabs the list of grades
+				for l in pairs(QBCore.Shared.Jobs[tostring(k)].grades) do -- Grabs the list of grades
 					if QBCore.Shared.Jobs[tostring(k)].grades[l].isboss == true then -- Checks the grade if is boss
 						if bossroles[tostring(k)] ~= nil then -- checks if the line exists
 							if bossroles[tostring(k)] > tonumber(l) then bossroles[tostring(k)] = tonumber(l) end -- the
@@ -84,9 +86,9 @@ CreateThread(function()
 				end
 			end
 		end
-		for k, v in pairs(QBCore.Shared.Gangs) do
+		for k in pairs(QBCore.Shared.Gangs) do
 			if QBCore.Shared.Gangs[tostring(k)] then
-				for l, b in pairs(QBCore.Shared.Gangs[tostring(k)].grades) do
+				for l in pairs(QBCore.Shared.Gangs[tostring(k)].grades) do
 					if tostring(k) ~= "none" then
 						if QBCore.Shared.Gangs[tostring(k)].grades[l].isboss == true then
 							if gangroles[tostring(k)] ~= nil then
@@ -135,7 +137,7 @@ CreateThread(function()
 					local i = math.random(1, #Config.PedPool)
 					loadModel(Config.PedPool[i])
 					if Peds["jimbank"..k..l] == nil then Peds["jimbank"..k..l] = CreatePed(0, Config.PedPool[i], vector3(tonumber(b.x), tonumber(b.y), tonumber(b.z)-1.03), b[4], false, false) end
-					if Config.Debug then print("Ped Created - 'jimbank"..k..l.."'") end
+					if Config.Debug then print("^5Debug^7: ^6Ped ^2Created for location^7: '^6"..k..l.."^7'") end
 				end
 			end
 		end
@@ -143,13 +145,15 @@ CreateThread(function()
 end)
 
 local function PlayATMAnimation(animation)
-    if animation == 'enter' then RequestAnimDict('amb@prop_human_atm@male@enter')
-        while not HasAnimDictLoaded('amb@prop_human_atm@male@enter') do Wait(1) end
-        if HasAnimDictLoaded('amb@prop_human_atm@male@enter') then TaskPlayAnim(PlayerPedId(), 'amb@prop_human_atm@male@enter', "enter", 1.0,-1.0, 1500, 1, 1, true, true, true) end
+    if animation == 'enter' then
+		loadAnimDict('amb@prop_human_atm@male@enter')
+		TaskPlayAnim(PlayerPedId(), 'amb@prop_human_atm@male@enter', "enter", 1.0,-1.0, 1500, 1, 1, true, true, true)
+		unloadAnimDict('amb@prop_human_atm@male@enter')
 	end
-    if animation == 'exit' then RequestAnimDict('amb@prop_human_atm@male@exit')
-		while not HasAnimDictLoaded('amb@prop_human_atm@male@exit') do Wait(1) end
-        if HasAnimDictLoaded('amb@prop_human_atm@male@exit') then TaskPlayAnim(PlayerPedId(), 'amb@prop_human_atm@male@exit', "exit", 1.0,-1.0, 3000, 1, 1, true, true, true) end
+    if animation == 'exit' then
+		loadAnimDict('amb@prop_human_atm@male@exit')
+		TaskPlayAnim(PlayerPedId(), 'amb@prop_human_atm@male@exit', "exit", 1.0,-1.0, 3000, 1, 1, true, true, true)
+		unloadAnimDict('amb@prop_human_atm@male@enter')
 	end
 end
 

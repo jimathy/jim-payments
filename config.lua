@@ -1,4 +1,4 @@
-print("Jim-Payments v2.7 - Payments Script by Jimathy")
+print("^2Jim^7-^2Payments ^4v^62.7 ^7- ^2Payments Script by ^1Jimathy^7")
 
 -- If you need support I now have a discord available, it helps me keep track of issues and give better support.
 
@@ -6,9 +6,8 @@ print("Jim-Payments v2.7 - Payments Script by Jimathy")
 
 Config = {
 	Debug = false,
-	Manage = true,		-- "true" if using qb-management
+	Manage = true, -- "true" if using qb-management
 				-- "false" if using qb-bossmenu
-	TicketSystem = true, -- Enable this if you want to use the ticket system false
 
 	List = true, -- "true" to use nearby player list feature in the cash registers, "false" for manual id entry
 	PaymentRadius = 30, -- This is how far the playerlist will check for nearby players (based on the person charging)
@@ -44,6 +43,9 @@ Config = {
 						-- "gks"" for GKSPhone
 
 	CashInLocation = vector4(252.23, 223.11, 106.29, 159.2), -- Default Third Window along in Pacific Bank
+
+	TicketSystem = true, -- Enable this if you want to use the ticket system false
+	TicketSystemAll = true, -- Enable this to give tickets to all workers clocked in
 
 	Commission = true, -- Set this to true to enable Commissions and give the person charging a percentage of the total
 	CommissionAll = false, -- Set this to true to give commission to workers clocked in

@@ -20,8 +20,8 @@ AddEventHandler('onResourceStart', function(resource) if GetCurrentResourceName(
 	end)
 end)
 
-local function loadModel(model) if Config.Debug then print("Debug: Loading Model: '"..model.."'") end RequestModel(model) while not HasModelLoaded(model) do Wait(0) end end
-local function unloadModel(model) if Config.Debug then print("Debug: Removing Model: '"..model.."'") end SetModelAsNoLongerNeeded(model) end
+local function loadModel(model) if not HasModelLoaded(model) then if Config.Debug then print("^5Debug^7: ^2Loading Model^7: '^6"..model.."^7'") end RequestModel(model) while not HasModelLoaded(model) do Wait(0) end end end
+local function unloadModel(model) if Config.Debug then print("^5Debug^7: ^2Removing Model^7: '^6"..model.."^7'") end SetModelAsNoLongerNeeded(model) end
 
 CreateThread(function()
 	local jobroles = {} local gangroles = {}
@@ -38,7 +38,7 @@ CreateThread(function()
 		local i = math.random(1, #Config.PedPool)
 		loadModel(Config.PedPool[i])
 		if not BankPed then BankPed = CreatePed(0, Config.PedPool[i], vector3(Config.CashInLocation.x, Config.CashInLocation.y, Config.CashInLocation.z-1), Config.CashInLocation[4], false, false) end
-		if Config.Debug then print("Ped Created for Ticket Trade") end
+		if Config.Debug then print("^5Debug^7: ^6Ped ^2Created for location^7: '^6Ticket Trade^7'") end
 	end
 end)
 

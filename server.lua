@@ -22,15 +22,15 @@ RegisterServerEvent('jim-payments:Tickets:Give', function(data, biller, gang)
 	if biller then -- If this is found, it ISN'T a phone payment, so add money to society here
 		if gang then
 			if Config.Manage then exports["qb-management"]:AddGangMoney(tostring(biller.PlayerData.gang.name), data.amount)
-				if Config.Debug then print("QB-Management(Gang): Adding $"..data.amount.." to account '"..tostring(biller.PlayerData.gang.name).."'") end
+				if Config.Debug then print("^5Debug^7: ^6QB-Management^7(^Gang^7): ^2Adding ^7$^6"..data.amount.." ^2to account ^7'^6"..tostring(biller.PlayerData.gang.name).."^7'") end
 			else TriggerEvent("qb-gangmenu:server:addAccountMoney", tostring(biller.PlayerData.gang.name), data.amount)
-				if Config.Debug then print("QB-GangMenu: Adding $"..data.amount.." to account '"..tostring(biller.PlayerData.gang.name).."'") end
+				if Config.Debug then print("^5Debug^7: ^6QB-GangMenu^7: ^2Adding ^7$^6"..data.amount.." ^2to account ^7'^6"..tostring(biller.PlayerData.gang.name).."^7'") end
 			end
 		elseif not gang then
 			if Config.Manage then exports["qb-management"]:AddMoney(tostring(biller.PlayerData.job.name), data.amount)
-				if Config.Debug then print("QB-Management(Job): Adding $"..data.amount.." to account '"..tostring(biller.PlayerData.job.name).."'") end
+				if Config.Debug then print("^5Debug^7: ^6QB-Management^7(^4Job^7): ^2Adding ^7$^6"..data.amount.." ^2to account ^7'^6"..tostring(biller.PlayerData.job.name).."^7'") end
 			else TriggerEvent("qb-bossmenu:server:addAccountMoney", tostring(biller.PlayerData.job.name), data.amount)
-				if Config.Debug then print("QB-BossMenu: Adding $"..data.amount.." to account '"..tostring(biller.PlayerData.job.name).."'") end
+				if Config.Debug then print("^5Debug^7: ^6QB-BossMenu^7: ^2Adding ^7$^6"..data.amount.." ^2to account ^7'^6"..tostring(biller.PlayerData.job.name).."^7'") end
 			end
 		end
 	elseif not biller then	--Find the biller from their citizenid
@@ -47,20 +47,26 @@ RegisterServerEvent('jim-payments:Tickets:Give', function(data, biller, gang)
 	-- If ticket system enabled, do this
 	if duty and Config.TicketSystem then
 		if data.amount >= Config.Jobs[data.society].MinAmountforTicket then
-			for _, v in pairs(QBCore.Functions.GetPlayers()) do
-				local Player = QBCore.Functions.GetPlayer(v)
-				if Player ~= nil or Player ~= billed then
-					if Player.PlayerData.job.name == data.society and Player.PlayerData.job.onduty then
-						Player.Functions.AddItem('payticket', 1, false, {["quality"] = nil})
-						TriggerClientEvent('QBCore:Notify', Player.PlayerData.source, 'Receipt received', 'success')
-						TriggerClientEvent('inventory:client:ItemBox', Player.PlayerData.source, QBCore.Shared.Items['payticket'], "add", 1)
+			if Config.TicketSystemAll then
+				for _, v in pairs(QBCore.Functions.GetPlayers()) do
+					local Player = QBCore.Functions.GetPlayer(v)
+					if Player ~= nil or Player ~= billed then
+						if Player.PlayerData.job.name == data.society and Player.PlayerData.job.onduty then
+							Player.Functions.AddItem('payticket', 1, false, {["quality"] = nil})
+							TriggerClientEvent('QBCore:Notify', Player.PlayerData.source, 'Receipt received', 'success')
+							TriggerClientEvent('inventory:client:ItemBox', Player.PlayerData.source, QBCore.Shared.Items['payticket'], "add", 1)
+						end
+					end
+					if gang then
+						biller.Functions.AddItem('payticket', 1, false, {["quality"] = nil})
+						TriggerClientEvent('QBCore:Notify', biller.PlayerData.source, 'Receipt received', 'success')
+						TriggerClientEvent('inventory:client:ItemBox', biller.PlayerData.source, QBCore.Shared.Items['payticket'], "add", 1)
 					end
 				end
-				if gang then
-					biller.Functions.AddItem('payticket', 1, false, {["quality"] = nil})
-					TriggerClientEvent('QBCore:Notify', biller.PlayerData.source, 'Receipt received', 'success')
-					TriggerClientEvent('inventory:client:ItemBox', biller.PlayerData.source, QBCore.Shared.Items['payticket'], "add", 1)
-				end
+			else
+				biller.Functions.AddItem('payticket', 1, false, {["quality"] = nil})
+				TriggerClientEvent('QBCore:Notify', biller.PlayerData.source, 'Receipt received', 'success')
+				TriggerClientEvent('inventory:client:ItemBox', biller.PlayerData.source, QBCore.Shared.Items['payticket'], "add", 1)
 			end
 		end
 	end
@@ -173,11 +179,11 @@ RegisterServerEvent("jim-payments:server:PolCharge", function(citizen, price)
 			local commission = (tonumber(price) * Config.FineJobs[biller.PlayerData.job.name].Commission)
 			biller.Functions.AddMoney("bank", math.floor(commission))
 			if Config.Manage then
-				if Config.Manage then exports["qb-management"]:AddMoney(tostring(biller.PlayerData.job.name), price)
-					if Config.Debug then print("QB-Management(Job): Adding $"..price.." to account '"..tostring(biller.PlayerData.job.name).."'") end
-				else TriggerEvent("qb-bossmenu:server:addAccountMoney", tostring(biller.PlayerData.job.name), price)
-					if Config.Debug then print("QB-BossMenu: Adding $"..price.." to account '"..tostring(biller.PlayerData.job.name).."'") end
-				end
+				exports["qb-management"]:AddMoney(tostring(biller.PlayerData.job.name), price)
+				if Config.Debug then print("^5Debug^7: ^6QB-Management^7(^4Job^7): ^2Adding ^7$^6"..price.." ^2to account ^7'^6"..tostring(biller.PlayerData.job.name).."^7'") end
+			else
+				TriggerEvent("qb-bossmenu:server:addAccountMoney", tostring(biller.PlayerData.job.name), price)
+				if Config.Debug then print("^5Debug^7: ^6QB-BossMenu^7: ^2Adding ^7$^6"..price.." ^2to account ^7'^6"..tostring(biller.PlayerData.job.name).."^7'") end
 			end
 			TriggerClientEvent('QBCore:Notify', src, billed.PlayerData.charinfo.firstname.." was charged for $"..tonumber(price), "success")
 			TriggerClientEvent('QBCore:Notify', billed.PlayerData.source, 'You were charged for $'..tonumber(price))
@@ -193,6 +199,15 @@ RegisterServerEvent("jim-payments:server:PolPopup", function(data)
 	if data.accept == true then
 		billed.Functions.RemoveMoney("bank", data.amount)
 		TriggerClientEvent("QBCore:Notify", data.biller, billed.PlayerData.charinfo.firstname.." accepted the $"..data.amount.." charge", "success")
+		local commission = (tonumber(data.amount) * Config.FineJobs[biller.PlayerData.job.name].Commission)
+		if biller.Functions.AddMoney("bank", math.floor(commission)) then if Config.Debug then print("^5Debug^7: ^6PolCharge^7 - ^4Commission ^2 of ^7$^6"..commission.." ^2sent to Player^7(^6"..biller.PlayerData.source.."^7)") end end
+		if Config.Manage then
+			exports["qb-management"]:AddMoney(tostring(biller.PlayerData.job.name), data.amount)
+			if Config.Debug then print("^5Debug^7: ^6QB-Management^7(^4Job^7): ^2Adding ^7$^6"..data.amount.." ^2to account ^7'^6"..tostring(biller.PlayerData.job.name).."^7'") end
+		else
+			TriggerEvent("qb-bossmenu:server:addAccountMoney", tostring(biller.PlayerData.job.name), data.amount)
+			if Config.Debug then print("^5Debug^7: ^6QB-BossMenu^7: ^2Adding ^6$^7"..data.amount.." ^2to account ^7'^6"..tostring(biller.PlayerData.job.name).."^7'") end
+		end
 	else
 		TriggerClientEvent("QBCore:Notify", src, "You declined the payment")
 		TriggerClientEvent("QBCore:Notify", data.biller, billed.PlayerData.charinfo.firstname.." declined the $"..data.amount.." charge", "error")

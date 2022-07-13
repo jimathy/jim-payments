@@ -174,10 +174,10 @@ RegisterServerEvent("jim-payments:server:PolCharge", function(citizen, price)
     local biller = QBCore.Functions.GetPlayer(src)
     local billed = QBCore.Functions.GetPlayer(tonumber(citizen))
 	local price = math.floor(tonumber(price))
+	local commission = math.floor(price * Config.FineJobs[biller.PlayerData.job.name].Commission)
 	if price > 0 then
 		if not Config.FineJobConfirmation then
 			if billed.Functions.AddMoney("bank", price) then if Config.Debug then print("^5Debug^7: ^3PolCharge^7 - ^2Player^7(^6"..billed.PlayerData.source.."^7) ^2charged ^7$^6"..price.."^7") end end
-			local commission = math.floor(price * Config.FineJobs[biller.PlayerData.job.name].Commission)
 			if biller.Functions.AddMoney("bank", commission) then if Config.Debug then print("^5Debug^7: ^3PolCharge^7 - ^2Commission of ^7$^6"..commission.." ^2sent to Player^7(^6"..biller.PlayerData.source.."^7)") end end
 			if Config.Manage then
 				exports["qb-management"]:AddMoney(tostring(biller.PlayerData.job.name), (price - commission))
@@ -189,7 +189,7 @@ RegisterServerEvent("jim-payments:server:PolCharge", function(citizen, price)
 			TriggerClientEvent('QBCore:Notify', src, billed.PlayerData.charinfo.firstname.." was charged for $"..(price - commission), "success")
 			TriggerClientEvent('QBCore:Notify', billed.PlayerData.source, 'You were charged for $'..(price - commission))
 		else
-			TriggerClientEvent("jim-payments:client:PolPopup", billed.PlayerData.source, (price - commission), src, biller.PlayerData.job.label)
+			TriggerClientEvent("jim-payments:client:PolPopup", billed.PlayerData.source, price, src, biller.PlayerData.job.label)
 		end
 	else TriggerClientEvent('QBCore:Notify', source, "You can't charge $0", 'error') return end
 end)
@@ -199,11 +199,11 @@ RegisterServerEvent("jim-payments:server:PolPopup", function(data)
     local billed = QBCore.Functions.GetPlayer(src)
     local biller = QBCore.Functions.GetPlayer(tonumber(data.biller))
 	data.amount = math.floor(data.amount)
+	local commission = math.floor(tonumber(data.amount) * Config.FineJobs[biller.PlayerData.job.name].Commission)
 	if data.accept == true then
-		if billed.Functions.AddMoney("bank", data.amount) then if Config.Debug then print("^5Debug^7: ^3PolCharge^7 - ^2Player^7(^6"..billed.PlayerData.source.."^7) ^2charged 7$^6"..data.amount.."^7") end end
+		if billed.Functions.AddMoney("bank", data.amount) then if Config.Debug then print("^5Debug^7: ^3PolCharge^7 - ^2Player^7(^6"..billed.PlayerData.source.."^7) ^2charged ^7$^6"..data.amount.."^7") end end
 		TriggerClientEvent("QBCore:Notify", data.biller, billed.PlayerData.charinfo.firstname.." accepted the $"..data.amount.." charge", "success")
-		local commission = math.floor(tonumber(data.amount) * Config.FineJobs[biller.PlayerData.job.name].Commission)
-		if biller.Functions.AddMoney("bank", commission) then if Config.Debug then print("^5Debug^7: ^3PolCharge^7 - ^2Commission ^2 of ^7$^6"..commission.." ^2sent to Player^7(^6"..biller.PlayerData.source.."^7)") end end
+		if biller.Functions.AddMoney("bank", commission) then if Config.Debug then print("^5Debug^7: ^3PolCharge^7 - ^2Commission^2 of ^7$^6"..commission.." ^2sent to Player^7(^6"..biller.PlayerData.source.."^7)") end end
 		if Config.Manage then
 			exports["qb-management"]:AddMoney(tostring(biller.PlayerData.job.name), data.amount - commission)
 			if Config.Debug then print("^5Debug^7: ^3QB^7-^3Management^7(^3Job^7): ^2Adding ^7$^6"..data.amount - commission.." ^2to account ^7'^6"..tostring(biller.PlayerData.job.name).."^7' ($^6"..exports["qb-management"]:GetAccount(biller.PlayerData.job.name).."^7)") end

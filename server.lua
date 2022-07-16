@@ -177,7 +177,7 @@ RegisterServerEvent("jim-payments:server:PolCharge", function(citizen, price)
 	local commission = math.floor(price * Config.FineJobs[biller.PlayerData.job.name].Commission)
 	if price > 0 then
 		if not Config.FineJobConfirmation then
-			if billed.Functions.AddMoney("bank", price) then if Config.Debug then print("^5Debug^7: ^3PolCharge^7 - ^2Player^7(^6"..billed.PlayerData.source.."^7) ^2charged ^7$^6"..price.."^7") end end
+			if billed.Functions.RemoveMoney("bank", price) then if Config.Debug then print("^5Debug^7: ^3PolCharge^7 - ^2Player^7(^6"..billed.PlayerData.source.."^7) ^2charged ^7$^6"..price.."^7") end end
 			if biller.Functions.AddMoney("bank", commission) then if Config.Debug then print("^5Debug^7: ^3PolCharge^7 - ^2Commission of ^7$^6"..commission.." ^2sent to Player^7(^6"..biller.PlayerData.source.."^7)") end end
 			if Config.Manage then
 				exports["qb-management"]:AddMoney(tostring(biller.PlayerData.job.name), (price - commission))
@@ -201,7 +201,7 @@ RegisterServerEvent("jim-payments:server:PolPopup", function(data)
 	data.amount = math.floor(data.amount)
 	local commission = math.floor(tonumber(data.amount) * Config.FineJobs[biller.PlayerData.job.name].Commission)
 	if data.accept == true then
-		if billed.Functions.AddMoney("bank", data.amount) then if Config.Debug then print("^5Debug^7: ^3PolCharge^7 - ^2Player^7(^6"..billed.PlayerData.source.."^7) ^2charged ^7$^6"..data.amount.."^7") end end
+		if billed.Functions.RemoveMoney("bank", data.amount) then if Config.Debug then print("^5Debug^7: ^3PolCharge^7 - ^2Player^7(^6"..billed.PlayerData.source.."^7) ^2charged ^7$^6"..data.amount.."^7") end end
 		TriggerClientEvent("QBCore:Notify", data.biller, billed.PlayerData.charinfo.firstname.." accepted the $"..data.amount.." charge", "success")
 		if biller.Functions.AddMoney("bank", commission) then if Config.Debug then print("^5Debug^7: ^3PolCharge^7 - ^2Commission^2 of ^7$^6"..commission.." ^2sent to Player^7(^6"..biller.PlayerData.source.."^7)") end end
 		if Config.Manage then

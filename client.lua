@@ -5,6 +5,8 @@ PlayerGang = {}
 
 local onDuty = false
 local BankPed = nil
+local Targets = {}
+local till = {}
 
 RegisterNetEvent('QBCore:Client:OnPlayerLoaded', function() QBCore.Functions.GetPlayerData(function(PlayerData) PlayerJob = PlayerData.job PlayerGang = PlayerData.gang end) end)
 RegisterNetEvent('QBCore:Client:OnJobUpdate', function(JobInfo) PlayerJob = JobInfo onDuty = PlayerJob.onduty end)
@@ -28,6 +30,7 @@ CreateThread(function()
 	--Build Job/Gang Checks for cashin location
 	for k, v in pairs(Config.Jobs) do if v.gang then gangroles[tostring(k)] = 0 else jobroles[tostring(k)] = 0 end end
 	--Create Target at location
+	Targets["JimBank"] =
 	exports['qb-target']:AddCircleZone("JimBank", vector3(Config.CashInLocation.x, Config.CashInLocation.y, Config.CashInLocation.z), 2.0, { name="JimBank", debugPoly=Config.Debug, useZ=true, },
 		{ options = {
 			{ event = "jim-payments:Tickets:Menu", icon = "fas fa-receipt", label = "Cash in Job Receipts", job = jobroles, },
@@ -39,6 +42,23 @@ CreateThread(function()
 		loadModel(Config.PedPool[i])
 		if not BankPed then BankPed = CreatePed(0, Config.PedPool[i], vector3(Config.CashInLocation.x, Config.CashInLocation.y, Config.CashInLocation.z-1), Config.CashInLocation[4], false, false) end
 		if Config.Debug then print("^5Debug^7: ^6Ped ^2Created for location^7: '^6Ticket Trade^7'") end
+	end
+
+	--Spawn Custom Cash Register Targets
+	for k, v in pairs(Config.CustomCashRegisters) do
+		for i = 1, #v do
+			Targets["CustomRegister: "..k..i] =
+			exports['qb-target']:AddBoxZone("CustomRegister: "..k..i, v[i].coords, 0.47, 0.34, { name="CustomRegister: "..k..i, heading = v[i].coords[4], debugPoly=Config.Debug, minZ=v[i].coords.z-0.1, maxZ=v[i].coords.z+0.4 },
+				{ options = { { event = "jim-payments:client:Charge", icon = "fas fa-credit-card", label = "Charge Customer", job = k, img = "" }, },
+					distance = 2.0
+			})
+			if v[i].prop then
+				loadModel(`prop_till_03`)
+				till[#till+1] = CreateObject(`prop_till_03`, v[i].coords.x, v[i].coords.y, v[i].coords.z, 0, 0, 0)
+				SetEntityHeading(till[#till],v[i].coords[4]+180.0)
+				FreezeEntityPosition(till[#till], true)
+			end
+		end
 	end
 end)
 
@@ -170,5 +190,7 @@ RegisterNetEvent('jim-payments:Tickets:Sell:yes', function() TriggerServerEvent(
 RegisterNetEvent('jim-payments:Tickets:Sell:no', function() exports['qb-menu']:closeMenu() end)
 
 AddEventHandler('onResourceStop', function(resource) if resource ~= GetCurrentResourceName() then return end
-	exports['qb-target']:RemoveZone("JimBank") unloadModel(GetEntityModel(BankPed)) DeletePed(BankPed)
+	for k in pairs(Targets) do exports['qb-target']:RemoveZone(k) end
+	for i = 1, #till do DeleteEntity(till[i]) end
+	unloadModel(GetEntityModel(BankPed)) DeletePed(BankPed)
 end)

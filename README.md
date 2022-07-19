@@ -11,20 +11,24 @@ Enchanced QB-Input payment system from my other scripts now free on its own
 
 ![General](https://i.imgur.com/37d2mE3.jpeg) ![General](https://i.imgur.com/AIdXzxX.jpeg)
 ![General](https://i.imgur.com/RYADcI2.jpeg) ![General](https://i.imgur.com/ICbQyeQ.jpeg)
+
 # Installation
 
-To make use of this payment system you need trigger the event
+To make use of this payment system you in a job that wasn't created by me
 
-```jim-payments:client:Charge```
+All you need to do is pick the job, grab a vector4 and confirm if you need a prop or not
 
-for example with qb-target
+For example:
 ```lua
-exports['qb-target']:AddBoxZone("Receipt", vector3(1589.14, 6458.26, 26.01), 0.6, 0.6, { name="Receipt", heading = 335.0, debugPoly=debugPoly, minZ = 26.01, maxZ = 26.81, }, 
-{ options = { { event = "jim-payments:client:Charge", icon = "fas fa-credit-card", label = "Charge Customer", job = "popsdiner" } }, distance = 2.0	})
+    CustomCashRegisters = { -- Located in the config.lua
+      ["burgershot"] = { -- Player job role restriction
+        { coords = vector4(-1185.5, -878.54, 13.91, 305.53), prop = true, }, -- vector4 to place the till and the way it faces
+        { coords = vector4(-1184.34, -880.51, 13.93, 302.04), prop = true, }, -- "prop = true" spawns a prop at the coords
+      },
+    },
 ```
-It currently requires you to be on duty to charge someone
 
-This does not need to be added to **MY** job scripts, they already have built in support
+This does not need to be done for **MY** job scripts, they already have built in support
 
 --------------
 
@@ -75,7 +79,6 @@ simply look in the atms.lua and change the config options at the top
 Choose wether to use atm's, choose wether to use banking locations
 Choose wether to add bank blips (if you want to disable qb-banking)
 Choose wether to add ATM blips (if you like $ signs)
-
 
 --------------
 

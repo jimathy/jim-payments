@@ -14,7 +14,7 @@ Enchanced QB-Input payment system from my other scripts now free on its own
 
 # Installation
 
-To make use of this payment system you in a job that wasn't created by me
+To make use of this payment system in a job that wasn't created by me
 
 All you need to do is pick the job, grab a vector4 and confirm if you need a prop or not
 

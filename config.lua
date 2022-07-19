@@ -5,7 +5,7 @@ print("^2Jim^7-^2Payments v^42^7.^47 ^7- ^2Payments Script by ^1Jimathy^7")
 -- https://discord.gg/xKgQZ6wZvS
 
 Config = {
-	Debug = true,
+	Debug = false,
 	Manage = true, -- "true" if using qb-management
 				-- "false" if using qb-bossmenu
 
@@ -76,7 +76,7 @@ Config = {
     CustomCashRegisters = {
 
 	},
-	
+
 	-- The /polcharge command requires specific jobs to be set
 	-- No tickets for these, it's just commission
 	FineJobs = {

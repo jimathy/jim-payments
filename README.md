@@ -11,8 +11,8 @@ https://ko-fi.com/jixelpatterns
   - Currently supported are:
     - qb-phone
     - gks-phone
-    - qs-smartphone
-	- Leave the setting as "qb" for qs
+    - qs-smartphone - Leave the setting as "qb"
+    - 
 ---
 # Installation
 ---

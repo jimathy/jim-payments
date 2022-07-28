@@ -107,14 +107,14 @@ CreateThread(function()
 			Targets["jimwallatm"..k] =
 			exports['qb-target']:AddCircleZone("jimwallatm"..k, vector3(tonumber(v.x), tonumber(v.y), tonumber(v.z)+0.2), 0.5, { name="jimwallatm"..k, debugPoly=Config.Debug, useZ=true, },
 			{ options = { { event = "jim-payments:Client:ATM:use", icon = "fas fa-money-check-alt", label = "Use ATM", id = "atm" },
-						  --{ event = "jim-payments:Client:ATM:use", icon = "fas fa-arrow-right-arrow-left", label = "Transfer Money", id = "transfer" },
+						--{ event = "jim-payments:Client:ATM:use", icon = "fas fa-arrow-right-arrow-left", label = "Transfer Money", id = "transfer" },
 			}, distance = 1.5 })
 		end
 		for k,v in pairs(Config.ATMLocations) do
 			Targets["jimatm"..k] =
 			exports['qb-target']:AddCircleZone("jimatm"..k, vector3(tonumber(v.x), tonumber(v.y), tonumber(v.z)+0.2), 0.5, { name="jimatm"..k, debugPoly=Config.Debug, useZ=true, },
 			{ options = { { event = "jim-payments:Client:ATM:use", icon = "fas fa-money-check-alt", label = "Use ATM", id = "atm" },
-						  --{ event = "jim-payments:Client:ATM:use", icon = "fas fa-arrow-right-arrow-left", label = "Transfer Money", id = "transfer" },
+						--{ event = "jim-payments:Client:ATM:use", icon = "fas fa-arrow-right-arrow-left", label = "Transfer Money", id = "transfer" },
 			}, distance = 1.5 })
 		end
 	end
@@ -124,18 +124,19 @@ CreateThread(function()
 				Targets["jimbank"..k..l] =
 				exports['qb-target']:AddCircleZone("jimbank"..k..l, vector3(tonumber(b.x), tonumber(b.y), tonumber(b.z)+0.2), 2.0, { name="jimbank"..k..l, debugPoly=Config.Debug, useZ=true, },
 				{ options = { { event = "jim-payments:Client:ATM:use", icon = "fas fa-piggy-bank", label = "Use Bank", id = "bank" },
-							  { event = "jim-payments:Client:ATM:use", icon = "fas fa-arrow-right-arrow-left", label = "Transfer Money", id = "transfer" },
-							  { event = "jim-payments:Client:ATM:use", icon = "fas fa-money-check-dollar", label = "Access Savings", id = "savings" },
+							{ event = "jim-payments:Client:ATM:use", icon = "fas fa-arrow-right-arrow-left", label = "Transfer Money", id = "transfer" },
+							{ event = "jim-payments:Client:ATM:use", icon = "fas fa-money-check-dollar", label = "Access Savings", id = "savings" },
 
-							  { event = "jim-payments:Client:ATM:use", icon = "fas fa-building", label = "Access Society Account", id = "society", job = bossroles },
-							  { event = "jim-payments:Client:ATM:use", icon = "fas fa-arrow-right-arrow-left", label = "Society Money Transfer", id = "societytransfer", job = bossroles },
+							{ event = "jim-payments:Client:ATM:use", icon = "fas fa-building", label = "Access Society Account", id = "society", job = bossroles },
+							{ event = "jim-payments:Client:ATM:use", icon = "fas fa-arrow-right-arrow-left", label = "Society Money Transfer", id = "societytransfer", job = bossroles },
 
-							  { event = "jim-payments:Client:ATM:use", icon = "fas fa-building", label = "Gang Society Account", id = "gang", gang = gangroles },
-							  { event = "jim-payments:Client:ATM:use", icon = "fas fa-arrow-right-arrow-left", label = "Gang Money Transfer", id = "gangtransfer", gang = gangroles }, },
+							{ event = "jim-payments:Client:ATM:use", icon = "fas fa-building", label = "Gang Society Account", id = "gang", gang = gangroles },
+							{ event = "jim-payments:Client:ATM:use", icon = "fas fa-arrow-right-arrow-left", label = "Gang Money Transfer", id = "gangtransfer", gang = gangroles }, },
 				distance = 2.5 })
 				if Config.Peds then
 					local i = math.random(1, #Config.PedPool)
 					loadModel(Config.PedPool[i])
+					if not Config.Gabz then CreateModelHide(vector3(tonumber(b.x), tonumber(b.y), tonumber(b.z)), 1.0, `v_corp_bk_chair3`, true) end
 					if Peds["jimbank"..k..l] == nil then Peds["jimbank"..k..l] = CreatePed(0, Config.PedPool[i], vector3(tonumber(b.x), tonumber(b.y), tonumber(b.z)-1.03), b[4], false, false) end
 					if Config.Debug then print("^5Debug^7: ^6Ped ^2Created for location^7: '^6"..k..l.."^7'") end
 				end
@@ -290,9 +291,9 @@ RegisterNetEvent('jim-payments:Client:ATM:use', function(data)
 		setoptions = { { value = "transfer", text = "Transfer" } }
 		setview = "Welcome back, "..info.name.."<br><br>- Society Account -<br>"..PlayerGang.label.."<br><br>- Balances -<br>🏢"..PlayerGang.label.." - $"..cv(gsociety).."<br><br>- Options -"
 		setheader = "🔀 Transfer Services 🔀"
-		setinputs = { { type = 'radio', name = 'billtype', text = setview, options = setoptions },
-					  { type = 'text', isRequired = true, name = 'account', text = '🏦 Account no.' },
-					  { type = 'number', isRequired = true, name = 'amount', text = '💸 Amount to transfer' }, }
+		setinputs = { 	{ type = 'radio', name = 'billtype', text = setview, options = setoptions },
+						{ type = 'text', isRequired = true, name = 'account', text = '🏦 Account no.' },
+						{ type = 'number', isRequired = true, name = 'amount', text = '💸 Amount to transfer' }, }
 		PlayATMAnimation('enter')
 		QBCore.Functions.Progressbar("accessing_atm", "Accessing Transfers", atmbartime, false, true, { disableMovement = false, disableCarMovement = false, disableMouse = false, disableCombat = false, }, {}, {}, {}, function() -- Done
 
@@ -323,7 +324,7 @@ RegisterNetEvent('jim-payments:client:ATM:give', function()
 			local dist = #(GetEntityCoords(GetPlayerPed(v)) - GetEntityCoords(PlayerPedId()))
 			for i = 1, #onlineList do
 				if onlineList[i].value == GetPlayerServerId(v) then
-					if v ~= PlayerId() then
+					if v ~= PlayerId() or Config.Debug then
 						nearbyList[#nearbyList+1] = { value = onlineList[i].value, text = onlineList[i].text..' ('..math.floor(dist+0.05)..'m)' }
 					end
 				end

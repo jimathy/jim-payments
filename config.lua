@@ -6,6 +6,10 @@ print("^2Jim^7-^2Payments v^42^7.^47 ^7- ^2Payments Script by ^1Jimathy^7")
 
 Config = {
 	Debug = false,
+
+	---------------------------------
+	-- Default Job Payment Systems --
+	---------------------------------
 	Manage = true, -- "true" if using qb-management
 				-- "false" if using qb-bossmenu
 
@@ -29,10 +33,6 @@ Config = {
 		`A_M_Y_Business_03`,
 		`U_F_M_CasinoShop_01`,
 	},
-	useATM = true, -- Enable this to use the scripts ATM's and controls
-	useBanks = true, -- Enable this to use my banking stuff
-	BankBlips = true, -- Enable this if you disabled qb-banking and need bank locations
-	ATMBlips = false, -- Enable this if you are a pyscho and need every ATM to be on the map too
 
 	PhoneBank = false, -- Set this to false to use the popup payment system FOR CARD/BANK PAYMENTS instead of using phone invoices
 						-- This doesn't affect Cash payments as they by default use confirmation now
@@ -53,8 +53,6 @@ Config = {
 	CommissionLimit = false,	-- If true, this limits the Commission to only be given if over the "MinAmountForTicket".
 								-- If false, Commission will be given for any amount
 
-	Gabz = false, -- "true" to enable Gabz Bank locations
-
 	-- MinAmountforTicket should be your cheapest item
 	-- PayPerTicket should never be higher than MinAmountforTicket
 	-- Commission is a percentage eg "0.10" becomes 10%
@@ -71,6 +69,9 @@ Config = {
 		['lostmc'] = { MinAmountforTicket = 50, PayPerTicket = 50, Commission = 0.10, gang = true, }, -- Example of a gang being supported
 	},
 
+	------------------------------
+	-- Custom Job Cash Register --
+	------------------------------
 	-- This adds the ability to add multiple locations for each job
 	-- Basically adding ready made locations, all you need to a vector4 and to confrim if you need a new prop in that location
     CustomCashRegisters = {
@@ -78,7 +79,7 @@ Config = {
 	},
 
 	-- The /polcharge command requires specific jobs to be set
-	-- No tickets for these, it's just commission
+	-- No tickets for these, it's just commission (0.25 = 25%)
 	FineJobs = {
 		['police'] = { Commission = 0.25, },
 		['ambulance'] = { Commission = 0.25, },
@@ -86,8 +87,18 @@ Config = {
 	FineJobConfirmation = false, --"true" makes it so fines need confirmation, "false" skips this ands just removes the money
 	FineJobList = true, -- "true" to use nearby player list feature in the cash registers, "false" for manual id entry
 
-	ATMModels = { "prop_atm_01", "prop_atm_02", "prop_atm_03", "prop_fleeca_atm" },
+	---------------------
+	-- Banking Systems --
+	---------------------
+	useATM = false, -- Enable this to use the scripts ATM's and controls
+	useBanks = false, -- Enable this to use my banking stuff
+	BankBlips = false, -- Enable this if you disabled qb-banking and need bank locations
+	ATMBlips = false, -- Enable this if you are a pyscho and need every ATM to be on the map too
 
+	Gabz = false, 	-- "true" to enable Gabz Bank locations
+					-- this corrects the ATM/Bank Cashier + Ticket Cash in location
+
+	ATMModels = { "prop_atm_01", "prop_atm_02", "prop_atm_03", "prop_fleeca_atm" },
 	ATMLocations = {
 	--PACIFIC BANK 10 ATMS
 		vector3(265.9, 213.86, 106.28),
@@ -156,6 +167,7 @@ Config = {
 		vector3(5.27, -919.87, 29.56),
 		vector3(-1200.61, -885.62, 13.26),
 	},
+
 	BankLocations = {
 		["legion"] = {
 			vector4(149.5, -1042.08, 29.37, 342.74), -- Legion Fleeca
@@ -184,7 +196,8 @@ Config = {
 		},
 	},
 }
-if Config.Gabz then -- If Gabz banks enabled, load these locations instead
+-- If Gabz banks enabled, load these locations instead
+if Config.Gabz then
 	Config.CashInLocation = vector4(269.28, 217.24, 106.28, 69.0)
 	Config.BankLocations = {
 		["legion"] = {

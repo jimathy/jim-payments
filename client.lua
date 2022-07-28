@@ -84,7 +84,7 @@ RegisterNetEvent('jim-payments:client:Charge', function(data, outside)
 			end
 		end
 		--If list is empty(no one nearby) show error and stop
-		if not nearbyList[#nearbyList] then TriggerEvent("QBCore:Notify", "No one near by to charge", "error") return end
+		if not nearbyList[1] then TriggerEvent("QBCore:Notify", "No one near by to charge", "error") return end
 		newinputs[#newinputs+1] = { text = " ", name = "citizen", type = "select", options = nearbyList }
 	else -- If Config.List is false, create input text box for ID's
 		newinputs[#newinputs+1] = { type = 'text', isRequired = true, name = 'citizen', text = '# Customer ID #' }
@@ -129,7 +129,7 @@ RegisterNetEvent('jim-payments:client:PolCharge', function()
 			end
 		end
 		--If list is empty(no one nearby) show error and stop
-		if not nearbyList[#nearbyList] then TriggerEvent("QBCore:Notify", "No one near by to charge", "error") return end
+		if not nearbyList[1] then TriggerEvent("QBCore:Notify", "No one near by to charge", "error") return end
 		newinputs[#newinputs+1] = { text = " ", name = "citizen", type = "select", options = nearbyList }
 	else -- If Config.List is false, create input text box for ID's
 		newinputs[#newinputs+1] = { type = 'text', isRequired = true, name = 'citizen', text = "# Person's ID #" }

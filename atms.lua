@@ -158,26 +158,16 @@ local function PlayATMAnimation(animation)
 	end
 end
 
-local function GrabAccount(type, job)
-	local p = promise.new()
-	QBCore.Functions.TriggerCallback('jim-payments:ManageWrapper', function(cb) p:resolve(cb) end, type, job)
-	return Citizen.Await(p)
-end
-
 RegisterNetEvent('jim-payments:Client:ATM:use', function(data)
 	--this grabs all the info from names to savings account numbers in the databases
 	local p = promise.new()
 	QBCore.Functions.TriggerCallback('jim-payments:ATM:Find', function(cb) p:resolve(cb) end) local info = Citizen.Await(p)
-	local society local gsociety local cancelled = false
-	if Config.Manage then
-		society = GrabAccount("GetAccount", PlayerJob.name)
-		Wait(200)
-		gsociety = GrabAccount("GetGangAccount", PlayerGang.name)
-	else
+	local cancelled = false
+	if not Config.Manage then
 		local p = promise.new()
-		QBCore.Functions.TriggerCallback('qb-bossmenu:server:GetAccount', function(cb) p:resolve(cb) end, PlayerJob.name) society = Citizen.Await(p)
+		QBCore.Functions.TriggerCallback('qb-bossmenu:server:GetAccount', function(cb) p:resolve(cb) end, PlayerJob.name) info.society = Citizen.Await(p)
 		local p2 = promise.new()
-		QBCore.Functions.TriggerCallback('qb-gangmenu:server:GetAccount', function(cb) p2:resolve(cb) end, PlayerGang.name) gsociety = Citizen.Await(p2)
+		QBCore.Functions.TriggerCallback('qb-gangmenu:server:GetAccount', function(cb) p2:resolve(cb) end, PlayerGang.name) info.gsociety = Citizen.Await(p2)
 	end
 	local atmbartime = 2500
 	local setoptions = {}
@@ -186,8 +176,8 @@ RegisterNetEvent('jim-payments:Client:ATM:use', function(data)
 		setoptions = { { value = "withdraw", text = "Withdrawl" }, }
 		setview = "<center><img src=https://static.wikia.nocookie.net/gtawiki/images/b/bd/Fleeca-GTAV-Logo.png width=200px></center><br>Welcome back, "..info.name.."<br><br>- Citizen ID -<br>"..info.cid.."<br><br>- Balances -<br>🏦Bank - $"..cv(info.bank).."<br>💵Cash - $"..cv(info.cash)..'<br><br>- Options -'
 		setheader = "💵 ATM Banking 💵"
-		setinputs = { { type = 'radio', name = 'billtype', text = setview, options = setoptions },
-					  { type = 'number', isRequired = true, name = 'amount', text = '💵 Amount to transfer' }, }
+		setinputs = { 	{ type = 'radio', name = 'billtype', text = setview, options = setoptions },
+						{ type = 'number', isRequired = true, name = 'amount', text = '💵 Amount to transfer' }, }
 		for k, v in pairs(Config.ATMModels) do
 			local playerPed = PlayerPedId()
 			local playerCoords = GetEntityCoords(playerPed, true)
@@ -211,8 +201,8 @@ RegisterNetEvent('jim-payments:Client:ATM:use', function(data)
 		setoptions = { { value = "withdraw", text = "Withdrawl" }, { value = "deposit", text = "Deposit" } }
 		setview = "Welcome back, "..info.name.."<br><br>- Account -<br>"..info.account.."<br>"..info.cid.."<br><br>- Balances -<br>🏦Bank - $"..cv(info.bank).."<br>💵Cash - $"..cv(info.cash).."<br><br>- Options -"
 		setheader = "🏦 Banking 🏦"
-		setinputs = { { type = 'radio', name = 'billtype', text = setview, options = setoptions },
-				      { type = 'number', isRequired = true, name = 'amount', text = '💵 Amount to transfer' }, }
+		setinputs = { 	{ type = 'radio', name = 'billtype', text = setview, options = setoptions },
+						{ type = 'number', isRequired = true, name = 'amount', text = '💵 Amount to transfer' }, }
 		PlayATMAnimation('enter')
 		QBCore.Functions.Progressbar("accessing_atm", "Accessing Bank", atmbartime, false, true, { disableMovement = false, disableCarMovement = false, disableMouse = false, disableCombat = false, }, {}, {}, {}, function() -- Done
 		end, function()
@@ -224,10 +214,11 @@ RegisterNetEvent('jim-payments:Client:ATM:use', function(data)
 		setoptions = { { value = "transfer", text = "Transfer" } }
 		setview = "Welcome back, "..info.name.."<br><br>- Account -<br>"..info.account.."<br>"..info.cid.."<br><br>- Balances -<br>🏦Bank - $"..cv(info.bank).."<br><br>- Options -"
 		setheader = "🔀 Transfer Services 🔀"
-		setinputs = { { type = 'radio', name = 'billtype', text = setview, options = setoptions },
-					  { type = 'text', isRequired = true, name = 'account', text = '🏦 Account no.' },
-					  { type = 'number', isRequired = true, name = 'amount', text = '💸 Amount to transfer' }, }
+		setinputs = {	{ type = 'radio', name = 'billtype', text = setview, options = setoptions },
+						{ type = 'text', isRequired = true, name = 'account', text = '🏦 Account no.' },
+						{ type = 'number', isRequired = true, name = 'amount', text = '💸 Amount to transfer' }, }
 		PlayATMAnimation('enter')
+
 		QBCore.Functions.Progressbar("accessing_atm", "Accessing Transfers", atmbartime, false, true, { disableMovement = false, disableCarMovement = false, disableMouse = false, disableCombat = false, }, {}, {}, {}, function() -- Done
 		end, function()
 			TriggerEvent("QBCore:Notify", "Cancelled!", "error")
@@ -238,9 +229,10 @@ RegisterNetEvent('jim-payments:Client:ATM:use', function(data)
 		setoptions = { { value = "withdraw", text = "Withdrawl" }, { value = "deposit", text = "Deposit" } }
 		setview = "Welcome back, "..info.name.."<br><br>- Account Info -<br>Savings ID: "..info.aid.."<br>"..info.cid.."<br><br>- Balances -<br>💰Savings - $"..cv(info.savbal).."<br>🏦Bank - $"..cv(info.bank).."<br><br>- Options -"
 		setheader = "💰 Savings 💰"
-		setinputs = { { type = 'radio', name = 'billtype', text = setview, options = setoptions },
-					  { type = 'number', isRequired = true, name = 'amount', text = '💵 Amount to transfer' }, }
+		setinputs = {	{ type = 'radio', name = 'billtype', text = setview, options = setoptions },
+						{ type = 'number', isRequired = true, name = 'amount', text = '💵 Amount to transfer' }, }
 		PlayATMAnimation('enter')
+
 		QBCore.Functions.Progressbar("accessing_atm", "Accessing Savings", atmbartime, false, true, { disableMovement = false, disableCarMovement = false, disableMouse = false, disableCombat = false, }, {}, {}, {}, function() -- Done
 		end, function()
 			TriggerEvent("QBCore:Notify", "Cancelled!", "error")
@@ -249,11 +241,17 @@ RegisterNetEvent('jim-payments:Client:ATM:use', function(data)
 
 	elseif data.id == "society" then
 		setoptions = { { value = "withdraw", text = "Withdrawl" }, { value = "deposit", text = "Deposit" } }
-		setview = "Welcome back, "..info.name.."<br><br>- Society Account -<br>"..PlayerJob.label.."<br><br>- Balances -<br>🏢"..PlayerJob.label.." - $"..cv(society).."<br>🏦Bank - $"..cv(info.bank).."<br><br>- Options -"
+		setview = 	"Welcome back, "..info.name..
+					"<br><br>- Society Account -<br>"..
+					PlayerJob.label..
+					"<br><br>- Balances -<br>🏢"..
+					PlayerJob.label.." - $"..cv(info.society)..
+					"<br>🏦Bank - $"..cv(info.bank)
 		setheader = "🏢 Society Banking 🏢"
-		setinputs = { { type = 'radio', name = 'billtype', text = setview, options = setoptions },
-				      { type = 'number', isRequired = true, name = 'amount', text = '💵 Amount to transfer' }, }
+		setinputs = { 	{ type = 'radio', name = 'billtype', text = setview, options = setoptions },
+						{ type = 'number', isRequired = true, name = 'amount', text = '💵 Amount to transfer' }, }
 		PlayATMAnimation('enter')
+
 		QBCore.Functions.Progressbar("accessing_atm", "Accessing Society Account", atmbartime, false, true, { disableMovement = false, disableCarMovement = false, disableMouse = false, disableCombat = false, }, {}, {}, {}, function() -- Done
 		end, function()
 			TriggerEvent("QBCore:Notify", "Cancelled!", "error")
@@ -262,11 +260,11 @@ RegisterNetEvent('jim-payments:Client:ATM:use', function(data)
 
 	elseif data.id == "societytransfer" then
 		setoptions = { { value = "transfer", text = "Transfer" } }
-		setview = "Welcome back, "..info.name.."<br><br>- Society Account -<br>"..PlayerJob.label.."<br><br>- Balances -<br>🏢"..PlayerJob.label.." - $"..cv(society).."<br><br>- Options -"
+		setview = "Welcome back, "..info.name.."<br><br>- Society Account -<br>"..PlayerJob.label.."<br><br>- Balances -<br>🏢"..PlayerJob.label.." - $"..cv(info.society).."<br><br>- Options -"
 		setheader = "🔀 Transfer Services 🔀"
-		setinputs = { { type = 'radio', name = 'billtype', text = setview, options = setoptions },
-					  { type = 'text', isRequired = true, name = 'account', text = '🏦 Account no.' },
-					  { type = 'number', isRequired = true, name = 'amount', text = '💸 Amount to transfer' }, }
+		setinputs = { 	{ type = 'radio', name = 'billtype', text = setview, options = setoptions },
+						{ type = 'text', isRequired = true, name = 'account', text = '🏦 Account no.' },
+						{ type = 'number', isRequired = true, name = 'amount', text = '💸 Amount to transfer' }, }
 		PlayATMAnimation('enter')
 		QBCore.Functions.Progressbar("accessing_atm", "Accessing Transfers", atmbartime, false, true, { disableMovement = false, disableCarMovement = false, disableMouse = false, disableCombat = false, }, {}, {}, {}, function() -- Done
 		end, function()
@@ -276,11 +274,12 @@ RegisterNetEvent('jim-payments:Client:ATM:use', function(data)
 
 	elseif data.id == "gang" then
 		setheader = "🏢 Society Banking 🏢"
-		setview = "Welcome back, "..info.name.."<br><br>- Society Account -<br>"..PlayerGang.label.."<br><br>- Balances -<br>🏢"..PlayerGang.label.." - $"..cv(gsociety).."<br>🏦Bank - $"..cv(info.bank).."<br><br>- Options -"
+		setview = "Welcome back, "..info.name.."<br><br>- Society Account -<br>"..PlayerGang.label.."<br><br>- Balances -<br>🏢"..PlayerGang.label.." - $"..cv(info.gsociety).."<br>🏦Bank - $"..cv(info.bank).."<br><br>- Options -"
 		setoptions = { { value = "withdraw", text = "Withdrawl" }, { value = "deposit", text = "Deposit" } }
-		setinputs = { { type = 'radio', name = 'billtype', text = setview, options = setoptions },
-				      { type = 'number', isRequired = true, name = 'amount', text = '💵 Amount to transfer' }, }
+		setinputs = {	{ type = 'radio', name = 'billtype', text = setview, options = setoptions },
+						{ type = 'number', isRequired = true, name = 'amount', text = '💵 Amount to transfer' }, }
 		PlayATMAnimation('enter')
+
 		QBCore.Functions.Progressbar("accessing_atm", "Accessing Society Account", atmbartime, false, true, { disableMovement = false, disableCarMovement = false, disableMouse = false, disableCombat = false, }, {}, {}, {}, function() -- Done
 		end, function()
 			TriggerEvent("QBCore:Notify", "Cancelled!", "error")
@@ -289,12 +288,13 @@ RegisterNetEvent('jim-payments:Client:ATM:use', function(data)
 
 	elseif data.id == "gangtransfer" then
 		setoptions = { { value = "transfer", text = "Transfer" } }
-		setview = "Welcome back, "..info.name.."<br><br>- Society Account -<br>"..PlayerGang.label.."<br><br>- Balances -<br>🏢"..PlayerGang.label.." - $"..cv(gsociety).."<br><br>- Options -"
+		setview = "Welcome back, "..info.name.."<br><br>- Society Account -<br>"..PlayerGang.label.."<br><br>- Balances -<br>🏢"..PlayerGang.label.." - $"..cv(info.gsociety).."<br><br>- Options -"
 		setheader = "🔀 Transfer Services 🔀"
 		setinputs = { 	{ type = 'radio', name = 'billtype', text = setview, options = setoptions },
 						{ type = 'text', isRequired = true, name = 'account', text = '🏦 Account no.' },
 						{ type = 'number', isRequired = true, name = 'amount', text = '💸 Amount to transfer' }, }
 		PlayATMAnimation('enter')
+
 		QBCore.Functions.Progressbar("accessing_atm", "Accessing Transfers", atmbartime, false, true, { disableMovement = false, disableCarMovement = false, disableMouse = false, disableCombat = false, }, {}, {}, {}, function() -- Done
 
 		end, function()
@@ -310,7 +310,7 @@ RegisterNetEvent('jim-payments:Client:ATM:use', function(data)
 		if dialog then
 			if not dialog.amount then return end
 			PlayATMAnimation('exit') Citizen.Wait(1000)
-			TriggerServerEvent('jim-payments:server:ATM:use', dialog.amount, dialog.billtype, dialog.account, data.id, society, gsociety)
+			TriggerServerEvent('jim-payments:server:ATM:use', dialog.amount, dialog.billtype, dialog.account, data.id, info.society, info.gsociety)
 		end
 	end
 end)
@@ -320,18 +320,18 @@ RegisterNetEvent('jim-payments:client:ATM:give', function()
 	local onlineList = {}
 	local nearbyList = {}
 	QBCore.Functions.TriggerCallback('jim-payments:MakePlayerList', function(cb) onlineList = cb if onlineList[1] == nil then Wait(200) end
-		for k, v in pairs(QBCore.Functions.GetPlayersFromCoords(GetEntityCoords(PlayerPedId()), Config.PaymentRadius)) do
-			local dist = #(GetEntityCoords(GetPlayerPed(v)) - GetEntityCoords(PlayerPedId()))
+		for _, id in pairs(QBCore.Functions.GetPlayersFromCoords(GetEntityCoords(PlayerPedId()), Config.PaymentRadius)) do
+			local dist = #(GetEntityCoords(GetPlayerPed(id)) - GetEntityCoords(PlayerPedId()))
 			for i = 1, #onlineList do
-				if onlineList[i].value == GetPlayerServerId(v) then
-					if v ~= PlayerId() or Config.Debug then
+				if onlineList[i].value == GetPlayerServerId(id) then
+					if id ~= PlayerId() or Config.Debug then
 						nearbyList[#nearbyList+1] = { value = onlineList[i].value, text = onlineList[i].text..' ('..math.floor(dist+0.05)..'m)' }
 					end
 				end
 			end
 			dist = nil
 		end
-		if nearbyList[#nearbyList] == nil then TriggerEvent("QBCore:Notify", "No one near by to charge", "error") return end
+		if not nearbyList[1] then TriggerEvent("QBCore:Notify", "No one near by to charge", "error") return end
 		local dialog = exports['qb-input']:ShowInput({ header = "Give someone cash", submitText = "Give",
 		inputs = {
 				{ text = " ", name = "citizen", type = "select", options = nearbyList },

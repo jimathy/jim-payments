@@ -11,14 +11,6 @@ local function cv(amount)
     return formatted
 end
 
----- BANK STUFF
-QBCore.Functions.CreateCallback('jim-payments:ManageWrapper', function(source, cb, type, account)
-	local result = nil
-	if type == "GetAccount" then result = exports["qb-management"]:GetAccount(account) end
-	if type == "GetGangAccount" then result = exports["qb-management"]:GetGangAccount(account) end
-	cb(result) 
-end)
-
 RegisterServerEvent('jim-payments:server:ATM:use', function(amount, billtype, baccount, account, society, gsociety)
 	local src = source
 	local Player = QBCore.Functions.GetPlayer(src)
@@ -47,7 +39,7 @@ RegisterServerEvent('jim-payments:server:ATM:use', function(amount, billtype, ba
 	elseif account == "savings" then
 		local getSavingsAccount = MySQL.Sync.fetchAll('SELECT * FROM bank_accounts WHERE citizenid = ? AND account_type = ?', { Player.PlayerData.citizenid, 'Savings' })
 		if getSavingsAccount[1] ~= nil then savbal = tonumber(getSavingsAccount[1].amount) aid = getSavingsAccount[1].record_id end
-		
+
 		if billtype == "withdraw" then
 			if savbal >= amount then
 				savbal = savbal - amount
@@ -62,7 +54,7 @@ RegisterServerEvent('jim-payments:server:ATM:use', function(amount, billtype, ba
 		elseif billtype == "deposit" then
 			if amount < bankB then
 				savbal = savbal + amount
-				Player.Functions.RemoveMoney('bank', amount) 
+				Player.Functions.RemoveMoney('bank', amount)
 				TriggerClientEvent("QBCore:Notify", src, "$"..cv(amount).." Deposited from bank account into savings", "success")
 				MySQL.Async.execute('UPDATE bank_accounts SET amount = ? WHERE citizenid = ? AND record_id = ?', { savbal, Player.PlayerData.citizenid, getSavingsAccount[1].record_id }, function(success)
 					if success then	return true	else return false end
@@ -100,16 +92,16 @@ RegisterServerEvent('jim-payments:server:ATM:use', function(amount, billtype, ba
 		end
 		baccount = newiban
 		amount = tonumber(newAmount)
-		
+
 		local Player = QBCore.Functions.GetPlayer(src)
 		if (society - amount) >= 0 then
 			local query = '%"account":"' .. baccount .. '"%'
 			local result = MySQL.Sync.fetchAll('SELECT * FROM players WHERE charinfo LIKE ?', {query})
-			if result[1] ~= nil then
+			if result[1] then
 				local Reciever = QBCore.Functions.GetPlayerByCitizenId(result[1].citizenid)
 				if Config.Manage then exports["qb-management"]:RemoveMoney(tostring(Player.PlayerData.job.name), amount)
 				else TriggerEvent("qb-bossmenu:server:removeAccountMoney", tostring(Player.PlayerData.job.name), amount) end
-				if Reciever ~= nil then
+				if Reciever then
 					Reciever.Functions.AddMoney('bank', amount)
 					TriggerClientEvent("QBCore:Notify", src, "Sent $"..amount.." to "..Reciever.PlayerData.charinfo.firstname.." "..Reciever.PlayerData.charinfo.lastname, "success")
 					TriggerClientEvent("QBCore:Notify", Reciever.PlayerData.source, "Recieved $"..cv(amount).." from "..tostring(Player.PlayerData.job.label).." account", "success")
@@ -118,10 +110,10 @@ RegisterServerEvent('jim-payments:server:ATM:use', function(amount, billtype, ba
 					RecieverMoney.bank = (RecieverMoney.bank + amount)
 					MySQL.Async.execute('UPDATE players SET money = ? WHERE citizenid = ?', {json.encode(RecieverMoney), result[1].citizenid})
 				end
-			elseif result[1] == nil then TriggerClientEvent("QBCore:Notify", src, "Error: Account '"..baccount.."' not found", "error")
+			elseif not result[1] then TriggerClientEvent("QBCore:Notify", src, "Error: Account '"..baccount.."' not found", "error")
 			end
 		end
-	
+
 	--Simple transfers from gang society account to bank --
 	elseif account == "gang" then
 		if billtype == "withdraw" then
@@ -152,16 +144,16 @@ RegisterServerEvent('jim-payments:server:ATM:use', function(amount, billtype, ba
 		end
 		baccount = newiban
 		amount = tonumber(newAmount)
-		
+
 		local Player = QBCore.Functions.GetPlayer(src)
 		if (gsociety - amount) >= 0 then
 			local query = '%"account":"' .. baccount .. '"%'
 			local result = MySQL.Sync.fetchAll('SELECT * FROM players WHERE charinfo LIKE ?', {query})
-			if result[1] ~= nil then
+			if result[1] then
 				local Reciever = QBCore.Functions.GetPlayerByCitizenId(result[1].citizenid)
 				if Config.Manage then exports["qb-management"]:RemoveGangMoney(tostring(Player.PlayerData.gang.name), amount)
 				else TriggerEvent("qb-bossmenu:server:removeAccountMoney", tostring(Player.PlayerData.gang.name), amount) end
-				if Reciever ~= nil then
+				if not Reciever then
 					Reciever.Functions.AddMoney('bank', amount)
 					TriggerClientEvent("QBCore:Notify", src, "Sent $"..amount.." to "..Reciever.PlayerData.charinfo.firstname.." "..Reciever.PlayerData.charinfo.lastname, "success")
 					TriggerClientEvent("QBCore:Notify", Reciever.PlayerData.source, "Recieved $"..cv(amount).." from "..tostring(Player.PlayerData.gang.label).." account", "success")
@@ -170,13 +162,13 @@ RegisterServerEvent('jim-payments:server:ATM:use', function(amount, billtype, ba
 					RecieverMoney.bank = (RecieverMoney.bank + amount)
 					MySQL.Async.execute('UPDATE players SET money = ? WHERE citizenid = ?', {json.encode(RecieverMoney), result[1].citizenid})
 				end
-			elseif result[1] == nil then TriggerClientEvent("QBCore:Notify", src, "Error: Account '"..baccount.."' not found", "error")
+			elseif not result[1] then TriggerClientEvent("QBCore:Notify", src, "Error: Account '"..baccount.."' not found", "error")
 
 			end
 		end
-	
+
 	elseif account == "transfer" then
-	
+
 		local bannedCharacters = {'%','$',';'}
 		local newAmount = tostring(amount)
 		local newiban = tostring(baccount)
@@ -186,15 +178,15 @@ RegisterServerEvent('jim-payments:server:ATM:use', function(amount, billtype, ba
 		end
 		baccount = newiban
 		amount = tonumber(newAmount)
-		
+
 		local Player = QBCore.Functions.GetPlayer(src)
 		if (Player.PlayerData.money.bank - amount) >= 0 then
 			local query = '%"account":"' .. baccount .. '"%'
 			local result = MySQL.Sync.fetchAll('SELECT * FROM players WHERE charinfo LIKE ?', {query})
-			if result[1] ~= nil then
+			if result[1] then
 				local Reciever = QBCore.Functions.GetPlayerByCitizenId(result[1].citizenid)
 				Player.Functions.RemoveMoney('bank', amount)
-				if Reciever ~= nil then
+				if Reciever then
 					Reciever.Functions.AddMoney('bank', amount)
 					TriggerClientEvent("QBCore:Notify", src, "Sent $"..cv(amount).." to "..Reciever.PlayerData.charinfo.firstname.." "..Reciever.PlayerData.charinfo.lastname, "success")
 					TriggerClientEvent("QBCore:Notify", Reciever.PlayerData.source, "Recieved $"..cv(amount).." from "..Player.PlayerData.charinfo.firstname.." "..Player.PlayerData.charinfo.lastname, "success")
@@ -203,11 +195,11 @@ RegisterServerEvent('jim-payments:server:ATM:use', function(amount, billtype, ba
 					RecieverMoney.bank = (RecieverMoney.bank + amount)
 					MySQL.Async.execute('UPDATE players SET money = ? WHERE citizenid = ?', {json.encode(RecieverMoney), result[1].citizenid})
 				end
-			elseif result[1] == nil then TriggerClientEvent("QBCore:Notify", src, "Error: Account '"..baccount.."' not found", "error")
+			elseif not result[1] then TriggerClientEvent("QBCore:Notify", src, "Error: Account '"..baccount.."' not found", "error")
 
 			end
 		end
-	end	
+	end
 end)
 
 QBCore.Functions.CreateCallback('jim-payments:ATM:Find', function(source, cb)
@@ -217,26 +209,43 @@ QBCore.Functions.CreateCallback('jim-payments:ATM:Find', function(source, cb)
 	local cash = Player.Functions.GetMoney("cash")
 	local bank = Player.Functions.GetMoney("bank")
 	local account = Player.PlayerData.charinfo.account
-	
-	local getSavingsAccount = MySQL.Sync.fetchAll('SELECT * FROM bank_accounts WHERE citizenid = ? AND account_type = ?', { Player.PlayerData.citizenid, 'Savings' })
-    if getSavingsAccount[1] ~= nil then
-        aid = getSavingsAccount[1].record_id
-        savbal = getSavingsAccount[1].amount
-	else 
+	local society = 0
+	local gsociety = 0
+
+	-- If qb-management, grab info directly from database
+	if Config.Manage then
+		local result = MySQL.Sync.fetchAll('SELECT * FROM management_funds')
+		for k, v in pairs(result) do
+			if Player.PlayerData.job.name == v.job_name then society = v.amount end
+		end
+		if Player.PlayerData.gang.name ~= "none" then
+			for k, v in pairs(result) do
+				if Player.PlayerData.gang.name == v.job_name then gsociety = v.amount end
+			end
+		end
+	else
+
+	end
+	-- Grab Savings account info
+	local result = MySQL.Sync.fetchAll('SELECT * FROM bank_accounts WHERE citizenid = ? AND account_type = ?', { Player.PlayerData.citizenid, 'Savings' })
+    if result[1] then
+        accountID = result[1].record_id
+        savingBalance = result[1].amount
+	else
 		MySQL.Async.insert('INSERT INTO bank_accounts (citizenid, amount, account_type) VALUES (?, ?, ?)', { Player.PlayerData.citizenid, 0, 'Savings' }, function() completed = true end) repeat Wait(0) until completed == true
-		local getSavingsAccount = MySQL.Sync.fetchAll('SELECT * FROM bank_accounts WHERE citizenid = ? AND account_type = ?', { Player.PlayerData.citizenid, 'Savings' })
-		aid = getSavingsAccount[1].record_id
-		savbal = getSavingsAccount[1].amount
+		local result = MySQL.Sync.fetchAll('SELECT * FROM bank_accounts WHERE citizenid = ? AND account_type = ?', { Player.PlayerData.citizenid, 'Savings' })
+		aid = result[1].record_id
+		savingBalance = result[1].amount
     end
-	local data = {
-		name = name,
+	cb({name = name,
 		cash = cash,
 		bank = bank,
 		account = account,
 		cid = cid,
-		savbal = savbal,
-		aid = aid }
-	cb(data) 
+		savbal = savingBalance,
+		aid = accountID,
+		society = society,
+		gsociety = gsociety})
 end)
 
 QBCore.Commands.Add("cashgive", "Pay a user nearby", {}, false, function(source) TriggerClientEvent("jim-payments:client:ATM:give", source) end)
@@ -246,7 +255,7 @@ RegisterServerEvent("jim-payments:server:ATM:give", function(citizen, price)
     local Reciever = QBCore.Functions.GetPlayer(tonumber(citizen))
     local amount = tonumber(price)
 	local balance = Player.Functions.GetMoney("cash")
-	
+
 	if amount and amount > 0 then
 		if balance >= amount then
 			Player.Functions.RemoveMoney('cash', amount)

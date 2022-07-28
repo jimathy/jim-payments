@@ -2,8 +2,11 @@
 - QBCore based payment system
 - Enchanced QB-Input payment system from my other scripts now free on its own
 
+### If you need support I have a discord server available, it helps me keep track of issues and give better support.
+## https://discord.gg/xKgQZ6wZvS
+
 ### If you think I did a good job here, consider donating as it keeps by lights on and my cat fat/floofy:
-https://ko-fi.com/jixelpatterns
+## https://ko-fi.com/jixelpatterns
 
 ---
 

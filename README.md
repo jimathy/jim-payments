@@ -13,10 +13,6 @@ https://ko-fi.com/jixelpatterns
     - gks-phone
     - qs-smartphone
 
-
-![](https://i.imgur.com/37d2mE3.jpeg) ![](https://i.imgur.com/AIdXzxX.jpeg)
-![](https://i.imgur.com/RYADcI2.jpeg) ![](https://i.imgur.com/ICbQyeQ.jpeg)
-
 ---
 # Installation
 ---
@@ -101,6 +97,7 @@ CustomCashRegisters = { -- Located in the config.lua
 ### This does not need to be done for MY job scripts, they already have built in support
 ---
 ## PayTickets
+![](https://i.imgur.com/ICbQyeQ.jpeg)
 - This script has a built in ticket reward system
 - On successful sale, the employees will be handed a ticket if they are clocked in
   - This can then be handed in to the bank to receive payment
@@ -134,18 +131,19 @@ Jobs = {
 - `Commission` is the amount of commission given to players on successful payments (0.10 = 10%)
 - `gang = true` add this if the added role is a gang role
 ---
-  ## /cashgive
-  - Alternative to /givecash
-  - A simple command built in to send cash to a `nearby player`
-  - Shows a list of names and id's of people nearby to select from rather
-  - Better experience than trying to figure out their ID and entering it manually
+## /cashgive
+![](https://i.imgur.com/AIdXzxX.jpeg)
+- Alternative to /givecash
+- A simple command built in to send cash to a `nearby player`
+- Shows a list of names and id's of people nearby to select from rather
+- Better experience than trying to figure out their ID and entering it manually
 ---
 ## /cashregister
+![](https://i.imgur.com/37d2mE3.jpeg)
 - This command is mean't as a portable cash register alternative
 - For example:
   - When a person is devliering food they can do `/cashregister` and the payment will still be sent to the society account
 - Doesn't utilize the ticket reward system unfortunately
-
 ---
 ## /polcharge
 - This script supports a customisable "police billing"
@@ -164,6 +162,7 @@ FineJobList = true, -- "true" to use nearby player list feature in the cash regi
 ```
 ---
 ## Banking
+![](https://i.imgur.com/RYADcI2.jpeg)
 - This script has simple banking systems built in
   - Works as a basic replacement for qb-banking and qb-atms
 - Adjust the options in config.lua:

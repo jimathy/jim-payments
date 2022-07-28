@@ -12,7 +12,7 @@ https://ko-fi.com/jixelpatterns
     - qb-phone
     - gks-phone
     - qs-smartphone
-
+	- Leave the setting as "qb" for qs
 ---
 # Installation
 ---

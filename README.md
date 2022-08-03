@@ -72,7 +72,7 @@ TriggerServerEvent('jim-payments:Tickets:Give', data)
 - Go to `gks-phone > server > serverapi.lua`
 - Search for the event: `gksphone:faturapayBill` and search for this line:
 ```lua
-  Ply.Functions.RemoveMoney('bank', amount, "paid-invoice")
+  Ply.Functions.RemoveMoney('bank', data[1].amount, "paid-invoice")
 ```
 
 - Directly under this line add this event:

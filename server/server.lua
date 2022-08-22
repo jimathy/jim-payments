@@ -19,18 +19,19 @@ QBCore.Commands.Add("polcharge", "Charge another person", {}, false, function(so
 
 RegisterServerEvent('jim-payments:Tickets:Give', function(data, biller, gang)
     local billed = QBCore.Functions.GetPlayer(source) -- This should always be from the person who accepted the payment
+	local takecomm = math.floor(tonumber(data.amount) * Config.Jobs[data.society].Commission)
 	if biller then -- If this is found, it ISN'T a phone payment, so add money to society here
 		if gang then
-			if Config.Manage then exports["qb-management"]:AddGangMoney(tostring(biller.PlayerData.gang.name), data.amount)
-				if Config.Debug then print("^5Debug^7: ^3QB^7-^3Management^7(^3Gang^7): ^2Adding ^7$^6"..data.amount.." ^2to account ^7'^6"..tostring(biller.PlayerData.gang.name).."^7' ($^6"..exports["qb-management"]:GetGangAccount(biller.PlayerData.gang.name).."^7)") end
-			else TriggerEvent("qb-gangmenu:server:addAccountMoney", tostring(biller.PlayerData.gang.name), data.amount)
-				if Config.Debug then print("^5Debug^7: ^3QB^7-^3GangMenu^7: ^2Adding ^7$^6"..data.amount.." ^2to account ^7'^6"..tostring(biller.PlayerData.gang.name).."^7'") end
+			if Config.Manage then exports["qb-management"]:AddGangMoney(tostring(biller.PlayerData.gang.name), data.amount - takecomm)
+				if Config.Debug then print("^5Debug^7: ^3QB^7-^3Management^7(^3Gang^7): ^2Adding ^7$^6"..data.amount - takecomm.." ^2to account ^7'^6"..tostring(biller.PlayerData.gang.name).."^7' ($^6"..exports["qb-management"]:GetGangAccount(biller.PlayerData.gang.name).."^7)") end
+			else TriggerEvent("qb-gangmenu:server:addAccountMoney", tostring(biller.PlayerData.gang.name), data.amount - takecomm)
+				if Config.Debug then print("^5Debug^7: ^3QB^7-^3GangMenu^7: ^2Adding ^7$^6"..data.amount - takecomm.." ^2to account ^7'^6"..tostring(biller.PlayerData.gang.name).."^7'") end
 			end
 		elseif not gang then
-			if Config.Manage then exports["qb-management"]:AddMoney(tostring(biller.PlayerData.job.name), data.amount)
-				if Config.Debug then print("^5Debug^7: ^3QB-Management^7(^3Job^7): ^2Adding ^7$^6"..data.amount.." ^2to account ^7'^6"..tostring(biller.PlayerData.job.name).."^7' ($^6"..exports["qb-management"]:GetAccount(biller.PlayerData.job.name).."^7)") end
-			else TriggerEvent("qb-bossmenu:server:addAccountMoney", tostring(biller.PlayerData.job.name), data.amount)
-				if Config.Debug then print("^5Debug^7: ^3QB-BossMenu^7: ^2Adding ^7$^6"..data.amount.." ^2to account ^7'^6"..tostring(biller.PlayerData.job.name).."^7'") end
+			if Config.Manage then exports["qb-management"]:AddMoney(tostring(biller.PlayerData.job.name), data.amount - takecomm)
+				if Config.Debug then print("^5Debug^7: ^3QB-Management^7(^3Job^7): ^2Adding ^7$^6"..data.amount - takecomm.." ^2to account ^7'^6"..tostring(biller.PlayerData.job.name).."^7' ($^6"..exports["qb-management"]:GetAccount(biller.PlayerData.job.name).."^7)") end
+			else TriggerEvent("qb-bossmenu:server:addAccountMoney", tostring(biller.PlayerData.job.name), data.amount - takecomm)
+				if Config.Debug then print("^5Debug^7: ^3QB-BossMenu^7: ^2Adding ^7$^6"..data.amount - takecomm.." ^2to account ^7'^6"..tostring(biller.PlayerData.job.name - takecomm).."^7'") end
 			end
 		end
 	elseif not biller then	--Find the biller from their citizenid

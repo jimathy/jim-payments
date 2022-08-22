@@ -119,5 +119,3 @@ function cv(amount)
     end
     return formatted
 end
-
-function toggleItem(give, item, amount) TriggerServerEvent("jim-mining:server:toggleItem", give, item, amount) end

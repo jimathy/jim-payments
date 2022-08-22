@@ -5,7 +5,7 @@ print("^2Jim^7-^2Payments v^42^7.^47 ^7- ^2Payments Script by ^1Jimathy^7")
 -- https://discord.gg/xKgQZ6wZvS
 
 Config = {
-	Debug = true,
+	Debug = false,
 	Notify = "qb",
 	---------------------------------
 	-- Default Job Payment Systems --

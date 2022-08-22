@@ -5,8 +5,8 @@ print("^2Jim^7-^2Payments v^42^7.^47 ^7- ^2Payments Script by ^1Jimathy^7")
 -- https://discord.gg/xKgQZ6wZvS
 
 Config = {
-	Debug = false,
-
+	Debug = true,
+	Notify = "qb",
 	---------------------------------
 	-- Default Job Payment Systems --
 	---------------------------------
@@ -14,7 +14,7 @@ Config = {
 				-- "false" if using qb-bossmenu
 
 	List = true, -- "true" to use nearby player list feature in the cash registers, "false" for manual id entry
-	PaymentRadius = 30, -- This is how far the playerlist will check for nearby players (based on the person charging)
+	PaymentRadius = 15, -- This is how far the playerlist will check for nearby players (based on the person charging)
 
 	Peds = true, -- "true" to enable peds spawning in banks
 	PedPool = {
@@ -95,10 +95,10 @@ Config = {
 	BankBlips = false, -- Enable this if you disabled qb-banking and need bank locations
 	ATMBlips = false, -- Enable this if you are a pyscho and need every ATM to be on the map too
 
-	Gabz = false, 	-- "true" to enable Gabz Bank locations
+	Gabz = true, 	-- "true" to enable Gabz Bank locations
 					-- this corrects the ATM/Bank Cashier + Ticket Cash in location
 
-	ATMModels = { "prop_atm_01", "prop_atm_02", "prop_atm_03", "prop_fleeca_atm" },
+	ATMModels = { `prop_atm_01`, `prop_atm_02`, `prop_atm_03`, `prop_fleeca_atm` },
 	ATMLocations = {
 	--PACIFIC BANK 10 ATMS
 		vector3(265.9, 213.86, 106.28),

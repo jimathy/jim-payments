@@ -1,4 +1,5 @@
 local QBCore = exports['qb-core']:GetCoreObject()
+RegisterNetEvent('QBCore:Client:UpdateObject', function() QBCore = exports['qb-core']:GetCoreObject() end)
 
 PlayerJob = {}
 PlayerGang = {}
@@ -6,7 +7,7 @@ PlayerGang = {}
 local onDuty = false
 local BankPed = nil
 local Targets = {}
-local till = {}
+local Till = {}
 
 RegisterNetEvent('QBCore:Client:OnPlayerLoaded', function() QBCore.Functions.GetPlayerData(function(PlayerData) PlayerJob = PlayerData.job PlayerGang = PlayerData.gang end) end)
 RegisterNetEvent('QBCore:Client:OnJobUpdate', function(JobInfo) PlayerJob = JobInfo onDuty = PlayerJob.onduty end)
@@ -22,9 +23,6 @@ AddEventHandler('onResourceStart', function(resource) if GetCurrentResourceName(
 	end)
 end)
 
-local function loadModel(model) if not HasModelLoaded(model) then if Config.Debug then print("^5Debug^7: ^2Loading Model^7: '^6"..model.."^7'") end RequestModel(model) while not HasModelLoaded(model) do Wait(0) end end end
-local function unloadModel(model) if Config.Debug then print("^5Debug^7: ^2Removing Model^7: '^6"..model.."^7'") end SetModelAsNoLongerNeeded(model) end
-
 CreateThread(function()
 	local jobroles = {} local gangroles = {}
 	--Build Job/Gang Checks for cashin location
@@ -38,26 +36,22 @@ CreateThread(function()
 		distance = 2.0 })
 	--Crete Ped at the location
 	if Config.Peds then
-		local i = math.random(1, #Config.PedPool)
-		loadModel(Config.PedPool[i])
 		if not Config.Gabz then CreateModelHide(vector3(Config.CashInLocation.x, Config.CashInLocation.y, Config.CashInLocation.z), 1.0, `v_corp_bk_chair3`, true) end
-		if not BankPed then BankPed = CreatePed(0, Config.PedPool[i], vector3(Config.CashInLocation.x, Config.CashInLocation.y, Config.CashInLocation.z-1), Config.CashInLocation[4], false, false) end
-		if Config.Debug then print("^5Debug^7: ^6Ped ^2Created for location^7: '^6Ticket Trade^7'") end
+		BankPed = makePed(Config.PedPool[math.random(1, #Config.PedPool)], Config.CashInLocation, false, false)
 	end
 
 	--Spawn Custom Cash Register Targets
 	for k, v in pairs(Config.CustomCashRegisters) do
 		for i = 1, #v do
+			local job = k
+			local gang = nil
+			if v[i].gang then job = nil gang = k end
 			Targets["CustomRegister: "..k..i] =
 			exports['qb-target']:AddBoxZone("CustomRegister: "..k..i, v[i].coords, 0.47, 0.34, { name="CustomRegister: "..k..i, heading = v[i].coords[4], debugPoly=Config.Debug, minZ=v[i].coords.z-0.1, maxZ=v[i].coords.z+0.4 },
-				{ options = { { event = "jim-payments:client:Charge", icon = "fas fa-credit-card", label = "Charge Customer", job = k, img = "" }, },
-					distance = 2.0
-			})
+				{ options = { { event = "jim-payments:client:Charge", icon = "fas fa-credit-card", label = "Charge Customer", job = job, gang = gang, img = "" }, },
+					distance = 2.0 })
 			if v[i].prop then
-				loadModel(`prop_till_03`)
-				till[#till+1] = CreateObject(`prop_till_03`, v[i].coords.x, v[i].coords.y, v[i].coords.z, 0, 0, 0)
-				SetEntityHeading(till[#till],v[i].coords[4]+180.0)
-				FreezeEntityPosition(till[#till], true)
+				Till[#Till+1] = makeProp({prop = `prop_till_03`, coords = v[i].coords}, 1, false)
 			end
 		end
 	end
@@ -65,7 +59,7 @@ end)
 
 RegisterNetEvent('jim-payments:client:Charge', function(data, outside)
 	--Check if player is using /cashregister command
-	if not outside and not onDuty and data.gang == nil then TriggerEvent("QBCore:Notify", "Not Clocked in!", "error") return end
+	if not outside and not onDuty and data.gang == nil then triggerNotify(nil, "Not Clocked in!", "error") return end
 	local newinputs = {} -- Begin qb-input creation here.
 	if Config.List then -- If nearby player list is wanted:
 		--Retrieve a list of nearby players from server
@@ -84,7 +78,7 @@ RegisterNetEvent('jim-payments:client:Charge', function(data, outside)
 			end
 		end
 		--If list is empty(no one nearby) show error and stop
-		if not nearbyList[1] then TriggerEvent("QBCore:Notify", "No one near by to charge", "error") return end
+		if not nearbyList[1] then triggerNotify(nil, "No one near by to charge", "error") return end
 		newinputs[#newinputs+1] = { text = " ", name = "citizen", type = "select", options = nearbyList }
 	else -- If Config.List is false, create input text box for ID's
 		newinputs[#newinputs+1] = { type = 'text', isRequired = true, name = 'citizen', text = '# Customer ID #' }
@@ -109,7 +103,7 @@ RegisterNetEvent('jim-payments:client:PolCharge', function()
 	--Check if player is allowed to use /cashregister command
 	local allowed = false
 	for k in pairs(Config.FineJobs) do if k == PlayerJob.name then allowed = true end end
-	if not allowed then TriggerEvent("QBCore:Notify", "You don't have the required job", "error") return end
+	if not allowed then triggerNotify(nil, "You don't have the required job", "error") return end
 
 	local newinputs = {} -- Begin qb-input creation here.
 	if Config.FineJobList then -- If nearby player list is wanted:
@@ -129,7 +123,7 @@ RegisterNetEvent('jim-payments:client:PolCharge', function()
 			end
 		end
 		--If list is empty(no one nearby) show error and stop
-		if not nearbyList[1] then TriggerEvent("QBCore:Notify", "No one near by to charge", "error") return end
+		if not nearbyList[1] then triggerNotify(nil, "No one near by to charge", "error") return end
 		newinputs[#newinputs+1] = { text = " ", name = "citizen", type = "select", options = nearbyList }
 	else -- If Config.List is false, create input text box for ID's
 		newinputs[#newinputs+1] = { type = 'text', isRequired = true, name = 'citizen', text = "# Person's ID #" }
@@ -146,12 +140,11 @@ RegisterNetEvent('jim-payments:client:PolCharge', function()
 	end
 end)
 
-
 RegisterNetEvent('jim-payments:Tickets:Menu', function(data)
 	--Get ticket info
 	local p = promise.new() QBCore.Functions.TriggerCallback('jim-payments:Ticket:Count', function(cb) p:resolve(cb) end)
 	local amount = Citizen.Await(p)
-	if amount == 0 then TriggerEvent("QBCore:Notify", "You don't have any tickets to trade", "error") return end
+	if not amount then triggerNotify(nil, "You don't have any tickets to trade", "error") amount = 0 return end
 	local sellable = false
 	local name = "" local label = ""
 	--Check/adjust for job/gang names
@@ -190,8 +183,8 @@ end)
 RegisterNetEvent('jim-payments:Tickets:Sell:yes', function() TriggerServerEvent('jim-payments:Tickets:Sell') end)
 RegisterNetEvent('jim-payments:Tickets:Sell:no', function() exports['qb-menu']:closeMenu() end)
 
-AddEventHandler('onResourceStop', function(resource) if resource ~= GetCurrentResourceName() then return end
+AddEventHandler('onResourceStop', function(r) if r ~= GetCurrentResourceName() then return end
 	for k in pairs(Targets) do exports['qb-target']:RemoveZone(k) end
-	for i = 1, #till do DeleteEntity(till[i]) end
+	for i = 1, #Till do DeleteEntity(Till[i]) end
 	unloadModel(GetEntityModel(BankPed)) DeletePed(BankPed)
 end)

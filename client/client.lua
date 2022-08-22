@@ -35,11 +35,8 @@ CreateThread(function()
 		distance = 2.0 })
 	--Crete Ped at the location
 	if Config.Peds then
-		local i = math.random(1, #Config.PedPool)
 		if not Config.Gabz then CreateModelHide(vector3(Config.CashInLocation.x, Config.CashInLocation.y, Config.CashInLocation.z), 1.0, `v_corp_bk_chair3`, true) end
-		if not BankPed then
-			BankPed = CreatePed(0, Config.PedPool[i], vector3(Config.CashInLocation.x, Config.CashInLocation.y, Config.CashInLocation.z-1), Config.CashInLocation[4], false, false)
-		end
+		BankPed = makePed(Config.PedPool[math.random(1, #Config.PedPool)], Config.CashInLocation, false, false)
 	end
 
 	--Spawn Custom Cash Register Targets
@@ -187,6 +184,6 @@ RegisterNetEvent('jim-payments:Tickets:Sell:no', function() exports['qb-menu']:c
 
 AddEventHandler('onResourceStop', function(r) if r ~= GetCurrentResourceName() then return end
 	for k in pairs(Targets) do exports['qb-target']:RemoveZone(k) end
-	for i = 1, #till do DeleteEntity(till[i]) end
+	for i = 1, #Till do DeleteEntity(Till[i]) end
 	unloadModel(GetEntityModel(BankPed)) DeletePed(BankPed)
 end)

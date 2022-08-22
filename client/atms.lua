@@ -1,4 +1,5 @@
 local QBCore = exports['qb-core']:GetCoreObject()
+RegisterNetEvent('QBCore:Client:UpdateObject', function() QBCore = exports['qb-core']:GetCoreObject() end)
 
 -- This script is a simple replacement for QB-Banking and QB-ATMs
 -- It uses QB-Input and server callbacks to retreive info about accounts and cash
@@ -226,7 +227,7 @@ RegisterNetEvent('jim-payments:Client:ATM:use', function(data)
 			Wait(1000)
 			TriggerServerEvent('jim-payments:server:ATM:use', dialog.amount, dialog.billtype, dialog.account, data.id, info.society, info.gsociety)
 		end
-	end, function()	TriggerEvent("QBCore:Notify", "Cancelled!", "error")
+	end, function()	triggerNotify(nil, "Cancelled!", "error")
 	end, data.icon)
 end)
 
@@ -245,7 +246,7 @@ RegisterNetEvent('jim-payments:client:ATM:give', function()
 			end
 			dist = nil
 		end
-		if not nearbyList[1] then TriggerEvent("QBCore:Notify", "No one near by to charge", "error") return end
+		if not nearbyList[1] then triggerNotify(nil, "No one near by to charge", "error") return end
 		local dialog = exports['qb-input']:ShowInput({ header = "Give someone cash", submitText = "Give",
 		inputs = {
 				{ text = " ", name = "citizen", type = "select", options = nearbyList },

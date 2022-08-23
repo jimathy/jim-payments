@@ -47,7 +47,7 @@ CreateThread(function()
 			local gang = nil
 			if v[i].gang then job = nil gang = k end
 			Targets["CustomRegister: "..k..i] =
-			exports['qb-target']:AddBoxZone("CustomRegister: "..k..i, v[i].coords, 0.47, 0.34, { name="CustomRegister: "..k..i, heading = v[i].coords[4], debugPoly=Config.Debug, minZ=v[i].coords.z-0.1, maxZ=v[i].coords.z+0.4 },
+			exports['qb-target']:AddBoxZone("CustomRegister: "..k..i, v[i].coords.xyz, 0.47, 0.34, { name="CustomRegister: "..k..i, heading = v[i].coords[4], debugPoly=Config.Debug, minZ=v[i].coords.z-0.1, maxZ=v[i].coords.z+0.4 },
 				{ options = { { event = "jim-payments:client:Charge", icon = "fas fa-credit-card", label = "Charge Customer", job = job, gang = gang, img = "" }, },
 					distance = 2.0 })
 			if v[i].prop then

@@ -98,7 +98,7 @@ end)
 
 RegisterServerEvent('jim-payments:Tickets:Sell', function()
     local Player = QBCore.Functions.GetPlayer(source)
-	if Player.Functions.GetItemByName("payticket") then triggerNotify(nil, "No tickets to trade", 'error', source) return
+	if not Player.Functions.GetItemByName("payticket") then triggerNotify(nil, "No tickets to trade", 'error', source) return
 	else
 		tickets = Player.Functions.GetItemByName("payticket").amount
 		Player.Functions.RemoveItem('payticket', tickets)

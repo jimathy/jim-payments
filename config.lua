@@ -5,6 +5,7 @@ print("^2Jim^7-^2Payments v^42^7.^47 ^7- ^2Payments Script by ^1Jimathy^7")
 -- https://discord.gg/xKgQZ6wZvS
 
 Config = {
+	Lan = "en",
 	Debug = false,
 	Notify = "qb",
 	---------------------------------
@@ -246,3 +247,5 @@ if Config.Gabz then
 		vector3(264.77, 207.51, 106.28),
 	}
 end
+
+Loc = {}

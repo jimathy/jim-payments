@@ -1,10 +1,11 @@
-print("^2Jim^7-^2Payments v^42^7.^47 ^7- ^2Payments Script by ^1Jimathy^7")
+print("^2Jim^7-^2Payments v^42^7.^48 ^7- ^2Payments Script by ^1Jimathy^7")
 
 -- If you need support I now have a discord available, it helps me keep track of issues and give better support.
 
 -- https://discord.gg/xKgQZ6wZvS
 
 Config = {
+	Lan = "en",
 	Debug = false,
 	Notify = "qb",
 	---------------------------------
@@ -87,6 +88,7 @@ Config = {
 	FineJobConfirmation = false, --"true" makes it so fines need confirmation, "false" skips this ands just removes the money
 	FineJobList = true, -- "true" to use nearby player list feature in the cash registers, "false" for manual id entry
 
+	ApGov = false, -- Add support for AP-Goverment Tax
 	---------------------
 	-- Banking Systems --
 	---------------------
@@ -246,3 +248,5 @@ if Config.Gabz then
 		vector3(264.77, 207.51, 106.28),
 	}
 end
+
+Loc = {}

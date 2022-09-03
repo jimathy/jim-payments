@@ -22,18 +22,18 @@ RegisterServerEvent('jim-payments:server:ATM:use', function(amount, billtype, ba
 	--Simple transfers from bank to wallet --
 	if account == "bank" or account == "atm" then
 		if billtype == "withdraw" then
-			if bankB < amount then triggerNotify(nil, "Bank Balance too low", "error", src)
+			if bankB < amount then triggerNotify(nil, Loc[Config.Lan].error["bank_low"], "error", src)
 			elseif bankB >= tonumber(amount) then
-				triggerNotify(nil, "Withdrew $"..cv(amount).." from the bank", "success") -- Don't really need this as phone gets notified when money is withdrawn
+				triggerNotify(nil, Loc[Config.Lan].success["draw"]..cv(amount)..Loc[Config.Lan].success["from_bank"], "success") -- Don't really need this as phone gets notified when money is withdrawn
 				Player.Functions.RemoveMoney('bank', amount) Wait(1500)
 				Player.Functions.AddMoney('cash', amount)
 			end
 		elseif billtype == "deposit" then
-			if cashB < amount then triggerNotify(nil, "Not enough cash", "error", src)
+			if cashB < amount then triggerNotify(nil, Loc[Config.Lan].error["no_cash"], "error", src)
 			elseif cashB >= amount then
 				Player.Functions.RemoveMoney('cash', amount) Wait(1500)
 				Player.Functions.AddMoney('bank', amount)
-				triggerNotify(nil, "Deposited $"..cv(amount).." into the Bank", "success", src)
+				triggerNotify(nil, Loc[Config.Lan].success["deposited"]..cv(amount)..Loc[Config.Lan].success["into_bank"], "success", src)
 			end
 		end
 	-- Transfers from bank to savings account --
@@ -45,41 +45,41 @@ RegisterServerEvent('jim-payments:server:ATM:use', function(amount, billtype, ba
 			if savbal >= amount then
 				savbal = savbal - amount
 				Player.Functions.AddMoney('bank', amount)
-				triggerNotify(nil, "$"..cv(amount).." Withdrawn from savings into bank account", "success", src)
+				triggerNotify(nil, "$"..cv(amount)..Loc[Config.Lan].success["draw_save"], "success", src)
 				MySQL.Async.execute('UPDATE bank_accounts SET amount = ? WHERE citizenid = ? AND record_id = ?', { savbal, Player.PlayerData.citizenid, getSavingsAccount[1].record_id }, function(success)
 					if success then	return true	else return false end
 				end)
 			elseif savbal < amount then
-				triggerNotify(nil, "Savings Balance too low", "error")
+				triggerNotify(nil, Loc[Config.Lan].error["saving_low"], "error")
 			end
 		elseif billtype == "deposit" then
 			if amount < bankB then
 				savbal = savbal + amount
 				Player.Functions.RemoveMoney('bank', amount)
-				triggerNotify(nil, "$"..cv(amount).." Deposited from bank account into savings", "success", src)
+				triggerNotify(nil, "$"..cv(amount)..Loc[Config.Lan].success["depos_save"], "success", src)
 				MySQL.Async.execute('UPDATE bank_accounts SET amount = ? WHERE citizenid = ? AND record_id = ?', { savbal, Player.PlayerData.citizenid, getSavingsAccount[1].record_id }, function(success)
 					if success then	return true	else return false end
 				end)
-			else triggerNotify(nil, "Bank Balance too low", "error", src)
+			else triggerNotify(nil, Loc[Config.Lan].error["bank_low"], "error", src)
 			end
 		end
 	--Simple transfers from society account to bank --
 	elseif account == "society" then
 		if billtype == "withdraw" then
-			if tonumber(society) < amount then triggerNotify(nil, "Society balance too low", "error", src)
+			if tonumber(society) < amount then triggerNotify(nil, Loc[Config.Lan].error["soc_low"], "error", src)
 			elseif tonumber(society) >= amount then
-				triggerNotify(nil, "Withdrew $"..cv(amount).." from the "..Player.PlayerData.job.label.." account", "success", src)
+				triggerNotify(nil, Loc[Config.Lan].success["draw"]..cv(amount)..Loc[Config.Lan].success["fromthe"]..Player.PlayerData.job.label..Loc[Config.Lan].success["account"], "success", src)
 				Player.Functions.AddMoney('bank', amount)
 				if Config.Manage then exports["qb-management"]:RemoveMoney(tostring(Player.PlayerData.job.name), amount)
 				else TriggerEvent("qb-bossmenu:server:removeAccountMoney", tostring(Player.PlayerData.job.name), amount) end
 			end
 		elseif billtype == "deposit" then
-			if bankB < amount then triggerNotify(nil, "Not enough money in your bank", "error", src)
+			if bankB < amount then triggerNotify(nil, Loc[Config.Lan].error["nomoney_bank"], "error", src)
 			elseif bankB >= amount then
 				if Config.Manage then exports["qb-management"]:AddMoney(tostring(Player.PlayerData.job.name), amount)
 				else TriggerEvent("qb-bossmenu:server:addAccountMoney", tostring(Player.PlayerData.job.name), amount) end
 				Player.Functions.RemoveMoney('bank', amount) Wait(1500)
-				triggerNotify(nil, "Deposited $"..cv(amount).." into the "..Player.PlayerData.job.label.." account", "success", src)
+				triggerNotify(nil, Loc[Config.Lan].success["deposited"]..cv(amount)..Loc[Config.Lan].success["into"]..Player.PlayerData.job.label..Loc[Config.Lan].success["account"], "success", src)
 			end
 		end
 	-- Transfer from boss account to players --
@@ -104,34 +104,34 @@ RegisterServerEvent('jim-payments:server:ATM:use', function(amount, billtype, ba
 				else TriggerEvent("qb-bossmenu:server:removeAccountMoney", tostring(Player.PlayerData.job.name), amount) end
 				if Reciever then
 					Reciever.Functions.AddMoney('bank', amount)
-					triggerNotify(nil, "Sent $"..amount.." to "..Reciever.PlayerData.charinfo.firstname.." "..Reciever.PlayerData.charinfo.lastname, "success", src)
-					triggerNotify(nil, "Recieved $"..cv(amount).." from "..tostring(Player.PlayerData.job.label).." account", "success", Reciever.PlayerData.source)
+					triggerNotify(nil, Loc[Config.Lan].success["sent"]..amount..Loc[Config.Lan].success["to"]..Reciever.PlayerData.charinfo.firstname.." "..Reciever.PlayerData.charinfo.lastname, "success", src)
+					triggerNotify(nil, Loc[Config.Lan].success["recieved"]..cv(amount)..Loc[Config.Lan].success["from"]..tostring(Player.PlayerData.job.label)..Loc[Config.Lan].success["account"], "success", Reciever.PlayerData.source)
 				else
 					local RecieverMoney = json.decode(result[1].money)
 					RecieverMoney.bank = (RecieverMoney.bank + amount)
 					MySQL.Async.execute('UPDATE players SET money = ? WHERE citizenid = ?', {json.encode(RecieverMoney), result[1].citizenid})
 				end
-			elseif not result[1] then triggerNotify(nil, "Error: Account '"..baccount.."' not found", "error", src)
+			elseif not result[1] then triggerNotify(nil, Loc[Config.Lan].error["error_start"]..baccount..Loc[Config.Lan].error["error_end"], "error", src)
 			end
 		end
 
 	--Simple transfers from gang society account to bank --
 	elseif account == "gang" then
 		if billtype == "withdraw" then
-			if tonumber(gsociety) < amount then triggerNotify(nil, "Society balance too low", "error", src)
+			if tonumber(gsociety) < amount then triggerNotify(nil, Loc[Config.Lan].error["soc_low"], "error", src)
 			elseif tonumber(gsociety) >= amount then
-				triggerNotify(nil, "Withdrew $"..cv(amount).." from the "..Player.PlayerData.gang.label.." account", "success", src)
+				triggerNotify(nil, Loc[Config.Lan].success["draw"]..cv(amount)..Loc[Config.Lan].success["fromthe"]..Player.PlayerData.gang.label..Loc[Config.Lan].success["account"], "success", src)
 				Player.Functions.AddMoney('bank', amount)
 				if Config.Manage then exports["qb-management"]:RemoveGangMoney(tostring(Player.PlayerData.gang.name), amount)
 				else TriggerEvent("qb-gangmenu:server:removeAccountMoney", tostring(Player.PlayerData.gang.name), amount) end
 			end
 		elseif billtype == "deposit" then
-			if bankB < amount then triggerNotify(nil, "Not enough money in your bank", "error", src)
+			if bankB < amount then triggerNotify(nil, Loc[Config.Lan].error["nomoney_bank"], "error", src)
 			elseif bankB >= amount then
 				if Config.Manage then exports["qb-management"]:AddGangMoney(tostring(Player.PlayerData.gang.name), amount)
 				else TriggerEvent("qb-gangmenu:server:addAccountMoney", tostring(Player.PlayerData.gang.name), amount) end
 				Player.Functions.RemoveMoney('bank', amount) Wait(1500)
-				triggerNotify(nil, "Deposited $"..cv(amount).." into the "..Player.PlayerData.gang.label.." account", "success", src)
+				triggerNotify(nil, Loc[Config.Lan].success["deposited"]..cv(amount)..Loc[Config.Lan].success["into"]..Player.PlayerData.gang.label..Loc[Config.Lan].success["account"], "success", src)
 			end
 		end
 	-- Transfer from gang account to players --
@@ -156,14 +156,14 @@ RegisterServerEvent('jim-payments:server:ATM:use', function(amount, billtype, ba
 				else TriggerEvent("qb-bossmenu:server:removeAccountMoney", tostring(Player.PlayerData.gang.name), amount) end
 				if not Reciever then
 					Reciever.Functions.AddMoney('bank', amount)
-					triggerNotify(nil, "Sent $"..amount.." to "..Reciever.PlayerData.charinfo.firstname.." "..Reciever.PlayerData.charinfo.lastname, "success", src)
-					triggerNotify(nil, Reciever.PlayerData.source, "Recieved $"..cv(amount).." from "..tostring(Player.PlayerData.gang.label).." account", "success", Reciever.PlayerData.source)
+					triggerNotify(nil, Loc[Config.Lan].success["sent"]..amount..Loc[Config.Lan].success["to"]..Reciever.PlayerData.charinfo.firstname.." "..Reciever.PlayerData.charinfo.lastname, "success", src)
+					triggerNotify(nil, Reciever.PlayerData.source, Loc[Config.Lan].success["recieved"]..cv(amount)..Loc[Config.Lan].success["from"]..tostring(Player.PlayerData.gang.label)..Loc[Config.Lan].success["account"], "success", Reciever.PlayerData.source)
 				else
 					local RecieverMoney = json.decode(result[1].money)
 					RecieverMoney.bank = (RecieverMoney.bank + amount)
 					MySQL.Async.execute('UPDATE players SET money = ? WHERE citizenid = ?', {json.encode(RecieverMoney), result[1].citizenid})
 				end
-			elseif not result[1] then triggerNotify(nil, "Error: Account '"..baccount.."' not found", "error", src)
+			elseif not result[1] then triggerNotify(nil, Loc[Config.Lan].error["error_start"]..baccount..Loc[Config.Lan].error["error_end"], "error", src)
 
 			end
 		end
@@ -188,14 +188,14 @@ RegisterServerEvent('jim-payments:server:ATM:use', function(amount, billtype, ba
 				Player.Functions.RemoveMoney('bank', amount)
 				if Reciever then
 					Reciever.Functions.AddMoney('bank', amount)
-					triggerNotify(nil, "Sent $"..cv(amount).." to "..Reciever.PlayerData.charinfo.firstname.." "..Reciever.PlayerData.charinfo.lastname, "success", src)
-					triggerNotify(nil, "Recieved $"..cv(amount).." from "..Player.PlayerData.charinfo.firstname.." "..Player.PlayerData.charinfo.lastname, "success", Reciever.PlayerData.source)
+					triggerNotify(nil, Loc[Config.Lan].success["sent"]..cv(amount)..Loc[Config.Lan].success["to"]..Reciever.PlayerData.charinfo.firstname.." "..Reciever.PlayerData.charinfo.lastname, "success", src)
+					triggerNotify(nil, Loc[Config.Lan].success["recieved"]..cv(amount)..Loc[Config.Lan].success["from"]..Player.PlayerData.charinfo.firstname.." "..Player.PlayerData.charinfo.lastname, "success", Reciever.PlayerData.source)
 				else
 					local RecieverMoney = json.decode(result[1].money)
 					RecieverMoney.bank = (RecieverMoney.bank + amount)
 					MySQL.Async.execute('UPDATE players SET money = ? WHERE citizenid = ?', {json.encode(RecieverMoney), result[1].citizenid})
 				end
-			elseif not result[1] then triggerNotify(nil, "Error: Account '"..baccount.."' not found", "error", src)
+			elseif not result[1] then triggerNotify(nil, Loc[Config.Lan].error["error_start"]..baccount..Loc[Config.Lan].error["error_end"], "error", src)
 
 			end
 		end
@@ -248,7 +248,7 @@ QBCore.Functions.CreateCallback('jim-payments:ATM:Find', function(source, cb)
 		gsociety = gsociety})
 end)
 
-QBCore.Commands.Add("cashgive", "Pay a user nearby", {}, false, function(source) TriggerClientEvent("jim-payments:client:ATM:give", source) end)
+QBCore.Commands.Add("cashgive", Loc[Config.Lan].command["pay_user"], {}, false, function(source) TriggerClientEvent("jim-payments:client:ATM:give", source) end)
 
 RegisterServerEvent("jim-payments:server:ATM:give", function(citizen, price)
     local Player = QBCore.Functions.GetPlayer(source)
@@ -259,11 +259,11 @@ RegisterServerEvent("jim-payments:server:ATM:give", function(citizen, price)
 	if amount and amount > 0 then
 		if balance >= amount then
 			Player.Functions.RemoveMoney('cash', amount)
-			triggerNotify(nil, "You gave "..Reciever.PlayerData.charinfo.firstname.." $"..cv(amount), "success", source)
+			triggerNotify(nil, Loc[Config.Lan].success["you_gave"]..Reciever.PlayerData.charinfo.firstname.." $"..cv(amount), "success", source)
 			Reciever.Functions.AddMoney('cash', amount)
-			triggerNotify(nil, "You got $"..cv(amount).." from "..Player.PlayerData.charinfo.firstname, "success", tonumber(citizen))
+			triggerNotify(nil, Loc[Config.Lan].success["you_got"]..cv(amount)..Loc[Config.Lan].success["from"]..Player.PlayerData.charinfo.firstname, "success", tonumber(citizen))
 		elseif balance < amount then
-			triggerNotify(nil, "You don't have enough cash to give", "error", source)
+			triggerNotify(nil, Loc[Config.Lan].error["not_enough"], "error", source)
 		end
-	else triggerNotify(nil,"You can't give $0", 'error', source) end
+	else triggerNotify(nil, Loc[Config.Lan].error["zero"], 'error', source) end
 end)

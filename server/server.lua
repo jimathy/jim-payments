@@ -161,6 +161,7 @@ RegisterServerEvent("jim-payments:server:PayPopup", function(data)
 	if data.gang == true then newdata.society = biller.PlayerData.gang.name end
 	if data.accept == true then
 		billed.Functions.RemoveMoney(tostring(data.billtype), data.amount)
+		if Config.ApGov then exports['ap-government']:chargeCityTax(billed.PlayerData.source, "Item", data.amount) end
 		TriggerEvent('jim-payments:Tickets:Give', newdata, biller, data.gang)
 		triggerNotify(nil, billed.PlayerData.charinfo.firstname..Loc[Config.Lan].success["accepted_pay"]..data.amount..Loc[Config.Lan].success["payment"], "success", data.biller)
 	elseif data.accept == false then
@@ -178,6 +179,7 @@ RegisterServerEvent("jim-payments:server:PolCharge", function(citizen, price)
 	if price > 0 then
 		if not Config.FineJobConfirmation then
 			if billed.Functions.RemoveMoney("bank", price) then if Config.Debug then print("^5Debug^7: ^3PolCharge^7 - ^2Player^7(^6"..billed.PlayerData.source.."^7) ^2charged ^7$^6"..price.."^7") end end
+			if Config.ApGov then exports['ap-government']:chargeCityTax(billed.PlayerData.source, "Item", price) end
 			if biller.Functions.AddMoney("bank", commission) then if Config.Debug then print("^5Debug^7: ^3PolCharge^7 - ^2Commission of ^7$^6"..commission.." ^2sent to Player^7(^6"..biller.PlayerData.source.."^7)") end end
 			if Config.Manage then
 				exports["qb-management"]:AddMoney(tostring(biller.PlayerData.job.name), (price - commission))
@@ -202,6 +204,7 @@ RegisterServerEvent("jim-payments:server:PolPopup", function(data)
 	local commission = math.floor(tonumber(data.amount) * Config.FineJobs[biller.PlayerData.job.name].Commission)
 	if data.accept == true then
 		if billed.Functions.RemoveMoney("bank", data.amount) then if Config.Debug then print("^5Debug^7: ^3PolCharge^7 - ^2Player^7(^6"..billed.PlayerData.source.."^7) ^2charged ^7$^6"..data.amount.."^7") end end
+		if Config.ApGov then exports['ap-government']:chargeCityTax(billed.PlayerData.source, "Item", data.amount) end
 		triggerNotify(nil, billed.PlayerData.charinfo.firstname..Loc[Config.Lan].success["accepted_pay"]..data.amount..Loc[Config.Lan].success["charge_end"], "success", data.biller)
 		if biller.Functions.AddMoney("bank", commission) then if Config.Debug then print("^5Debug^7: ^3PolCharge^7 - ^2Commission^2 of ^7$^6"..commission.." ^2sent to Player^7(^6"..biller.PlayerData.source.."^7)") end end
 		if Config.Manage then

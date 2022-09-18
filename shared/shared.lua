@@ -5,7 +5,7 @@ local time = 1000
 function loadModel(model) if not HasModelLoaded(model) then
 	if Config.Debug then print("^5Debug^7: ^2Loading Model^7: '^6"..model.."^7'") end
 	while not HasModelLoaded(model) do
-		if time > 0 then time = time - 1 RequestModel(model)
+		if time > 0 then time -= 1 RequestModel(model)
 		else time = 1000 print("^5Debug^7: ^3LoadModel^7: ^2Timed out loading model ^7'^6"..model.."^7'") break
 		end
 		Wait(10)
@@ -83,11 +83,11 @@ end
 
 function triggerNotify(title, message, type, src)
 	if Config.Notify == "okok" then
-		if not src then	exports['okokNotify']:Alert(title, message, 6000, type)
-		else TriggerClientEvent('okokNotify:Alert', src, title, message, 6000, type) end
+		if not src then	exports['okokNotify']:Alert(title, message, 6000, type or 'info')
+		else TriggerClientEvent('okokNotify:Alert', src, title, message, 6000, type or 'info') end
 	elseif Config.Notify == "qb" then
-		if not src then	TriggerEvent("QBCore:Notify", message, type)
-		else TriggerClientEvent("QBCore:Notify", src, message, type) end
+		if not src then	TriggerEvent("QBCore:Notify", message, "primary")
+		else TriggerClientEvent("QBCore:Notify", src, message, "primary") end
 	elseif Config.Notify == "t" then
 		if not src then exports['t-notify']:Custom({title = title, style = type, message = message, sound = true})
 		else TriggerClientEvent('t-notify:client:Custom', src, { style = type, duration = 6000, title = title, message = message, sound = true, custom = true}) end
@@ -105,11 +105,11 @@ function pairsByKeys(t)
 	for n in pairs(t) do a[#a+1] = n end
 	table.sort(a)
 	local i = 0
-	local iter = function() i = i + 1 if a[i] == nil then return nil else return a[i], t[a[i]] end end
+	local iter = function() i += 1 if a[i] == nil then return nil else return a[i], t[a[i]] end end
 	return iter
 end
 
-function countTable(table) local i = 0 for keys in pairs(table) do i = i + 1 end return i end
+function countTable(table) local i = 0 for keys in pairs(table) do i += 1 end return i end
 
 function cv(amount)
     local formatted = amount

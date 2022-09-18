@@ -1,4 +1,4 @@
-print("^2Jim^7-^2Payments v^42^7.^48 ^7- ^2Payments Script by ^1Jimathy^7")
+print("^2Jim^7-^2Payments ^7v^42^7.^48^7.^41 ^7- ^2Payments Script by ^1Jimathy^7")
 
 -- If you need support I now have a discord available, it helps me keep track of issues and give better support.
 
@@ -8,11 +8,12 @@ Config = {
 	Lan = "en",
 	Debug = false,
 	Notify = "qb",
+
 	---------------------------------
 	-- Default Job Payment Systems --
 	---------------------------------
-	Manage = true, -- "true" if using qb-management
-				-- "false" if using qb-bossmenu
+	Manage = true, 	-- "true" if using qb-management
+					-- "false" if using qb-bossmenu
 
 	List = true, -- "true" to use nearby player list feature in the cash registers, "false" for manual id entry
 	PaymentRadius = 15, -- This is how far the playerlist will check for nearby players (based on the person charging)
@@ -88,6 +89,7 @@ Config = {
 	FineJobConfirmation = false, --"true" makes it so fines need confirmation, "false" skips this ands just removes the money
 	FineJobList = true, -- "true" to use nearby player list feature in the cash registers, "false" for manual id entry
 
+	RenewedBanking = false, -- Enable if using renewed banking
 	ApGov = false, -- Add support for AP-Goverment Tax
 	---------------------
 	-- Banking Systems --

@@ -104,17 +104,6 @@ CreateThread(function()
 	end
 end)
 
-local function PlayATMAnimation(animation)
-    if animation == 'enter' then
-
-	end
-    if animation == 'exit' then
-		loadAnimDict('amb@prop_human_atm@male@exit')
-		TaskPlayAnim(PlayerPedId(), 'amb@prop_human_atm@male@exit', "exit", 1.0,-1.0, 3000, 1, 1, true, true, true)
-		unloadAnimDict('amb@prop_human_atm@male@enter')
-	end
-end
-
 RegisterNetEvent('jim-payments:Client:ATM:use', function(data)
 	--this grabs all the info from names to savings account numbers in the databases
 	local p = promise.new()

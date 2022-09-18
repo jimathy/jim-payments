@@ -175,3 +175,11 @@ FineJobList = true, -- "true" to use nearby player list feature in the cash regi
   - `ATMBlips` Enable this if you are a pyscho and need every ATM to be on the map too
   - `Gabz` Enable to change to Gabz Bank locations, this corrects the ATM/Bank Cashier + Ticket Cash in
 ---
+## Support for other scripts
+### Renewed-Banking
+  - Support for renewed banking added
+  - Toggle `RenewedBanking` in the config.lua to enable this
+
+### AP-Goverment
+- Support for AP-Goverment Tax on payments
+- Toggle `ApGov` in the config.lua to enable this

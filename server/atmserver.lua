@@ -43,7 +43,7 @@ RegisterServerEvent('jim-payments:server:ATM:use', function(amount, billtype, ba
 
 		if billtype == "withdraw" then
 			if savbal >= amount then
-				savbal = savbal - amount
+				savbal -= amount
 				Player.Functions.AddMoney('bank', amount)
 				triggerNotify(nil, "$"..cv(amount)..Loc[Config.Lan].success["draw_save"], "success", src)
 				MySQL.Async.execute('UPDATE bank_accounts SET amount = ? WHERE citizenid = ? AND record_id = ?', { savbal, Player.PlayerData.citizenid, getSavingsAccount[1].record_id }, function(success)
@@ -54,7 +54,7 @@ RegisterServerEvent('jim-payments:server:ATM:use', function(amount, billtype, ba
 			end
 		elseif billtype == "deposit" then
 			if amount < bankB then
-				savbal = savbal + amount
+				savbal += amount
 				Player.Functions.RemoveMoney('bank', amount)
 				triggerNotify(nil, "$"..cv(amount)..Loc[Config.Lan].success["depos_save"], "success", src)
 				MySQL.Async.execute('UPDATE bank_accounts SET amount = ? WHERE citizenid = ? AND record_id = ?', { savbal, Player.PlayerData.citizenid, getSavingsAccount[1].record_id }, function(success)
@@ -108,7 +108,7 @@ RegisterServerEvent('jim-payments:server:ATM:use', function(amount, billtype, ba
 					triggerNotify(nil, Loc[Config.Lan].success["recieved"]..cv(amount)..Loc[Config.Lan].success["from"]..tostring(Player.PlayerData.job.label)..Loc[Config.Lan].success["account"], "success", Reciever.PlayerData.source)
 				else
 					local RecieverMoney = json.decode(result[1].money)
-					RecieverMoney.bank = (RecieverMoney.bank + amount)
+					RecieverMoney.bank += amount
 					MySQL.Async.execute('UPDATE players SET money = ? WHERE citizenid = ?', {json.encode(RecieverMoney), result[1].citizenid})
 				end
 			elseif not result[1] then triggerNotify(nil, Loc[Config.Lan].error["error_start"]..baccount..Loc[Config.Lan].error["error_end"], "error", src)
@@ -160,7 +160,7 @@ RegisterServerEvent('jim-payments:server:ATM:use', function(amount, billtype, ba
 					triggerNotify(nil, Reciever.PlayerData.source, Loc[Config.Lan].success["recieved"]..cv(amount)..Loc[Config.Lan].success["from"]..tostring(Player.PlayerData.gang.label)..Loc[Config.Lan].success["account"], "success", Reciever.PlayerData.source)
 				else
 					local RecieverMoney = json.decode(result[1].money)
-					RecieverMoney.bank = (RecieverMoney.bank + amount)
+					RecieverMoney.bank += amount
 					MySQL.Async.execute('UPDATE players SET money = ? WHERE citizenid = ?', {json.encode(RecieverMoney), result[1].citizenid})
 				end
 			elseif not result[1] then triggerNotify(nil, Loc[Config.Lan].error["error_start"]..baccount..Loc[Config.Lan].error["error_end"], "error", src)
@@ -192,7 +192,7 @@ RegisterServerEvent('jim-payments:server:ATM:use', function(amount, billtype, ba
 					triggerNotify(nil, Loc[Config.Lan].success["recieved"]..cv(amount)..Loc[Config.Lan].success["from"]..Player.PlayerData.charinfo.firstname.." "..Player.PlayerData.charinfo.lastname, "success", Reciever.PlayerData.source)
 				else
 					local RecieverMoney = json.decode(result[1].money)
-					RecieverMoney.bank = (RecieverMoney.bank + amount)
+					RecieverMoney.bank += amount
 					MySQL.Async.execute('UPDATE players SET money = ? WHERE citizenid = ?', {json.encode(RecieverMoney), result[1].citizenid})
 				end
 			elseif not result[1] then triggerNotify(nil, Loc[Config.Lan].error["error_start"]..baccount..Loc[Config.Lan].error["error_end"], "error", src)

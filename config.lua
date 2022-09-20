@@ -1,4 +1,4 @@
-print("^2Jim^7-^2Payments ^7v^42^7.^48^7.^42 ^7- ^2Payments Script by ^1Jimathy^7")
+print("^2Jim^7-^2Payments ^7v^42^7.^48^7.^43 ^7- ^2Payments Script by ^1Jimathy^7")
 
 -- If you need support I now have a discord available, it helps me keep track of issues and give better support.
 
@@ -39,7 +39,7 @@ Config = {
 		`U_F_M_CasinoShop_01`,
 	},
 
-	PhoneBank = false, -- Set this to false to use the popup payment system FOR CARD/BANK PAYMENTS instead of using phone invoices
+	PhoneBank = false, 	-- Set this to false to use the popup payment system FOR CARD/BANK PAYMENTS instead of using phone invoices
 						-- This doesn't affect Cash payments as they by default use confirmation now
 						-- This is helpful for phones that don't support invoices well
 

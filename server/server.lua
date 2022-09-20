@@ -54,7 +54,7 @@ RegisterServerEvent('jim-payments:Tickets:Give', function(data, biller, gang)
 	end
 
 	local duty = true
-	if not biller.PlayerData.job.onduty or gang == nil then duty = false end
+	if not biller.PlayerData.job.onduty or gang ~= nil then duty = false end
 
 	-- If ticket system enabled, do this
 	if duty and Config.TicketSystem then
@@ -64,21 +64,18 @@ RegisterServerEvent('jim-payments:Tickets:Give', function(data, biller, gang)
 					local Player = QBCore.Functions.GetPlayer(v)
 					if Player ~= nil or Player ~= billed then
 						if Player.PlayerData.job.name == data.society and Player.PlayerData.job.onduty then
-							Player.Functions.AddItem('payticket', 1, false, {["quality"] = nil})
+							if Player.Functions.AddItem('payticket', 1) then TriggerClientEvent('inventory:client:ItemBox', Player.PlayerData.source, QBCore.Shared.Items['payticket'], "add", 1) end
 							triggerNotify(nil, Loc[Config.Lan].success["rec_rec"], 'success', Player.PlayerData.source)
-							TriggerClientEvent('inventory:client:ItemBox', Player.PlayerData.source, QBCore.Shared.Items['payticket'], "add", 1)
 						end
 					end
 					if gang then
-						biller.Functions.AddItem('payticket', 1, false, {["quality"] = nil})
+						if biller.Functions.AddItem('payticket', 1) then TriggerClientEvent('inventory:client:ItemBox', biller.PlayerData.source, QBCore.Shared.Items['payticket'], "add", 1) end
 						triggerNotify(nil, Loc[Config.Lan].success["rec_rec"], 'success', biller.PlayerData.source)
-						TriggerClientEvent('inventory:client:ItemBox', biller.PlayerData.source, QBCore.Shared.Items['payticket'], "add", 1)
 					end
 				end
 			else
-				biller.Functions.AddItem('payticket', 1, false, {["quality"] = nil})
+				if biller.Functions.AddItem('payticket', 1) then TriggerClientEvent('inventory:client:ItemBox', biller.PlayerData.source, QBCore.Shared.Items['payticket'], "add", 1) end
 				triggerNotify(nil, Loc[Config.Lan].success["rec_rec"], 'success', biller.PlayerData.source)
-				TriggerClientEvent('inventory:client:ItemBox', biller.PlayerData.source, QBCore.Shared.Items['payticket'], "add", 1)
 			end
 		end
 	end
@@ -143,7 +140,11 @@ RegisterServerEvent("jim-payments:server:Charge", function(citizen, price, billt
 			if Config.PhoneType == "qb" then
 				MySQL.Async.insert(
 					'INSERT INTO phone_invoices (citizenid, amount, society, sender, sendercitizenid) VALUES (?, ?, ?, ?, ?)',
-					{billed.PlayerData.citizenid, amount, biller.PlayerData.job.name, biller.PlayerData.charinfo.firstname, biller.PlayerData.citizenid})
+					{billed.PlayerData.citizenid, amount, biller.PlayerData.job.name, biller.PlayerData.charinfo.firstname, biller.PlayerData.citizenid}, function(id)
+						if id then
+							TriggerClientEvent('qb-phone:client:AcceptorDenyInvoice', billed.PlayerData.source, id, biller.PlayerData.charinfo.firstname, biller.PlayerData.job.name, biller.PlayerData.citizenid, amount, GetInvokingResource())
+						end
+					end)
 				TriggerClientEvent('qb-phone:RefreshPhone', billed.PlayerData.source)
 			elseif Config.PhoneType == "gks" then
 				MySQL.Async.execute('INSERT INTO gksphone_invoices (citizenid, amount, society, sender, sendercitizenid, label) VALUES (@citizenid, @amount, @society, @sender, @sendercitizenid, @label)', {

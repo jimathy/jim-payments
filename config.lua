@@ -6,14 +6,14 @@ print("^2Jim^7-^2Payments ^7v^42^7.^48^7.^44 ^7- ^2Payments Script by ^1Jimathy^
 
 Config = {
 	Lan = "en",
-	Debug = true,
+	Debug = false,
 	Notify = "qb",
 
 	---------------------------------
 	-- Default Job Payment Systems --
 	---------------------------------
 
-	RenewedBanking = true, -- Enable if using Renewed-Banking false if using QB-Management
+	RenewedBanking = false, -- Enable if using Renewed-Banking false if using QB-Management
 
 	ApGov = false, -- Toggle support for AP-Goverment Tax
 
@@ -38,7 +38,7 @@ Config = {
 		`U_F_M_CasinoShop_01`,
 	},
 
-	PhoneBank = true, 	-- Set this to false to use the popup payment system FOR CARD/BANK PAYMENTS instead of using phone invoices
+	PhoneBank = false, 	-- Set this to false to use the popup payment system FOR CARD/BANK PAYMENTS instead of using phone invoices
 						-- This doesn't affect Cash payments as they by default use confirmation now
 						-- This is helpful for phones that don't support invoices well
 
@@ -100,7 +100,7 @@ Config = {
 	BankBlips = false, -- Enable this if you disabled qb-banking and need bank locations
 	ATMBlips = false, -- Enable this if you are a pyscho and need every ATM to be on the map too
 
-	Gabz = true, 	-- "true" to enable Gabz Bank locations
+	Gabz = false, 	-- "true" to enable Gabz Bank locations
 					-- this corrects the ATM/Bank Cashier + Ticket Cash in location
 
 	ATMModels = { `prop_atm_01`, `prop_atm_02`, `prop_atm_03`, `prop_fleeca_atm` },

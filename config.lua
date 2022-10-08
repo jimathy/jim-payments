@@ -1,4 +1,4 @@
-print("^2Jim^7-^2Payments ^7v^42^7.^48^7.^43 ^7- ^2Payments Script by ^1Jimathy^7")
+print("^2Jim^7-^2Payments ^7v^42^7.^48^7.^44 ^7- ^2Payments Script by ^1Jimathy^7")
 
 -- If you need support I now have a discord available, it helps me keep track of issues and give better support.
 
@@ -12,10 +12,9 @@ Config = {
 	---------------------------------
 	-- Default Job Payment Systems --
 	---------------------------------
-	Manage = true, 	-- "true" if using qb-management
-					-- "false" if using qb-bossmenu
 
-	RenewedBanking = false, -- Enable if using Renewed-Banking (requires Manage to be true and leaving jim-payments banking part separate)
+	RenewedBanking = false, -- Enable if using Renewed-Banking false if using QB-Management
+
 	ApGov = false, -- Toggle support for AP-Goverment Tax
 
 	List = true, -- "true" to use nearby player list feature in the cash registers, "false" for manual id entry
@@ -63,6 +62,7 @@ Config = {
 	-- Commission is a percentage eg "0.10" becomes 10%
 	Jobs = {
 		['beanmachine'] = { MinAmountforTicket = 50, PayPerTicket = 50, Commission = 0.10, },
+		['bakery'] = { MinAmountforTicket = 50, PayPerTicket = 50, Commission = 0.10, },
 		['burgershot'] = { MinAmountforTicket = 50, PayPerTicket = 50 , Commission = 0.10, },
 		['catcafe'] = { MinAmountforTicket = 50, PayPerTicket = 50, Commission = 0.10, },
 		['henhouse'] = { MinAmountforTicket = 50, PayPerTicket = 50, Commission = 0.10, },
@@ -100,7 +100,7 @@ Config = {
 	BankBlips = false, -- Enable this if you disabled qb-banking and need bank locations
 	ATMBlips = false, -- Enable this if you are a pyscho and need every ATM to be on the map too
 
-	Gabz = true, 	-- "true" to enable Gabz Bank locations
+	Gabz = false, 	-- "true" to enable Gabz Bank locations
 					-- this corrects the ATM/Bank Cashier + Ticket Cash in location
 
 	ATMModels = { `prop_atm_01`, `prop_atm_02`, `prop_atm_03`, `prop_fleeca_atm` },

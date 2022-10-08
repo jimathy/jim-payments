@@ -23,26 +23,18 @@ RegisterServerEvent('jim-payments:Tickets:Give', function(data, biller, gang)
 	local takecomm = math.floor(tonumber(data.amount) * Config.Jobs[data.society].Commission)
 	if biller then -- If this is found, it ISN'T a phone payment, so add money to society here
 		if gang then
-			if Config.Manage then
-				if Config.RenewedBanking then exports['Renewed-Banking']:addAccountMoney(tostring(biller.PlayerData.gang.name), data.amount - takecomm)
-					if Config.Debug then print("^5Debug^7: ^3Renewed-Banking^7(^3Gang^7): ^2Adding ^7$^6"..data.amount - takecomm.." ^2to account ^7'^6"..tostring(biller.PlayerData.gang.name).."^7' ($^6"..exports['Renewed-Banking']:getAccountMoney(biller.PlayerData.gang.name).."^7)") end
-				else
-					exports["qb-management"]:AddGangMoney(tostring(biller.PlayerData.gang.name), data.amount - takecomm)
-					if Config.Debug then print("^5Debug^7: ^3QB-Management^7(^3Gang^7): ^2Adding ^7$^6"..data.amount - takecomm.." ^2to account ^7'^6"..tostring(biller.PlayerData.gang.name).."^7' ($^6"..exports["qb-management"]:GetGangAccount(biller.PlayerData.gang.name).."^7)") end
-				end
-			else TriggerEvent("qb-gangmenu:server:addAccountMoney", tostring(biller.PlayerData.gang.name), data.amount - takecomm)
-				if Config.Debug then print("^5Debug^7: ^3QB^7-^3GangMenu^7: ^2Adding ^7$^6"..data.amount - takecomm.." ^2to account ^7'^6"..tostring(biller.PlayerData.gang.name).."^7'") end
+			if Config.RenewedBanking then exports['Renewed-Banking']:addAccountMoney(tostring(biller.PlayerData.gang.name), data.amount - takecomm)
+				if Config.Debug then print("^5Debug^7: ^3Renewed-Banking^7(^3Gang^7): ^2Adding ^7$^6"..data.amount - takecomm.." ^2to account ^7'^6"..tostring(biller.PlayerData.gang.name).."^7' ($^6"..exports['Renewed-Banking']:getAccountMoney(biller.PlayerData.gang.name).."^7)") end
+			else
+				exports["qb-management"]:AddGangMoney(tostring(biller.PlayerData.gang.name), data.amount - takecomm)
+				if Config.Debug then print("^5Debug^7: ^3QB-Management^7(^3Gang^7): ^2Adding ^7$^6"..data.amount - takecomm.." ^2to account ^7'^6"..tostring(biller.PlayerData.gang.name).."^7' ($^6"..exports["qb-management"]:GetGangAccount(biller.PlayerData.gang.name).."^7)") end
 			end
 		elseif not gang then
-			if Config.Manage then
-				if Config.RenewedBanking then exports['Renewed-Banking']:addAccountMoney(tostring(biller.PlayerData.job.name), data.amount - takecomm)
-					if Config.Debug then print("^5Debug^7: ^3Renewed-Banking^7(^3Job^7): ^2Adding ^7$^6"..data.amount - takecomm.." ^2to account ^7'^6"..tostring(biller.PlayerData.job.name).."^7' ($^6"..exports['Renewed-Banking']:getAccountMoney(biller.PlayerData.job.name).."^7)") end
-				else
-					exports["qb-management"]:AddMoney(tostring(biller.PlayerData.job.name), data.amount - takecomm)
-					if Config.Debug then print("^5Debug^7: ^3QB-Management^7(^3Job^7): ^2Adding ^7$^6"..data.amount - takecomm.." ^2to account ^7'^6"..tostring(biller.PlayerData.job.name).."^7' ($^6"..exports["qb-management"]:GetAccount(biller.PlayerData.job.name).."^7)") end
-				end
-			else TriggerEvent("qb-bossmenu:server:addAccountMoney", tostring(biller.PlayerData.job.name), data.amount - takecomm)
-				if Config.Debug then print("^5Debug^7: ^3QB-BossMenu^7: ^2Adding ^7$^6"..data.amount - takecomm.." ^2to account ^7'^6"..tostring(biller.PlayerData.job.name - takecomm).."^7'") end
+			if Config.RenewedBanking then exports['Renewed-Banking']:addAccountMoney(tostring(biller.PlayerData.job.name), data.amount - takecomm)
+				if Config.Debug then print("^5Debug^7: ^3Renewed-Banking^7(^3Job^7): ^2Adding ^7$^6"..data.amount - takecomm.." ^2to account ^7'^6"..tostring(biller.PlayerData.job.name).."^7' ($^6"..tostring(exports['Renewed-Banking']:getAccountMoney(biller.PlayerData.job.name)).."^7)") end
+			else
+				exports["qb-management"]:AddMoney(tostring(biller.PlayerData.job.name), data.amount - takecomm)
+				if Config.Debug then print("^5Debug^7: ^3QB-Management^7(^3Job^7): ^2Adding ^7$^6"..data.amount - takecomm.." ^2to account ^7'^6"..tostring(biller.PlayerData.job.name).."^7' ($^6"..exports["qb-management"]:GetAccount(biller.PlayerData.job.name).."^7)") end
 			end
 		end
 	elseif not biller then	--Find the biller from their citizenid
@@ -192,16 +184,14 @@ RegisterServerEvent("jim-payments:server:PolCharge", function(citizen, price)
 			if billed.Functions.RemoveMoney("bank", price) then if Config.Debug then print("^5Debug^7: ^3PolCharge^7 - ^2Player^7(^6"..billed.PlayerData.source.."^7) ^2charged ^7$^6"..price.."^7") end end
 			if Config.ApGov then exports['ap-government']:chargeCityTax(billed.PlayerData.source, "Item", price) end
 			if biller.Functions.AddMoney("bank", commission) then if Config.Debug then print("^5Debug^7: ^3PolCharge^7 - ^2Commission of ^7$^6"..commission.." ^2sent to Player^7(^6"..biller.PlayerData.source.."^7)") end end
-			if Config.Manage then
-				if Config.RenewedBanking then exports['Renewed-Banking']:addAccountMoney(tostring(biller.PlayerData.job.name), (price - commission))
-					if Config.Debug then print("^5Debug^7: ^3Renewed-Banking^7(^3Job^7): ^2Adding ^7$^6"..(price - commission).." ^2to account ^7'^6"..tostring(biller.PlayerData.job.name).."^7' ($^6"..exports['Renewed-Banking']:getAccountMoney((biller.PlayerData.job.name).."^7)")) end
-				else
-					exports["qb-management"]:AddMoney(tostring(biller.PlayerData.job.name), (price - commission))
-					if Config.Debug then print("^5Debug^7: ^3QB-Management^7(^3Job^7): ^2Adding ^7$^6"..(price - takecomm).." ^2to account ^7'^6"..tostring(biller.PlayerData.job.name).."^7' ($^6"..exports["qb-management"]:GetAccount(biller.PlayerData.job.name).."^7)") end
-				end
-			else TriggerEvent("qb-bossmenu:server:addAccountMoney", tostring(biller.PlayerData.job.name), price - takecomm)
-				if Config.Debug then print("^5Debug^7: ^3QB^7-^3Bossmenu^7(^3Job^7): ^2Adding ^7$^6"..(price - commission).." ^2to account ^7'^6"..tostring(biller.PlayerData.job.name).."^7'") end
+
+			if Config.RenewedBanking then exports['Renewed-Banking']:addAccountMoney(tostring(biller.PlayerData.job.name), (price - commission))
+				if Config.Debug then print("^5Debug^7: ^3Renewed-Banking^7(^3Job^7): ^2Adding ^7$^6"..(price - commission).." ^2to account ^7'^6"..tostring(biller.PlayerData.job.name).."^7' ($^6"..exports['Renewed-Banking']:getAccountMoney((biller.PlayerData.job.name).."^7)")) end
+			else
+				exports["qb-management"]:AddMoney(tostring(biller.PlayerData.job.name), (price - commission))
+				if Config.Debug then print("^5Debug^7: ^3QB-Management^7(^3Job^7): ^2Adding ^7$^6"..(price - takecomm).." ^2to account ^7'^6"..tostring(biller.PlayerData.job.name).."^7' ($^6"..exports["qb-management"]:GetAccount(biller.PlayerData.job.name).."^7)") end
 			end
+
 			triggerNotify(nil, billed.PlayerData.charinfo.firstname..Loc[Config.Lan].success["charged"]..(price - commission), "success", src)
 			triggerNotify(nil, Loc[Config.Lan].success["you_charged"]..(price - commission), nil, billed.PlayerData.source)
 		else
@@ -221,15 +211,12 @@ RegisterServerEvent("jim-payments:server:PolPopup", function(data)
 		if Config.ApGov then exports['ap-government']:chargeCityTax(billed.PlayerData.source, "Item", data.amount) end
 		triggerNotify(nil, billed.PlayerData.charinfo.firstname..Loc[Config.Lan].success["accepted_pay"]..data.amount..Loc[Config.Lan].success["charge_end"], "success", data.biller)
 		if biller.Functions.AddMoney("bank", commission) then if Config.Debug then print("^5Debug^7: ^3PolCharge^7 - ^2Commission^2 of ^7$^6"..commission.." ^2sent to Player^7(^6"..biller.PlayerData.source.."^7)") end end
-		if Config.Manage then
-			if Config.RenewedBanking then exports['Renewed-Banking']:addAccountMoney(tostring(biller.PlayerData.job.name), data.amount - commission)
-				if Config.Debug then print("^5Debug^7: ^3Renewed-Banking^7(^3Job^7): ^2Adding ^7$^6"..(data.amount - commission).." ^2to account ^7'^6"..tostring(biller.PlayerData.job.name).."^7' ($^6"..exports['Renewed-Banking']:getAccountMoney((biller.PlayerData.job.name).."^7)")) end
-			else
-				exports["qb-management"]:AddMoney(tostring(biller.PlayerData.job.name), data.amount - commission)
-				if Config.Debug then print("^5Debug^7: ^3QB-Management^7(^3Job^7): ^2Adding ^7$^6"..data.amount - takecomm.." ^2to account ^7'^6"..tostring(biller.PlayerData.job.name).."^7' ($^6"..exports["qb-management"]:GetAccount(biller.PlayerData.job.name).."^7)") end
-			end
-		else TriggerEvent("qb-bossmenu:server:addAccountMoney", tostring(biller.PlayerData.job.name), data.amount - takecomm)
-			if Config.Debug then print("^5Debug^7: ^3QB^7-^3Bossmenu^7(^3Job^7): ^2Adding ^7$^6"..(data.amount - commission).." ^2to account ^7'^6"..tostring(biller.PlayerData.job.name).."^7'") end
+
+		if Config.RenewedBanking then exports['Renewed-Banking']:addAccountMoney(tostring(biller.PlayerData.job.name), data.amount - commission)
+			if Config.Debug then print("^5Debug^7: ^3Renewed-Banking^7(^3Job^7): ^2Adding ^7$^6"..(data.amount - commission).." ^2to account ^7'^6"..tostring(biller.PlayerData.job.name).."^7' ($^6"..exports['Renewed-Banking']:getAccountMoney((biller.PlayerData.job.name).."^7)")) end
+		else
+			exports["qb-management"]:AddMoney(tostring(biller.PlayerData.job.name), data.amount - commission)
+			if Config.Debug then print("^5Debug^7: ^3QB-Management^7(^3Job^7): ^2Adding ^7$^6"..data.amount - takecomm.." ^2to account ^7'^6"..tostring(biller.PlayerData.job.name).."^7' ($^6"..exports["qb-management"]:GetAccount(biller.PlayerData.job.name).."^7)") end
 		end
 	else
 		triggerNotify(nil, Loc[Config.Lan].error["declined_payment"], nil, src)

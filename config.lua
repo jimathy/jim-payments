@@ -13,7 +13,7 @@ Config = {
 	-- Default Job Payment Systems --
 	---------------------------------
 
-	RenewedBanking = false, -- Enable if using Renewed-Banking false if using QB-Management
+	Management = true, -- Enable if using QB-Management false if using Renewed-Banking
 
 	ApGov = false, -- Toggle support for AP-Goverment Tax
 

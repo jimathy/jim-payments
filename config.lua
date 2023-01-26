@@ -1,4 +1,4 @@
-print("^2Jim^7-^2Payments ^7v^42^7.^48^7.^44 ^7- ^2Payments Script by ^1Jimathy^7")
+print("^2Jim^7-^2Payments ^7v^42^7.^48^7.^45 ^7- ^2Payments Script by ^1Jimathy^7")
 
 -- If you need support I now have a discord available, it helps me keep track of issues and give better support.
 

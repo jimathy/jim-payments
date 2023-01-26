@@ -70,13 +70,13 @@ RegisterServerEvent('jim-payments:server:ATM:use', function(amount, billtype, ba
 			elseif tonumber(society) >= amount then
 				triggerNotify(nil, Loc[Config.Lan].success["draw"]..cv(amount)..Loc[Config.Lan].success["fromthe"]..Player.PlayerData.job.label..Loc[Config.Lan].success["account"], "success", src)
 				Player.Functions.AddMoney('bank', amount)
-				if Config.Manage then exports["qb-management"]:RemoveMoney(tostring(Player.PlayerData.job.name), amount)
+				if Config.Management then exports["qb-management"]:RemoveMoney(tostring(Player.PlayerData.job.name), amount)
 				else TriggerEvent("qb-bossmenu:server:removeAccountMoney", tostring(Player.PlayerData.job.name), amount) end
 			end
 		elseif billtype == "deposit" then
 			if bankB < amount then triggerNotify(nil, Loc[Config.Lan].error["nomoney_bank"], "error", src)
 			elseif bankB >= amount then
-				if Config.Manage then exports["qb-management"]:AddMoney(tostring(Player.PlayerData.job.name), amount)
+				if Config.Management then exports["qb-management"]:AddMoney(tostring(Player.PlayerData.job.name), amount)
 				else TriggerEvent("qb-bossmenu:server:addAccountMoney", tostring(Player.PlayerData.job.name), amount) end
 				Player.Functions.RemoveMoney('bank', amount) Wait(1500)
 				triggerNotify(nil, Loc[Config.Lan].success["deposited"]..cv(amount)..Loc[Config.Lan].success["into"]..Player.PlayerData.job.label..Loc[Config.Lan].success["account"], "success", src)
@@ -100,7 +100,7 @@ RegisterServerEvent('jim-payments:server:ATM:use', function(amount, billtype, ba
 			local result = MySQL.Sync.fetchAll('SELECT * FROM players WHERE charinfo LIKE ?', {query})
 			if result[1] then
 				local Reciever = QBCore.Functions.GetPlayerByCitizenId(result[1].citizenid)
-				if Config.Manage then exports["qb-management"]:RemoveMoney(tostring(Player.PlayerData.job.name), amount)
+				if Config.Management then exports["qb-management"]:RemoveMoney(tostring(Player.PlayerData.job.name), amount)
 				else TriggerEvent("qb-bossmenu:server:removeAccountMoney", tostring(Player.PlayerData.job.name), amount) end
 				if Reciever then
 					Reciever.Functions.AddMoney('bank', amount)
@@ -122,13 +122,13 @@ RegisterServerEvent('jim-payments:server:ATM:use', function(amount, billtype, ba
 			elseif tonumber(gsociety) >= amount then
 				triggerNotify(nil, Loc[Config.Lan].success["draw"]..cv(amount)..Loc[Config.Lan].success["fromthe"]..Player.PlayerData.gang.label..Loc[Config.Lan].success["account"], "success", src)
 				Player.Functions.AddMoney('bank', amount)
-				if Config.Manage then exports["qb-management"]:RemoveGangMoney(tostring(Player.PlayerData.gang.name), amount)
+				if Config.Management then exports["qb-management"]:RemoveGangMoney(tostring(Player.PlayerData.gang.name), amount)
 				else TriggerEvent("qb-gangmenu:server:removeAccountMoney", tostring(Player.PlayerData.gang.name), amount) end
 			end
 		elseif billtype == "deposit" then
 			if bankB < amount then triggerNotify(nil, Loc[Config.Lan].error["nomoney_bank"], "error", src)
 			elseif bankB >= amount then
-				if Config.Manage then exports["qb-management"]:AddGangMoney(tostring(Player.PlayerData.gang.name), amount)
+				if Config.Management then exports["qb-management"]:AddGangMoney(tostring(Player.PlayerData.gang.name), amount)
 				else TriggerEvent("qb-gangmenu:server:addAccountMoney", tostring(Player.PlayerData.gang.name), amount) end
 				Player.Functions.RemoveMoney('bank', amount) Wait(1500)
 				triggerNotify(nil, Loc[Config.Lan].success["deposited"]..cv(amount)..Loc[Config.Lan].success["into"]..Player.PlayerData.gang.label..Loc[Config.Lan].success["account"], "success", src)
@@ -152,7 +152,7 @@ RegisterServerEvent('jim-payments:server:ATM:use', function(amount, billtype, ba
 			local result = MySQL.Sync.fetchAll('SELECT * FROM players WHERE charinfo LIKE ?', {query})
 			if result[1] then
 				local Reciever = QBCore.Functions.GetPlayerByCitizenId(result[1].citizenid)
-				if Config.Manage then exports["qb-management"]:RemoveGangMoney(tostring(Player.PlayerData.gang.name), amount)
+				if Config.Management then exports["qb-management"]:RemoveGangMoney(tostring(Player.PlayerData.gang.name), amount)
 				else TriggerEvent("qb-bossmenu:server:removeAccountMoney", tostring(Player.PlayerData.gang.name), amount) end
 				if not Reciever then
 					Reciever.Functions.AddMoney('bank', amount)
@@ -213,7 +213,7 @@ QBCore.Functions.CreateCallback('jim-payments:ATM:Find', function(source, cb)
 	local gsociety = 0
 
 	-- If qb-management, grab info directly from database
-	if Config.Manage then
+	if Config.Management then
 		local result = MySQL.Sync.fetchAll('SELECT * FROM management_funds')
 		for _, v in pairs(result) do
 			if Player.PlayerData.job.name == v.job_name then society = v.amount end

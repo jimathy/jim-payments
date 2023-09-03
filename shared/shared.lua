@@ -1,5 +1,4 @@
-local QBCore = exports['qb-core']:GetCoreObject()
-RegisterNetEvent('QBCore:Client:UpdateObject', function() QBCore = exports['qb-core']:GetCoreObject() end)
+QBCore = exports['qb-core']:GetCoreObject()
 
 local time = 1000
 function loadModel(model) if not HasModelLoaded(model) then

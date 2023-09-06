@@ -82,6 +82,7 @@ RegisterNetEvent('jim-payments:client:Charge', function(data, outside)
 	end
 	--Check if image was given when opening the regsiter
 	local img = data.img or ""
+	if not string.find(img, "<") then img = "<center><p><img src="..img.." width=100px></p>" end
 	--Continue adding payment options to qb-input
 	newinputs[#newinputs+1] = { type = 'radio', name = 'billtype', text = Loc[Config.Lan].menu["type"], options = { { value = "cash", text = Loc[Config.Lan].menu["cash"] }, { value = "bank", text = Loc[Config.Lan].menu["card"] } } }
 	newinputs[#newinputs+1] = { type = 'number', isRequired = true, name = 'price', text = Loc[Config.Lan].menu["amount_charge"] }

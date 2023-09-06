@@ -1,6 +1,3 @@
-local QBCore = exports['qb-core']:GetCoreObject()
-RegisterNetEvent('QBCore:Client:UpdateObject', function() QBCore = exports['qb-core']:GetCoreObject() end)
-
 -- This script is a simple replacement for QB-Banking and QB-ATMs
 -- It uses QB-Input and server callbacks to retreive info about accounts and cash
 -- This requires QB-Target and has the location of every ATM, ATM prop and bank window
@@ -108,7 +105,7 @@ RegisterNetEvent('jim-payments:Client:ATM:use', function(data)
 	--this grabs all the info from names to savings account numbers in the databases
 	local p = promise.new()
 	QBCore.Functions.TriggerCallback('jim-payments:ATM:Find', function(cb) p:resolve(cb) end) local info = Citizen.Await(p)
-	if not Config.RenewedBanking then
+	if Config.Banking == "qb" then
 		local p = promise.new()
 		QBCore.Functions.TriggerCallback('qb-bossmenu:server:GetAccount', function(cb) p:resolve(cb) end, PlayerJob.name) info.society = Citizen.Await(p)
 		local p2 = promise.new()

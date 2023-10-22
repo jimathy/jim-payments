@@ -62,6 +62,7 @@ Config = {
 	-- Commission is a percentage eg "0.10" becomes 10%
 	Jobs = {
 		['beanmachine'] = { MinAmountforTicket = 50, PayPerTicket = 50, Commission = 0.10, },
+		['elite_motorsports'] = { MinAmountforTicket = 50, PayPerTicket = 50, Commission = 0.10, },
 		['bakery'] = { MinAmountforTicket = 50, PayPerTicket = 50, Commission = 0.10, },
 		['burgershot'] = { MinAmountforTicket = 50, PayPerTicket = 50 , Commission = 0.10, },
 		['catcafe'] = { MinAmountforTicket = 50, PayPerTicket = 50, Commission = 0.10, },
@@ -80,7 +81,10 @@ Config = {
 	-- This adds the ability to add multiple locations for each job
 	-- Basically adding ready made locations, all you need to a vector4 and to confrim if you need a new prop in that location
     CustomCashRegisters = {
-
+		["elite_motorsports"] = { -- Player job role restriction
+		{ coords = vector4(874.97, -2100.91, 30.49, 175), prop = false, }, -- vector4 to place the till and the way it faces
+		{ coords = vector4(-1184.34, -880.51, 13.93, 302.04), prop = true, }, -- "prop = true" spawns a prop at the coords
+	  },
 	},
 
 	-- The /polcharge command requires specific jobs to be set
@@ -95,11 +99,18 @@ Config = {
 	---------------------
 	-- Banking Systems --
 	---------------------
-	useATM = false, -- Enable this to use the scripts ATM's and controls
-	useBanks = false, -- Enable this to use my banking stuff
-	BankBlips = false, -- Enable this if you disabled qb-banking and need bank locations
+	useATM = true, -- Enable this to use the scripts ATM's and controls
+	useBanks = true, -- Enable this to use my banking stuff
+	BankBlips = true, -- Enable this if you disabled qb-banking and need bank locations
 	ATMBlips = false, -- Enable this if you are a pyscho and need every ATM to be on the map too
-
+	
+	MoneyLaundering = true, -- Enable this to enable the in depth money laundering system.
+	MarkedMoneyItem = 'markedbills',
+	CatchChance = 100, -- What is the chance that the person gets caught?
+	Dispatch = 'ps-dispatch',
+	PoliceJobs = {
+		'police'
+	},
 	Gabz = false, 	-- "true" to enable Gabz Bank locations
 					-- this corrects the ATM/Bank Cashier + Ticket Cash in location
 

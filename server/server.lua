@@ -247,3 +247,11 @@ QBCore.Functions.CreateCallback('jim-payments:MakePlayerList', function(source, 
 	end
 	cb(onlineList)
 end)
+
+QBCore.Functions.CreateCallback('jim-payments:server:ATM:GetMarkedAmount', function (source, cb)
+	local Player = QBCore.Functions.GetPlayer(source)
+	local Amount = Player.Functions.GetItemByName(Config.MarkedMoneyItem).amount
+	print(Amount)
+	cb(Amount)
+end)
+

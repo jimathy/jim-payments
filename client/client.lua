@@ -186,3 +186,18 @@ AddEventHandler('onResourceStop', function(r) if r ~= GetCurrentResourceName() t
 	for i = 1, #Till do DeleteEntity(Till[i]) end
 	unloadModel(GetEntityModel(BankPed)) DeletePed(BankPed)
 end)
+
+RegisterNetEvent('jim-payments:client:callPolice', function ()
+	exports["ps-dispatch"]:CustomAlert({
+		coords = GetEntityCoords(PlayerPedId()),
+		message = "Attempted Money Laundering",
+		dispatchCode = "10-65",
+		description = "Money Laundering",
+		radius = 0,
+		sprite = 64,
+		color = 2,
+		scale = 1.0,
+		length = 3,
+		recipientList = Config.PoliceJobs
+	})
+end)

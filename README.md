@@ -198,3 +198,4 @@ FineJobList = true, -- "true" to use nearby player list feature in the cash regi
 ### AP-Goverment
 - Support for AP-Goverment Tax on payments
 - Toggle `ApGov` in the config.lua to enable this
+

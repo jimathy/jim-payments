@@ -1,11 +1,13 @@
-# jim-payments
-- QBCore based payment system
-- Enchanced QB-Input payment system from my other scripts now free on its own
+# jim-payments Modified
+This fork of jim-payments adds a money laundering side :)
 
-### If you need support I have a discord server available, it helps me keep track of issues and give better support.
+### FiveStars Development Discord:
+## https://dsc.gg/fivestarsdevelopment
+
+### Jim-Payments discord
 ## https://discord.gg/xKgQZ6wZvS
 
-### If you think I did a good job here, consider donating as it keeps by lights on and my cat fat/floofy:
+### Buy Jim A Coffee!
 ## https://ko-fi.com/jixelpatterns
 
 ---

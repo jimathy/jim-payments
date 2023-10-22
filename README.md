@@ -4,12 +4,9 @@ This fork of jim-payments adds a money laundering side :)
 ### FiveStars Development Discord:
 ## https://dsc.gg/fivestarsdevelopment
 
-### Jim-Payments discord
-## https://discord.gg/xKgQZ6wZvS
-
-### Buy Jim A Coffee!
+### Support Jim
 ## https://ko-fi.com/jixelpatterns
-
+## https://discord.gg/xKgQZ6wZvS
 ---
 
 - If you use a different phone/invoice system let me know and I will add support for it as best I can!

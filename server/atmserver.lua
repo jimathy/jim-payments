@@ -9,7 +9,47 @@ local function cv(amount)
     return formatted
 end
 
-RegisterServerEvent('jim-payments:server:ATM:use', function(amount, billtype, baccount, account, society, gsociety)
+function rollChance(chancePercentage)
+    -- Generate a random number between 1 and 100
+    local randomNumber = math.random(1, 100)
+    
+    -- Check if the random number is less than or equal to the chancePercentage
+    if randomNumber <= chancePercentage then
+        return true -- Return true if the random number falls within the chance
+    else
+        return false -- Return false otherwise
+    end
+end
+
+function CallPolice(player)
+	local pos = GetEntityCoords(GetPlayerPed(player))
+	if Config.Dispatch == 'ps-dispatch' then
+		TriggerClientEvent('jim-payments:client:callPolice', player)
+	elseif Config.Dispatch == 'qb' then
+
+	elseif Config.Dispatch == 'cd-dispatch' then
+		TriggerClientEvent('cd_dispatch:AddNotification', -1, {
+			job_table = Config.PoliceJobs,
+			coords = pos,
+			title = '10-65 - Money Laundering',
+			message = 'Somebody has attempted to launder money.',
+			flash = 0,
+			unique_id = tostring(math.random(0000000,9999999)),
+			sound = 1,
+			blip = {
+				sprite = 431,
+				scale = 1.2,
+				colour = 3,
+				flashes = false,
+				text = '10-65 - Money Laundering',
+				time = 5,
+				radius = 0,
+			}
+		})
+	end
+end
+
+RegisterServerEvent('jim-payments:server:ATM:use', function(amount, billtype, baccount, account, society, gsociety, markedAmount)
 	local src = source
 	local Player = QBCore.Functions.GetPlayer(src)
 	local cashB = Player.Functions.GetMoney("cash")
@@ -31,6 +71,25 @@ RegisterServerEvent('jim-payments:server:ATM:use', function(amount, billtype, ba
 				Player.Functions.RemoveMoney('cash', amount) Wait(1500)
 				Player.Functions.AddMoney('bank', amount)
 				triggerNotify(nil, Loc[Config.Lan].success["deposited"]..cv(amount)..Loc[Config.Lan].success["into_bank"], "success", src)
+			end
+		elseif billtype == "depositdirty" then
+			print(markedAmount)
+			print(math.ceil(markedAmount))
+			if markedAmount < amount or ((markedAmount / 2) < 1 and (markedAmount / 2) ~= 0) then triggerNotify(nil, Loc[Config.Lan].error["dirty_low"], "error", src)
+			elseif string.find(tostring(markedAmount), '.') and math.ceil(markedAmount) < amount then triggerNotify(nil, Loc[Config.Lan].error["dirty_low"], "error", src)
+			elseif markedAmount >= amount then
+				Player.Functions.RemoveMoney('cash', (amount / 2))
+				Player.Functions.RemoveItem(Config.MarkedMoneyItem, (amount / 2))
+				Wait(1500)
+				triggerNotify(nil, Loc[Config.Lan].dialog["clerk_check"], "info", src)
+				Wait(2500)
+				if rollChance(Config.CatchChance) then
+					triggerNotify(nil, Loc[Config.Lan].dialog["clerk_caught"], "error", src)
+					CallPolice(src)
+				else
+					Player.Functions.AddMoney('bank', amount)
+					triggerNotify(nil, Loc[Config.Lan].success["deposited"]..cv(amount)..Loc[Config.Lan].success["into_bank"], "success", src)
+				end
 			end
 		end
 	-- Transfers from bank to savings account --

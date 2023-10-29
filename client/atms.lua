@@ -105,11 +105,14 @@ RegisterNetEvent('jim-payments:Client:ATM:use', function(data)
 	--this grabs all the info from names to savings account numbers in the databases
 	local p = promise.new()
 	QBCore.Functions.TriggerCallback('jim-payments:ATM:Find', function(cb) p:resolve(cb) end) local info = Citizen.Await(p)
+	local markedAmount
 	if Config.Banking == "qb" then
 		local p = promise.new()
 		QBCore.Functions.TriggerCallback('qb-bossmenu:server:GetAccount', function(cb) p:resolve(cb) end, PlayerJob.name) info.society = Citizen.Await(p)
 		local p2 = promise.new()
 		QBCore.Functions.TriggerCallback('qb-gangmenu:server:GetAccount', function(cb) p2:resolve(cb) end, PlayerGang.name) info.gsociety = Citizen.Await(p2)
+		local d = promise.new()
+			QBCore.Functions.TriggerCallback('jim-payments:server:ATM:GetMarkedAmount', function(result) d:resolve(result) end) markedAmount = Citizen.Await(d)
 	end
 	local atmbartime = 2500
 	local bartext = ""
@@ -130,13 +133,22 @@ RegisterNetEvent('jim-payments:Client:ATM:use', function(data)
 			end
 		end
 
-	elseif data.id == "bank" then
+	elseif data.id == "bank" then -- Edit this
+		if QBCore.Functions.HasItem(Config.MarkedMoneyItem) then
+			setoptions = { { value = "withdraw", text = Loc[Config.Lan].menu["withdraw"] }, { value = "deposit", text = Loc[Config.Lan].menu["deposit"] }, { value = "depositdirty", text = Loc[Config.Lan].menu["depositdirty"]} }
+			setview = Loc[Config.Lan].menu["welcome"]..info.name..Loc[Config.Lan].menu["header_acc"]..info.account.."<br>"..info.cid..Loc[Config.Lan].menu["header_balance_bank"]..cv(info.bank)..Loc[Config.Lan].menu["cash_balance"]..cv(info.cash)..Loc[Config.Lan].menu['dirty_balance']..cv(markedAmount)..Loc[Config.Lan].menu["header_option"]
+			setheader = Loc[Config.Lan].menu["header_bank"]
+			setinputs = { 	{ type = 'radio', name = 'billtype', text = setview, options = setoptions },
+							{ type = 'number', isRequired = true, name = 'amount', text = Loc[Config.Lan].menu["header_trans_amount"] }, }
+			bartext = Loc[Config.Lan].menu["acc_bank"]
+		else
 		setoptions = { { value = "withdraw", text = Loc[Config.Lan].menu["withdraw"] }, { value = "deposit", text = Loc[Config.Lan].menu["deposit"] } }
 		setview = Loc[Config.Lan].menu["welcome"]..info.name..Loc[Config.Lan].menu["header_acc"]..info.account.."<br>"..info.cid..Loc[Config.Lan].menu["header_balance_bank"]..cv(info.bank)..Loc[Config.Lan].menu["cash_balance"]..cv(info.cash)..Loc[Config.Lan].menu["header_option"]
 		setheader = Loc[Config.Lan].menu["header_bank"]
 		setinputs = { 	{ type = 'radio', name = 'billtype', text = setview, options = setoptions },
 						{ type = 'number', isRequired = true, name = 'amount', text = Loc[Config.Lan].menu["header_trans_amount"] }, }
 		bartext = Loc[Config.Lan].menu["acc_bank"]
+		end
 
 	elseif data.id == "transfer" then
 		setoptions = { { value = "transfer", text = Loc[Config.Lan].menu["transfer"] } }
@@ -206,7 +218,8 @@ RegisterNetEvent('jim-payments:Client:ATM:use', function(data)
 			TaskPlayAnim(PlayerPedId(), 'amb@prop_human_atm@male@exit', "exit", 1.0,-1.0, 3000, 1, 1, true, true, true)
 			unloadAnimDict('amb@prop_human_atm@male@enter')
 			Wait(1000)
-			TriggerServerEvent('jim-payments:server:ATM:use', dialog.amount, dialog.billtype, dialog.account, data.id, info.society, info.gsociety)
+
+			TriggerServerEvent('jim-payments:server:ATM:use', dialog.amount, dialog.billtype, dialog.account, data.id, info.society, info.gsociety, markedAmount)
 		end
 	end, function()	triggerNotify(nil, Loc[Config.Lan].error["cancel"], "error")
 	end, data.icon)

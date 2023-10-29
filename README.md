@@ -1,13 +1,12 @@
-# jim-payments
-- QBCore based payment system
-- Enchanced QB-Input payment system from my other scripts now free on its own
+## jim-payments Modified
+This fork of jim-payments adds a money laundering side :)
 
-### If you need support I have a discord server available, it helps me keep track of issues and give better support.
-## https://discord.gg/xKgQZ6wZvS
+# My Discord
+# https://dsc.gg/fivestarsdevelopment
 
-### If you think I did a good job here, consider donating as it keeps by lights on and my cat fat/floofy:
+### Support Jim
 ## https://ko-fi.com/jixelpatterns
-
+## https://discord.gg/xKgQZ6wZvS
 ---
 
 - If you use a different phone/invoice system let me know and I will add support for it as best I can!
@@ -198,3 +197,4 @@ FineJobList = true, -- "true" to use nearby player list feature in the cash regi
 ### AP-Goverment
 - Support for AP-Goverment Tax on payments
 - Toggle `ApGov` in the config.lua to enable this
+

@@ -257,8 +257,6 @@ end)
 
 CreateThread(function()
 	if Config.Usebzzz then
-		QBCore.Functions.CreateUseableItem('terminal', function(source, item)
 		TriggerClientEvent("jim-payments:client:Charge", source, {}, true)
-		end)
 	end
 end)

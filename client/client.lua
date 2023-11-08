@@ -58,6 +58,9 @@ RegisterNetEvent('jim-payments:client:Charge', function(data, outside)
 	--Check if player is using /cashregister command
 	if not outside and not onDuty and data.gang == nil then triggerNotify(nil, Loc[Config.Lan].error["not_onduty"], "error") return end
 	local newinputs = {} -- Begin qb-input creation here.
+	if Config.Usebzzz then 
+		TriggerEvent('animations:client:EmoteCommandStart', {'terminal'})
+	end
 	if Config.List then -- If nearby player list is wanted:
 		--Retrieve a list of nearby players from server
 		local p = promise.new() QBCore.Functions.TriggerCallback('jim-payments:MakePlayerList', function(cb) p:resolve(cb) end)
@@ -188,8 +191,4 @@ AddEventHandler('onResourceStop', function(r) if r ~= GetCurrentResourceName() t
 	for k in pairs(Targets) do exports['qb-target']:RemoveZone(k) end
 	for i = 1, #Till do DeleteEntity(Till[i]) end
 	unloadModel(GetEntityModel(BankPed)) DeletePed(BankPed)
-end)
-
-RegisterNetEvent('terminal', function()
-    TriggerEvent('animations:client:EmoteCommandStart', {'terminal'})
 end)

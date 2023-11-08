@@ -35,6 +35,15 @@ ensure [vehicles]
 ensure [jim]
 ```
 
+--- 
+## BZZ Terminal Instructions 
+Free Package https://bzzz.tebex.io/package/5551076
+
+Stream the prop and add the emote that is provided to rpemotes or dpemotes
+```lua
+	['terminal'] 			 = {['name'] = 'terminal', 				['label'] = 'Wireless Terminal', 				['weight'] = 5000, 		["type"] = "item", 		["image"] = 'terminal.png', 		['unique'] = true, 		['useable'] = true, 	["shouldClose"] = true,	   ["combinable"] = nil,   ['description'] = ''},
+```
+
 ---
 ## Item installation
 - To make use of the ticket reward system for workers you need to add the ticket item to your shared items lua

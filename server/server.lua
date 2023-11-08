@@ -13,7 +13,13 @@ AddEventHandler('onResourceStart', function(resource) if GetCurrentResourceName(
 	end
 end)
 
-QBCore.Commands.Add("cashregister", Loc[Config.Lan].command["cash_reg"], {}, false, function(source) TriggerClientEvent("jim-payments:client:Charge", source, {}, true) end)
+
+CreateThread(function()
+    if Config.Enablecommand then
+        QBCore.Commands.Add("cashregister", Loc[Config.Lan].command["cash_reg"], {}, false, function(source) TriggerClientEvent("jim-payments:client:Charge", source, {}, true) end)
+    end
+end)
+
 QBCore.Commands.Add("polcharge", Loc[Config.Lan].command["charge"], {}, false, function(source) TriggerClientEvent("jim-payments:client:PolCharge", source) end)
 
 RegisterServerEvent('jim-payments:Tickets:Give', function(data, biller, gang)
@@ -246,4 +252,15 @@ QBCore.Functions.CreateCallback('jim-payments:MakePlayerList', function(source, 
 		onlineList[#onlineList+1] = { value = tonumber(v), text = "["..v.."] - "..P.PlayerData.charinfo.firstname..' '..P.PlayerData.charinfo.lastname  }
 	end
 	cb(onlineList)
+end)
+
+
+CreateThread(function()
+	if Config.Usebzzz then
+		QBCore.Functions.CreateUseableItem('terminal', function(source, item)
+		local src = source
+		TriggerClientEvent('terminal', src)
+		TriggerClientEvent("jim-payments:client:Charge", source, {}, true)
+		end)
+	end
 end)

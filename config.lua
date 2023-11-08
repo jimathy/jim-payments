@@ -82,6 +82,11 @@ Config = {
     CustomCashRegisters = {
 
 	},
+	------------------------------
+	-- Custom Job Cash Register --
+	------------------------------
+	Bzzprop = false -- Set to true if you want to use the FREE bzzz terminal prop https://bzzz.tebex.io/package/5551076
+	Disableregistercommand = false -- Set to true to disable the command
 
 	-- The /polcharge command requires specific jobs to be set
 	-- No tickets for these, it's just commission (0.25 = 25%)

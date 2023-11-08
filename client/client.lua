@@ -95,6 +95,9 @@ RegisterNetEvent('jim-payments:client:Charge', function(data, outside)
 		if not dialog.citizen or not dialog.price then return end
 		TriggerServerEvent('jim-payments:server:Charge', dialog.citizen, dialog.price, dialog.billtype, data.img, outside, gang)
 	end
+	if config.Usebzzz then
+		ExecuteCommand("e c")
+	end
 end)
 
 RegisterNetEvent('jim-payments:client:PolCharge', function()
@@ -185,4 +188,8 @@ AddEventHandler('onResourceStop', function(r) if r ~= GetCurrentResourceName() t
 	for k in pairs(Targets) do exports['qb-target']:RemoveZone(k) end
 	for i = 1, #Till do DeleteEntity(Till[i]) end
 	unloadModel(GetEntityModel(BankPed)) DeletePed(BankPed)
+end)
+
+RegisterNetEvent('terminal', function()
+    TriggerEvent('animations:client:EmoteCommandStart', {'terminal'})
 end)

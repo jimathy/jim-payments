@@ -38,6 +38,9 @@ Config = {
 		`U_F_M_CasinoShop_01`,
 	},
 
+	usebzzz = false, -- enable if you're using the prop from bzzz
+	Enablecommand = true, -- Enables the cashregister command
+
 	PhoneBank = false, 	-- Set this to false to use the popup payment system FOR CARD/BANK PAYMENTS instead of using phone invoices
 						-- This doesn't affect Cash payments as they by default use confirmation now
 						-- This is helpful for phones that don't support invoices well
@@ -82,11 +85,6 @@ Config = {
     CustomCashRegisters = {
 
 	},
-	------------------------------
-	-- Custom Job Cash Register --
-	------------------------------
-	Bzzprop = false -- Set to true if you want to use the FREE bzzz terminal prop https://bzzz.tebex.io/package/5551076
-	Disableregistercommand = false -- Set to true to disable the command
 
 	-- The /polcharge command requires specific jobs to be set
 	-- No tickets for these, it's just commission (0.25 = 25%)

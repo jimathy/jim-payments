@@ -77,7 +77,7 @@ RegisterServerEvent('jim-payments:server:ATM:use', function(amount, billtype, ba
 		elseif billtype == "deposit" then
 			if bankB < amount then triggerNotify(nil, Loc[Config.Lan].error["nomoney_bank"], "error", src)
 			elseif bankB >= amount then
-				if Config.Banking == "qb" then
+				if Config.Banking == "renewed" then
 					exports['Renewed-Banking']:addAccountMoney(tostring(Player.PlayerData.job.name), amount)
 				elseif Config.Banking == "qb" then
 					exports["qb-management"]:AddMoney(tostring(Player.PlayerData.job.name), amount)

@@ -133,7 +133,7 @@ RegisterServerEvent('jim-payments:server:ATM:use', function(amount, billtype, ba
 			elseif tonumber(gsociety) >= amount then
 				triggerNotify(nil, Loc[Config.Lan].success["draw"]..cv(amount)..Loc[Config.Lan].success["fromthe"]..Player.PlayerData.gang.label..Loc[Config.Lan].success["account"], "success", src)
 				Player.Functions.AddMoney('bank', amount)
-				if Config.Banking == "renewed" then exports['Renewed-Banking']:removeAccountMoney( tostring(Player.PlayerData.gang.name), amount)
+				if Config.Banking == "renewed" then exports['Renewed-Banking']:removeAccountMoney(tostring(Player.PlayerData.gang.name), amount)
 				elseif Config.Banking == "qb" then exports["qb-management"]:RemoveGangMoney(tostring(Player.PlayerData.gang.name), amount)
 				elseif Config.Banking == "fd" then exports.fd_banking:RemoveGangMoney(tostring(Player.PlayerData.gang.name), amount) end
 			end

@@ -166,7 +166,7 @@ RegisterServerEvent('jim-payments:server:ATM:use', function(amount, billtype, ba
 			if result[1] then
 				local Reciever = QBCore.Functions.GetPlayerByCitizenId(result[1].citizenid)
 				if Config.Banking == "renewed" then
-					exports['Renewed-Banking']:removeAccountMoney( tostring(Player.PlayerData.gang.name), amount)
+					exports['Renewed-Banking']:removeAccountMoney(tostring(Player.PlayerData.gang.name), amount)
 				elseif Config.Banking == "qb" then
 					exports["qb-management"]:RemoveGangMoney(tostring(Player.PlayerData.gang.name), amount)
 				elseif Config.Banking == "fd" then

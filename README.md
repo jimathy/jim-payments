@@ -5,6 +5,9 @@
 ### If you need support I have a discord server available, it helps me keep track of issues and give better support.
 ## https://discord.gg/xKgQZ6wZvS
 
+### We also have Documentation over on Gitbook, feel free to check it out
+## https://jixelpatterns.gitbook.io/jixelpatterns-script-guide/overview/who-we-are
+
 ### If you think I did a good job here, consider donating as it keeps by lights on and my cat fat/floofy:
 ## https://ko-fi.com/jixelpatterns
 

@@ -31,7 +31,10 @@ RegisterServerEvent('jim-payments:Tickets:Give', function(data, biller, gang)
 				exports['Renewed-Banking']:addAccountMoney(tostring(biller.PlayerData.gang.name), data.amount - takecomm)
 				if Config.Debug then
 					print("^5Debug^7: ^3Renewed-Banking^7(^3Gang^7): ^2Adding ^7$^6"..data.amount - takecomm.." ^2to account ^7'^6"..tostring(biller.PlayerData.gang.name).."^7' ($^6"..exports['Renewed-Banking']:getAccountMoney(biller.PlayerData.gang.name).."^7)") end
-			elseif Config.Banking == "qb" then
+			elseif Config.Banking == "qb-management" then
+					exports["qb-management"]:AddGangMoney(tostring(biller.PlayerData.gang.name), data.amount - takecomm)
+					if Config.Debug then print("^5Debug^7: ^3QB-Management^7(^3Gang^7): ^2Adding ^7$^6"..data.amount - takecomm.." ^2to account ^7'^6"..tostring(biller.PlayerData.gang.name).."^7' ($^6"..exports["qb-management"]:GetGangAccount(biller.PlayerData.gang.name).."^7)") end
+			elseif Config.Banking == "qb-banking" then
 				exports["qb-banking"]:AddGangMoney(tostring(biller.PlayerData.gang.name), data.amount - takecomm)
 				if Config.Debug then print("^5Debug^7: ^3QB-Banking^7(^3Gang^7): ^2Adding ^7$^6"..data.amount - takecomm.." ^2to account ^7'^6"..tostring(biller.PlayerData.gang.name).."^7' ($^6"..exports["qb-banking"]:GetGangAccount(biller.PlayerData.gang.name).."^7)") end
 			elseif Config.Banking == "fd" then
@@ -42,9 +45,12 @@ RegisterServerEvent('jim-payments:Tickets:Give', function(data, biller, gang)
 			if Config.Banking == "renewed"
 			then exports['Renewed-Banking']:addAccountMoney(tostring(biller.PlayerData.job.name), data.amount - takecomm)
 				if Config.Debug then print("^5Debug^7: ^3Renewed-Banking^7(^3Job^7): ^2Adding ^7$^6"..data.amount - takecomm.." ^2to account ^7'^6"..tostring(biller.PlayerData.job.name).."^7' ($^6"..tostring(exports['Renewed-Banking']:getAccountMoney(biller.PlayerData.job.name)).."^7)") end
-			elseif Config.Banking == "qb" then
+			elseif Config.Banking == "qb-management" then
+				exports["qb-management"]:AddMoney(tostring(biller.PlayerData.job.name), data.amount - takecomm)
+				if Config.Debug then print("^5Debug^7: ^3QB-Management^7(^3Job^7): ^2Adding ^7$^6"..data.amount - takecomm.." ^2to account ^7'^6"..tostring(biller.PlayerData.job.name).."^7' ($^6"..exports["qb-management"]:GetAccount(biller.PlayerData.job.name).."^7)") end
+			elseif Config.Banking == "qb-banking" then
 				exports["qb-banking"]:AddMoney(tostring(biller.PlayerData.job.name), data.amount - takecomm)
-				if Config.Debug then print("^5Debug^7: ^3QB-Banking^7(^3Job^7): ^2Adding ^7$^6"..data.amount - takecomm.." ^2to account ^7'^6"..tostring(biller.PlayerData.job.name).."^7' ($^6"..exports["qb-banking"]:GetAccount(biller.PlayerData.job.name).."^7)") end
+				if Config.Debug then print("^5Debug^7: ^3QB-Banking^7(^3Job^7): ^2Adding ^7$^6"..data.amount - takecomm.." ^2to account ^7'^6"..tostring(biller.PlayerData.job.name).."^7' ($^6^7)") end
 			elseif Config.Banking == "fd" then
 				exports.fd_banking:AddMoney(tostring(biller.PlayerData.job.name), data.amount - takecomm)
 				if Config.Debug then print("^5Debug^7: ^3FD-Banking^7(^3Job^7): ^2Adding ^7$^6"..data.amount - takecomm.." ^2to account ^7'^6"..tostring(biller.PlayerData.job.name).."^7' ($^6"..exports.fd_banking:GetAccount(biller.PlayerData.job.name).."^7)") end
@@ -202,7 +208,10 @@ RegisterServerEvent("jim-payments:server:PolCharge", function(citizen, price)
 			if Config.Banking == "renewed" then
 				exports['Renewed-Banking']:addAccountMoney(tostring(biller.PlayerData.job.name), (price - commission))
 				if Config.Debug then print("^5Debug^7: ^3Renewed-Banking^7(^3Job^7): ^2Adding ^7$^6"..(price - commission).." ^2to account ^7'^6"..tostring(biller.PlayerData.job.name).."^7' ($^6"..exports['Renewed-Banking']:getAccountMoney((biller.PlayerData.job.name).."^7)")) end
-			elseif Config.Banking == "qb" then
+			elseif Config.Banking == "qb-management" then
+				exports["qb-management"]:AddMoney(tostring(biller.PlayerData.job.name), (price - commission))
+				if Config.Debug then print("^5Debug^7: ^3QB-Management^7(^3Job^7): ^2Adding ^7$^6"..(price - takecomm).." ^2to account ^7'^6"..tostring(biller.PlayerData.job.name).."^7' ($^6"..exports["qb-management"]:GetAccount(biller.PlayerData.job.name).."^7)") end
+			elseif Config.Banking == "qb-banking" then
 				exports["qb-banking"]:AddMoney(tostring(biller.PlayerData.job.name), (price - commission))
 				if Config.Debug then print("^5Debug^7: ^3QB-Banking^7(^3Job^7): ^2Adding ^7$^6"..(price - takecomm).." ^2to account ^7'^6"..tostring(biller.PlayerData.job.name).."^7' ($^6"..exports["qb-banking"]:GetAccount(biller.PlayerData.job.name).."^7)") end
 			elseif Config.Banking == "fd" then
@@ -232,7 +241,10 @@ RegisterServerEvent("jim-payments:server:PolPopup", function(data)
 		if Config.Banking == "renewed" then
 			exports['Renewed-Banking']:addAccountMoney(tostring(biller.PlayerData.job.name), data.amount - commission)
 			if Config.Debug then print("^5Debug^7: ^3Renewed-Banking^7(^3Job^7): ^2Adding ^7$^6"..(data.amount - commission).." ^2to account ^7'^6"..tostring(biller.PlayerData.job.name).."^7' ($^6"..exports['Renewed-Banking']:getAccountMoney((biller.PlayerData.job.name).."^7)")) end
-		elseif Config.Banking == "qb" then
+		elseif Config.Banking == "qb-management" then
+			exports["qb-management"]:AddMoney(tostring(biller.PlayerData.job.name), data.amount - commission)
+			if Config.Debug then print("^5Debug^7: ^3QB-Management^7(^3Job^7): ^2Adding ^7$^6"..data.amount - takecomm.." ^2to account ^7'^6"..tostring(biller.PlayerData.job.name).."^7' ($^6"..exports["qb-management"]:GetAccount(biller.PlayerData.job.name).."^7)") end
+		elseif Config.Banking == "qb-banking" then
 			exports["qb-banking"]:AddMoney(tostring(biller.PlayerData.job.name), data.amount - commission)
 			if Config.Debug then print("^5Debug^7: ^3QB-Banking^7(^3Job^7): ^2Adding ^7$^6"..data.amount - takecomm.." ^2to account ^7'^6"..tostring(biller.PlayerData.job.name).."^7' ($^6"..exports["qb-banking"]:GetAccount(biller.PlayerData.job.name).."^7)") end
 		elseif Config.Banking == "fd" then

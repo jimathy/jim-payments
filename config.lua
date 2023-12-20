@@ -7,13 +7,17 @@ print("^2Jim^7-^2Payments ^7v^42^7.^48^7.^45 ^7- ^2Payments Script by ^1Jimathy^
 Config = {
 	Lan = "en",
 	Debug = false,
-	Notify = "qb",
+	Notify = "qb",		-- "qb" | "okok" | "t" | "infinity" | "rr"
 
 	---------------------------------
 	-- Default Job Payment Systems --
 	---------------------------------
 
-	Banking = "qb", -- qb, renewed, and fd currently default supported
+	Banking = "qb-banking", 	
+								-- "qb-management" 	- This is for the older version of QBCore
+								-- "qb-banking" 	- This is for the latest QBCore updates
+								-- "renewed"
+								-- "fd" 			- currently default supported
 
 	ApGov = false, -- Toggle support for AP-Goverment Tax
 
@@ -64,8 +68,9 @@ Config = {
 	-- PayPerTicket should never be higher than MinAmountforTicket
 	-- Commission is a percentage eg "0.10" becomes 10%
 	Jobs = {
-		['beanmachine'] = { MinAmountforTicket = 50, PayPerTicket = 50, Commission = 0.10, },
+		-- Jim Businesses | https://jimathy666.tebex.io/
 		['bakery'] = { MinAmountforTicket = 50, PayPerTicket = 50, Commission = 0.10, },
+		['beanmachine'] = { MinAmountforTicket = 50, PayPerTicket = 50, Commission = 0.10, },
 		['burgershot'] = { MinAmountforTicket = 50, PayPerTicket = 50 , Commission = 0.10, },
 		['catcafe'] = { MinAmountforTicket = 50, PayPerTicket = 50, Commission = 0.10, },
 		['henhouse'] = { MinAmountforTicket = 50, PayPerTicket = 50, Commission = 0.10, },
@@ -73,8 +78,27 @@ Config = {
 		['popsdiner'] = { MinAmountforTicket = 50, PayPerTicket = 50, Commission = 0.10, },
 		['tequilala'] = { MinAmountforTicket = 50, PayPerTicket = 50, Commission = 0.10, },
 		['vanilla'] = { MinAmountforTicket = 50, PayPerTicket = 50, Commission = 0.10, },
+		['upnatom'] = { MinAmountforTicket = 50, PayPerTicket = 50, Commission = 0.10, },
+		['hornys'] = { MinAmountforTicket = 50, PayPerTicket = 50, Commission = 0.10, },
+
+		-- JixelTay Businesses | https://jixeltay.tebex.io/
+		['cigarbar'] = { MinAmountforTicket = 50, PayPerTicket = 50, Commission = 0.10, },
+		['cluckinbell'] = { MinAmountforTicket = 50, PayPerTicket = 50, Commission = 0.10, },
+		['smokeshop'] = { MinAmountforTicket = 50, PayPerTicket = 50, Commission = 0.10, },
+		['pearls'] = { MinAmountforTicket = 50, PayPerTicket = 50, Commission = 0.10, },
+		['kois'] = { MinAmountforTicket = 50, PayPerTicket = 50, Commission = 0.10, },
+		['whitewidow'] = { MinAmountforTicket = 50, PayPerTicket = 50, Commission = 0.10, },
+		['bestbuds'] = { MinAmountforTicket = 50, PayPerTicket = 50, Commission = 0.10, },
+
+		-- Jim Mechanic | https://jimathy666.tebex.io/
 		['mechanic'] = { MinAmountforTicket = 1000, PayPerTicket = 500, Commission = 0.10, },
-		['lostmc'] = { MinAmountforTicket = 50, PayPerTicket = 50, Commission = 0.10, gang = true, }, -- Example of a gang being supported
+		['tuners'] = { MinAmountforTicket = 1000, PayPerTicket = 500, Commission = 0.10, },
+		['ottos'] = { MinAmountforTicket = 1000, PayPerTicket = 500, Commission = 0.10, },
+		['lscustoms'] = { MinAmountforTicket = 1000, PayPerTicket = 500, Commission = 0.10, },
+		['bennys'] = { MinAmountforTicket = 1000, PayPerTicket = 500, Commission = 0.10, },
+
+		-- Gangs | Example of a gang being supported
+		['lostmc'] = { MinAmountforTicket = 50, PayPerTicket = 50, Commission = 0.10, gang = true, },
 	},
 
 	------------------------------
@@ -83,7 +107,10 @@ Config = {
 	-- This adds the ability to add multiple locations for each job
 	-- Basically adding ready made locations, all you need to a vector4 and to confrim if you need a new prop in that location
     CustomCashRegisters = {
-
+		-- ["jobname"] = { -- Player job role restriction
+		-- 	{ coords = vector4(0, 0, 0, 0), prop = true, }, -- vector4 to place the till and the way it faces
+		-- 	{ coords = vector4(0, 0, 0, 0), prop = true, }, -- "prop = true" spawns a prop at the coords
+		-- },
 	},
 
 	-- The /polcharge command requires specific jobs to be set

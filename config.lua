@@ -13,11 +13,12 @@ Config = {
 	-- Default Job Payment Systems --
 	---------------------------------
 
-	Banking = "qb-banking", 	
+	Banking = "okok", 	
 								-- "qb-management" 	- This is for the older version of QBCore
 								-- "qb-banking" 	- This is for the latest QBCore updates
 								-- "renewed"
 								-- "fd" 			- currently default supported
+								-- "okok"			- make sure to add societies to Config.Societies in okok banking
 
 	ApGov = false, -- Toggle support for AP-Goverment Tax
 

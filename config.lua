@@ -13,7 +13,7 @@ Config = {
 	-- Default Job Payment Systems --
 	---------------------------------
 
-	Banking = "okok", 	
+	Banking = "qb-banking", 	
 								-- "qb-management" 	- This is for the older version of QBCore
 								-- "qb-banking" 	- This is for the latest QBCore updates
 								-- "renewed"

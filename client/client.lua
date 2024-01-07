@@ -1,3 +1,6 @@
+local QBCore = exports['qb-core']:GetCoreObject()
+RegisterNetEvent('QBCore:Client:UpdateObject', function() QBCore = exports['qb-core']:GetCoreObject() end)
+
 PlayerJob = {}
 PlayerGang = {}
 
@@ -54,7 +57,6 @@ CreateThread(function()
 	end
 end)
 
-
 RegisterNetEvent('jim-payments:client:Charge', function(data, outside)
 	--Check if player is using /cashregister command
 	local dialog
@@ -64,7 +66,6 @@ RegisterNetEvent('jim-payments:client:Charge', function(data, outside)
 		--Retrieve a list of nearby players from server
 		local p = promise.new() QBCore.Functions.TriggerCallback('jim-payments:MakePlayerList', function(cb) p:resolve(cb) end)
 		local onlineList = Citizen.Await(p)
-		print(json.encode(onlineList))
 		local nearbyList = {}
 		--Convert list of players nearby into one qb-input understands + add distance info
 		for _, v in pairs(QBCore.Functions.GetPlayersFromCoords(GetEntityCoords(PlayerPedId()), Config.PaymentRadius)) do
@@ -84,7 +85,7 @@ RegisterNetEvent('jim-payments:client:Charge', function(data, outside)
 		if Config.Menu == "qb" then
 		newinputs[#newinputs+1] = { type = 'text', isRequired = true, name = 'citizen',  text = Loc[Config.Lan].menu["cus_id"] }
 		elseif Config.Menu == "ox" then
-		newinputs[#newinputs+1] = {type = 'text', required = true, name = 'citizen', label = Loc[Config.Lan].menu["cus_id"], text = Loc[Config.Lan].menu["cus_id"]}
+		newinputs[#newinputs+1] = {type = 'input', required = true, name = 'citizen', label = Loc[Config.Lan].menu["cus_id"], text = Loc[Config.Lan].menu["cus_id"]}
 		end
 	end
 	--Check if image was given when opening the regsiter
@@ -154,7 +155,7 @@ RegisterNetEvent('jim-payments:client:PolCharge', function()
 		if not nearbyList[1] then triggerNotify(nil, nil, Loc[Config.Lan].error["no_one"], "error") return end
 		newinputs[#newinputs+1] = { text = " ", name = "citizen", type = "select", options = nearbyList }
 	else -- If Config.List is false, create input text box for ID's
-		newinputs[#newinputs+1] = { type = 'text', isRequired = true, name = 'citizen', text = Loc[Config.Lan].menu["person_id"] }
+		newinputs[#newinputs+1] = { type = 'text', isRequired = true, required = true, name = 'citizen', label = Loc[Config.Lan].menu["person_id"], text = Loc[Config.Lan].menu["person_id"] }
 	end
 	--Continue adding payment options to qb-input
 	if Config.Menu == "qb" then
@@ -288,14 +289,9 @@ RegisterNetEvent("jim-payments:client:PolPopup", function(amount, biller, biller
 		lib.showContext('polpopup')
 	end
 end)
+
 RegisterNetEvent('jim-payments:Tickets:Sell:yes', function() TriggerServerEvent('jim-payments:Tickets:Sell') end)
-RegisterNetEvent('jim-payments:Tickets:Sell:no', function() 
-	if Config.Menu == "qb" then
-		exports['qb-menu']:closeMenu() 
-	elseif Config.Menu == "ox" then
-		lib.hideContext(true) 
-	end
-end)
+RegisterNetEvent('jim-payments:Tickets:Sell:no', function() exports['qb-menu']:closeMenu() end)
 
 AddEventHandler('onResourceStop', function(r) if r ~= GetCurrentResourceName() then return end
 	for k in pairs(Targets) do exports['qb-target']:RemoveZone(k) end

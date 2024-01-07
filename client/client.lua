@@ -289,7 +289,13 @@ RegisterNetEvent("jim-payments:client:PolPopup", function(amount, biller, biller
 	end
 end)
 RegisterNetEvent('jim-payments:Tickets:Sell:yes', function() TriggerServerEvent('jim-payments:Tickets:Sell') end)
-RegisterNetEvent('jim-payments:Tickets:Sell:no', function() exports['qb-menu']:closeMenu() end)
+RegisterNetEvent('jim-payments:Tickets:Sell:no', function() 
+	if Config.Menu == "qb" then
+		exports['qb-menu']:closeMenu() 
+	elseif Config.Menu == "ox" then
+		lib.hideContext(true) 
+	end
+end)
 
 AddEventHandler('onResourceStop', function(r) if r ~= GetCurrentResourceName() then return end
 	for k in pairs(Targets) do exports['qb-target']:RemoveZone(k) end

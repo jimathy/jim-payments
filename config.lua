@@ -18,6 +18,7 @@ Config = {
 								-- "qb-banking" 	- This is for the latest QBCore updates
 								-- "renewed"
 								-- "fd" 			- currently default supported
+								-- "okok"			- make sure to add societies to Config.Societies in okokBanking, This is for the latest QBCore updates
 
 	ApGov = false, -- Toggle support for AP-Goverment Tax
 

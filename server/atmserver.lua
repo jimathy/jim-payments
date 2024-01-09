@@ -35,15 +35,15 @@ RegisterServerEvent('jim-payments:server:ATM:use', function(amount, billtype, ba
 		end
 	-- Transfers from bank to savings account --
 	elseif account == "savings" then
-		local getSavingsAccount = MySQL.Sync.fetchAll('SELECT * FROM bank_accounts WHERE citizenid = ? AND account_type = ?', { Player.PlayerData.citizenid, 'Savings' })
-		if getSavingsAccount[1] ~= nil then savbal = tonumber(getSavingsAccount[1].amount) aid = getSavingsAccount[1].record_id end
+		local getSavingsAccount = MySQL.Sync.fetchAll('SELECT * FROM bank_accounts WHERE citizenid = ? AND account_name = ?', { Player.PlayerData.citizenid, 'Savings' })
+		if getSavingsAccount[1] ~= nil then savbal = tonumber(getSavingsAccount[1].account_balance) aid = getSavingsAccount[1].citizenid end
 
 		if billtype == "withdraw" then
 			if savbal >= amount then
 				savbal -= amount
 				Player.Functions.AddMoney('bank', amount)
 				triggerNotify(nil, "$"..cv(amount)..Loc[Config.Lan].success["draw_save"], "success", src)
-				MySQL.Async.execute('UPDATE bank_accounts SET amount = ? WHERE citizenid = ? AND record_id = ?', { savbal, Player.PlayerData.citizenid, getSavingsAccount[1].record_id }, function(success)
+				MySQL.Async.execute('UPDATE bank_accounts SET account_balance = ? WHERE citizenid = ?', { savbal, Player.PlayerData.citizenid}, function(success)
 					if success then	return true	else return false end
 				end)
 			elseif savbal < amount then
@@ -54,7 +54,7 @@ RegisterServerEvent('jim-payments:server:ATM:use', function(amount, billtype, ba
 				savbal += amount
 				Player.Functions.RemoveMoney('bank', amount)
 				triggerNotify(nil, "$"..cv(amount)..Loc[Config.Lan].success["depos_save"], "success", src)
-				MySQL.Async.execute('UPDATE bank_accounts SET amount = ? WHERE citizenid = ? AND record_id = ?', { savbal, Player.PlayerData.citizenid, getSavingsAccount[1].record_id }, function(success)
+				MySQL.Async.execute('UPDATE bank_accounts SET account_balance = ? WHERE citizenid = ?', { savbal, Player.PlayerData.citizenid}, function(success)
 					if success then	return true	else return false end
 				end)
 			else triggerNotify(nil, Loc[Config.Lan].error["bank_low"], "error", src)
@@ -204,7 +204,7 @@ RegisterServerEvent('jim-payments:server:ATM:use', function(amount, billtype, ba
 					RecieverMoney.bank += amount
 					MySQL.Async.execute('UPDATE players SET money = ? WHERE citizenid = ?', {json.encode(RecieverMoney), result[1].citizenid})
 				end
-			elseif not result[1] then 
+			elseif not result[1] then
 				triggerNotify(nil, Loc[Config.Lan].error["error_start"]..baccount..Loc[Config.Lan].error["error_end"], "error", src)
 			end
 		end
@@ -224,11 +224,11 @@ QBCore.Functions.CreateCallback('jim-payments:ATM:Find', function(source, cb)
 	if Config.Banking == "qb-banking" then
 		local result = MySQL.Sync.fetchAll('SELECT * FROM bank_accounts')
 		for _, v in pairs(result) do
-			if Player.PlayerData.job.name == v.job_name then society = v.amount end
+			if Player.PlayerData.job.name == v.account_name then society = v.account_balance end
 		end
 		if Player.PlayerData.gang.name ~= "none" then
 			for _, v in pairs(result) do
-				if Player.PlayerData.gang.name == v.job_name then gsociety = v.amount end
+				if Player.PlayerData.gang.name ==  v.account_name then gsociety = v.account_balance end
 			end
 		end
 
@@ -247,15 +247,15 @@ QBCore.Functions.CreateCallback('jim-payments:ATM:Find', function(source, cb)
 
 	end
 	-- Grab Savings account info
-	local result = MySQL.Sync.fetchAll('SELECT * FROM bank_accounts WHERE citizenid = ? AND account_type = ?', { Player.PlayerData.citizenid, 'Savings' })
+	local result = MySQL.Sync.fetchAll('SELECT * FROM bank_accounts WHERE citizenid = ? AND account_name = ?', { Player.PlayerData.citizenid, 'Savings' })
     if result[1] then
-        accountID = result[1].record_id
-        savingBalance = result[1].amount
+        accountID = result[1].citizenid
+        savingBalance = result[1].account_balance
 	else
-		MySQL.Async.insert('INSERT INTO bank_accounts (citizenid, amount, account_type) VALUES (?, ?, ?)', { Player.PlayerData.citizenid, 0, 'Savings' }, function() completed = true end) repeat Wait(0) until completed == true
-		local result = MySQL.Sync.fetchAll('SELECT * FROM bank_accounts WHERE citizenid = ? AND account_type = ?', { Player.PlayerData.citizenid, 'Savings' })
-		aid = result[1].record_id
-		savingBalance = result[1].amount
+		MySQL.Async.insert('INSERT INTO bank_accounts (citizenid, account_name, account_balance) VALUES (?, ?, ?)', { Player.PlayerData.citizenid, 'Savings', 0}, function() completed = true end) repeat Wait(0) until completed == true
+		local result = MySQL.Sync.fetchAll('SELECT * FROM bank_accounts WHERE citizenid = ? AND account_name = ?', { Player.PlayerData.citizenid, 'Savings' })
+		accountID = result[1].citizenid
+		savingBalance = result[1].account_balance
     end
 	cb({name = name,
 		cash = cash,

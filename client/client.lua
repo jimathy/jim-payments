@@ -60,7 +60,7 @@ end)
 RegisterNetEvent('jim-payments:client:Charge', function(data, outside)
 	--Check if player is using /cashregister command
 	local dialog
-	if not outside and not onDuty and data.gang == nil then triggerNotify(nil, nil, Loc[Config.Lan].error["not_onduty"], "error") return end
+	if not outside and not onDuty and data.gang == nil then triggerNotify(nil, Loc[Config.Lan].error["not_onduty"], "error") return end
 	local newinputs = {} -- Begin qb-input creation here.
 	if Config.List then -- If nearby player list is wanted:
 		--Retrieve a list of nearby players from server
@@ -79,7 +79,7 @@ RegisterNetEvent('jim-payments:client:Charge', function(data, outside)
 			end
 		end
 		--If list is empty(no one nearby) show error and stop
-		if not nearbyList[1] then triggerNotify(nil, nil, Loc[Config.Lan].error["no_one"], "error") return end
+		if not nearbyList[1] then triggerNotify(nil, Loc[Config.Lan].error["no_one"], "error") return end
 		newinputs[#newinputs+1] = { text = " ", name = "citizen", label = Loc[Config.Lan].menu["cus_id"], type = "select", options = nearbyList }
 	else -- If Config.List is false, create input text box for ID's
 		if Config.Menu == "qb" then
@@ -132,7 +132,7 @@ RegisterNetEvent('jim-payments:client:PolCharge', function()
 	--Check if player is allowed to use /cashregister command
 	local allowed = false
 	for k in pairs(Config.FineJobs) do if k == PlayerJob.name then allowed = true end end
-	if not allowed then triggerNotify(nil, nil, Loc[Config.Lan].error["no_job"], "error") return end
+	if not allowed then triggerNotify(nil, Loc[Config.Lan].error["no_job"], "error") return end
 
 	local newinputs = {} -- Begin qb-input creation here.
 	if Config.FineJobList then -- If nearby player list is wanted:
@@ -152,7 +152,7 @@ RegisterNetEvent('jim-payments:client:PolCharge', function()
 			end
 		end
 		--If list is empty(no one nearby) show error and stop
-		if not nearbyList[1] then triggerNotify(nil, nil, Loc[Config.Lan].error["no_one"], "error") return end
+		if not nearbyList[1] then triggerNotify(nil, Loc[Config.Lan].error["no_one"], "error") return end
 		newinputs[#newinputs+1] = { text = " ", name = "citizen", type = "select", options = nearbyList }
 	else -- If Config.List is false, create input text box for ID's
 		newinputs[#newinputs+1] = { type = 'text', isRequired = true, required = true, name = 'citizen', label = Loc[Config.Lan].menu["person_id"], text = Loc[Config.Lan].menu["person_id"] }
@@ -186,7 +186,7 @@ RegisterNetEvent('jim-payments:Tickets:Menu', function(data)
 	--Get ticket info
 	local p = promise.new() QBCore.Functions.TriggerCallback('jim-payments:Ticket:Count', function(cb) p:resolve(cb) end)
 	local amount = Citizen.Await(p)
-	if not amount then triggerNotify(nil, nil, Loc[Config.Lan].error["no_ticket"], "error") amount = 0 return else amount = amount.amount end
+	if not amount then triggerNotify(nil, Loc[Config.Lan].error["no_ticket"], "error") amount = 0 return else amount = amount.amount end
 	local sellable = false
 	local name = "" local label = ""
 	--Check/adjust for job/gang names

@@ -96,6 +96,9 @@ function triggerNotify(title, message, type, src)
 	elseif Config.Notify == "rr" then
 		if not src then exports.rr_uilib:Notify({msg = message, type = type, style = "dark", duration = 6000, position = "top-right", })
 		else TriggerClientEvent("rr_uilib:Notify", src, {msg = message, type = type, style = "dark", duration = 6000, position = "top-right", }) end
+	elseif Config.Notify == "ox" then
+		if not src then exports.ox_lib:notify({title = title, description = message, type = type or "success"})
+		else TriggerClientEvent('ox_lib:notify', src, { type = type or "success", title = title, description = message }) end
 	end
 end
 

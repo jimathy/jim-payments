@@ -7,7 +7,7 @@ print("^2Jim^7-^2Payments ^7v^42^7.^48^7.^45 ^7- ^2Payments Script by ^1Jimathy^
 Config = {
 	Lan = "en",
 	Debug = false,
-	Notify = "qb",		-- "qb" | "okok" | "t" | "infinity" | "rr"
+	Notify = "qb",		-- "qb" | "okok" | "t" | "infinity" | "rr" | "ox"
 	Menu = "ox",
 
 	---------------------------------

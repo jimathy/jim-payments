@@ -1,17 +1,6 @@
-local function cv(amount)
-    local formatted = amount
-    while true do
-        formatted, k = string.gsub(formatted, "^(-?%d+)(%d%d%d)", '%1,%2')
-        if (k==0) then
-            break
-        end
-    end
-    return formatted
-end
-
 RegisterServerEvent('jim-payments:server:ATM:use', function(amount, billtype, baccount, account, society, gsociety)
 	local src = source
-	local Player = QBCore.Functions.GetPlayer(src)
+	local Player = Core.Functions.GetPlayer(src)
 	local cashB = Player.Functions.GetMoney("cash")
 	local bankB = Player.Functions.GetMoney("bank")
 	local amount = tonumber(amount)
@@ -95,12 +84,12 @@ RegisterServerEvent('jim-payments:server:ATM:use', function(amount, billtype, ba
 		baccount = newiban
 		amount = tonumber(newAmount)
 
-		local Player = QBCore.Functions.GetPlayer(src)
+		local Player = Core.Functions.GetPlayer(src)
 		if (society - amount) >= 0 then
 			local query = '%"account":"' .. baccount .. '"%'
 			local result = MySQL.Sync.fetchAll('SELECT * FROM players WHERE charinfo LIKE ?', {query})
 			if result[1] then
-				local Reciever = QBCore.Functions.GetPlayerByCitizenId(result[1].citizenid)
+				local Reciever = Core.Functions.GetPlayerByCitizenId(result[1].citizenid)
 				if Config.Banking == "renewed" then exports['Renewed-Banking']:removeAccountMoney(tostring(Player.PlayerData.job.name), amount)
 				elseif Config.Banking == "qb-management" then exports["qb-management"]:RemoveMoney(tostring(Player.PlayerData.job.name), amount)
 				elseif Config.Banking == "qb-banking" then exports["qb-banking"]:RemoveMoney(tostring(Player.PlayerData.job.name), amount)
@@ -153,12 +142,12 @@ RegisterServerEvent('jim-payments:server:ATM:use', function(amount, billtype, ba
 		baccount = newiban
 		amount = tonumber(newAmount)
 
-		local Player = QBCore.Functions.GetPlayer(src)
+		local Player = Core.Functions.GetPlayer(src)
 		if (gsociety - amount) >= 0 then
 			local query = '%"account":"' .. baccount .. '"%'
 			local result = MySQL.Sync.fetchAll('SELECT * FROM players WHERE charinfo LIKE ?', {query})
 			if result[1] then
-				local Reciever = QBCore.Functions.GetPlayerByCitizenId(result[1].citizenid)
+				local Reciever = Core.Functions.GetPlayerByCitizenId(result[1].citizenid)
 				if Config.Banking == "renewed" then exports['Renewed-Banking']:removeAccountMoney(tostring(Player.PlayerData.gang.name), amount)
 				elseif Config.Banking == "qb-management" then exports["qb-management"]:RemoveGangMoney(tostring(Player.PlayerData.gang.name), amount)
 				elseif Config.Banking == "qb-banking" then exports["qb-banking"]:RemoveGangMoney(tostring(Player.PlayerData.gang.name), amount)
@@ -188,12 +177,12 @@ RegisterServerEvent('jim-payments:server:ATM:use', function(amount, billtype, ba
 		baccount = newiban
 		amount = tonumber(newAmount)
 
-		local Player = QBCore.Functions.GetPlayer(src)
+		local Player = Core.Functions.GetPlayer(src)
 		if (Player.PlayerData.money.bank - amount) >= 0 then
 			local query = '%"account":"' .. baccount .. '"%'
 			local result = MySQL.Sync.fetchAll('SELECT * FROM players WHERE charinfo LIKE ?', {query})
 			if result[1] then
-				local Reciever = QBCore.Functions.GetPlayerByCitizenId(result[1].citizenid)
+				local Reciever = Core.Functions.GetPlayerByCitizenId(result[1].citizenid)
 				Player.Functions.RemoveMoney('bank', amount)
 				if Reciever then
 					Reciever.Functions.AddMoney('bank', amount)
@@ -211,8 +200,8 @@ RegisterServerEvent('jim-payments:server:ATM:use', function(amount, billtype, ba
 	end
 end)
 
-QBCore.Functions.CreateCallback('jim-payments:ATM:Find', function(source, cb)
-	local Player = QBCore.Functions.GetPlayer(source)
+createCallback('jim-payments:GetInfo', function(source, cb)
+	local Player = Core.Functions.GetPlayer(source)
 	local name = Player.PlayerData.charinfo.firstname..' '..Player.PlayerData.charinfo.lastname
 	local cid = Player.PlayerData.citizenid.." ["..source.."]"
 	local cash = Player.Functions.GetMoney("cash")
@@ -221,7 +210,7 @@ QBCore.Functions.CreateCallback('jim-payments:ATM:Find', function(source, cb)
 	local society = 0
 	local gsociety = 0
 
-	if Config.Banking == "qb-banking" then
+	if Config.General.Banking == "qb-banking" then
 		local result = MySQL.Sync.fetchAll('SELECT * FROM bank_accounts')
 		for _, v in pairs(result) do
 			if Player.PlayerData.job.name == v.account_name then society = v.account_balance end
@@ -233,7 +222,7 @@ QBCore.Functions.CreateCallback('jim-payments:ATM:Find', function(source, cb)
 		end
 
 	-- If qb-management, grab info directly from database
-	elseif not Config.Banking == "renewed" then
+	elseif not Config.General.Banking == "renewed" then
 		local result = MySQL.Sync.fetchAll('SELECT * FROM management_funds')
 		for _, v in pairs(result) do
 			if Player.PlayerData.job.name == v.job_name then society = v.amount end
@@ -257,22 +246,24 @@ QBCore.Functions.CreateCallback('jim-payments:ATM:Find', function(source, cb)
 		accountID = result[1].citizenid
 		savingBalance = result[1].account_balance
     end
-	cb({name = name,
-		cash = cash,
-		bank = bank,
-		account = account,
-		cid = cid,
-		savbal = savingBalance,
-		aid = accountID,
-		society = society,
-		gsociety = gsociety})
+	local retTable = {name = name,
+	cash = cash,
+	bank = bank,
+	account = account,
+	cid = cid,
+	savbal = savingBalance,
+	aid = accountID,
+	society = society,
+	gsociety = gsociety}
+	if GetResourceState(OXLibExport):find("start") then return retTable
+	else return cb(retTable) end
 end)
 
-QBCore.Commands.Add("cashgive", Loc[Config.Lan].command["pay_user"], {}, false, function(source) TriggerClientEvent("jim-payments:client:ATM:give", source) end)
+Core.Commands.Add("cashgive", Loc[Config.Lan].command["pay_user"], {}, false, function(source) TriggerClientEvent("jim-payments:client:ATM:give", source) end)
 
 RegisterServerEvent("jim-payments:server:ATM:give", function(citizen, price)
-    local Player = QBCore.Functions.GetPlayer(source)
-    local Reciever = QBCore.Functions.GetPlayer(tonumber(citizen))
+    local Player = Core.Functions.GetPlayer(source)
+    local Reciever = Core.Functions.GetPlayer(tonumber(citizen))
     local amount = tonumber(price)
 	local balance = Player.Functions.GetMoney("cash")
 

@@ -1,3 +1,5 @@
+Loc = Loc or {}
+
 Loc["en"] = {
     error = {
         ["cancel"] = "Cancelled",
@@ -76,7 +78,7 @@ Loc["en"] = {
     },
     menu = {
         ["close"] = "Close",
-        ["withdraw"] = "Withdrawl",
+        ["withdraw"] = "Withdrawal",
         ["deposit"] = "Deposit",
         ["transfer"] = "Transfer",
         ["transfer_money"] = "Transfer Money",
@@ -94,21 +96,20 @@ Loc["en"] = {
         ["acc_boss_trans"] = "Accessing Society Transfers",
         ["acc_gang"] = "Accessing Gang Society Account",
         ["acc_gang_trans"] = "Accessing Gang Transfers",
-        ["header_soc"] = "<br><br>- Society Account -<br>",
-        ["header_balance"] = "<br><br>- Balances -<br>🏢",
-        ["header_soc_bank"] = "🏢 Society Banking 🏢",
+        ["header_soc"] = "Society Account -",
+        ["header_soc_bank"] = "Society Banking",
         ["amount_pay"] = "💵  Amount to Pay'",
         ["give_cash"] = "Give someone cash",
         ["give"] = "Give",
         ["welcome"] = "Welcome back, ",
-        ["citizenid"] = "<br><br>- Citizen ID -<br>",
-        ["header_acc"] = "<br><br>- Account -<br>",
-        ["header_info"] = "<br><br>- Account Info -<br>Savings ID: ",
-        ["header_balance_bank"] = "<br><br>- Balances -<br>🏦Bank - $",
-        ["header_option"] = "<br><br>- Options -",
-        ["cash_balance"] = "<br>💵Cash - $",
-        ["bank_balance"] = "<br>🏦Bank - $",
-        ["saving_balance"] = "<br><br>- Balances -<br>💰Savings - $",
+        ["citizenid"] = "Citizen ID -",
+        ["header_acc"] = "Account -",
+        ["header_info"] = "Account Info - Savings ID: ",
+        ["header_balance"] = "Balances -",
+        ["header_option"] = "Options -",
+        ["cash_balance"] = "💵Cash - $",
+        ["bank_balance"] = "🏦Bank - $",
+        ["saving_balance"] = "💰Savings - $",
         ["cus_id"] = "# Customer ID #",
         ["type"] = "Payment Type",
         ["amount_charge"] = "💵  Amount to Charge",
@@ -123,6 +124,7 @@ Loc["en"] = {
         ["accept_charge"] = "Do you want accept the charge?",
         ["ticket_amount"] = "Amount of Tickets: ",
         ["total_pay"] = "<br>Total Payment: $",
+        ["confirm"] = "Confirm",
         ["yes"] = "Yes",
         ["no"] = "No",
         ["cash"] = "Cash",
@@ -130,4 +132,4 @@ Loc["en"] = {
         ["payment_amount"] = " Payment: $",
         ["bank_charge"] = "Bank Charge: $",
     },
-} 
+}

@@ -42,18 +42,13 @@ RegisterNetEvent('jim-payments:client:Charge', function(data, outside)
 		end
 		--If list is empty(no one nearby) show error and stop
 		if not nearbyList[1] then triggerNotify(nil, Loc[Config.Lan].error["no_one"], "error") return end
-    end
+	else -- If Config.List is false, create input text box for ID's
+		newinputs[#newinputs+1] = { type = 'text', isRequired = true, required = true, name = 'citizen', label = Loc[Config.Lan].menu["person_id"], text = Loc[Config.Lan].menu["person_id"] }
+	end
 	--Check if image was given when opening the regsiter
-	local img = ""
-    if Config.System.Menu == "qb" then
-        img = "<center><img src="..(data.img and data.img or "").." width=200px></center>"
-    elseif Config.System.Menu == "ox" then
-        img = ""
-    end
+	local img = Config.System.Menu == "qb" and "<center><img src="..(data.img and data.img or "").." width=200px></center>" or ""
 	--Grab Player Job name or Gang Name if needed
-	local label = PlayerJob.label
-	local gang = false
-	if data.gang then label = PlayerGang.label gang = true end
+	local label = data.gang and PlayerGang.label or PlayerJob.label
     if Config.General.List then
         newinputs[#newinputs+1] = { type = "select", text = Loc[Config.Lan].menu["cus_id"], name = "citizen", label = Loc[Config.Lan].menu["cus_id"], default = 1, options = nearbyList }
     else
@@ -65,8 +60,8 @@ RegisterNetEvent('jim-payments:client:Charge', function(data, outside)
         text = Loc[Config.Lan].menu["type"],
         default = billPrev,
         options = {
-            { value = "cash", text = Loc[Config.Lan].menu["cash"] },
-            { value = "bank", text = Loc[Config.Lan].menu["card"] }
+            { value = "cash", text = Loc[Config.Lan].menu["cash"], label = Loc[Config.Lan].menu["cash"] },
+            { value = "bank", text = Loc[Config.Lan].menu["card"], label = Loc[Config.Lan].menu["card"] }
         }
     }
     newinputs[#newinputs+1] = { type = 'number', isRequired = true, name = 'price', text = Loc[Config.Lan].menu["amount_charge"] }

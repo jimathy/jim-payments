@@ -1,9 +1,3 @@
-## jim-payments Modified
-This fork of jim-payments adds a money laundering side :)
-
-# My Discord
-# https://dsc.gg/fivestarsdevelopment
-
 ### Support Jim
 ## https://ko-fi.com/jixelpatterns
 ## https://discord.gg/xKgQZ6wZvS

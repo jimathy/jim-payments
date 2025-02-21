@@ -6,21 +6,17 @@ function spawnCustomRegisters()
 		for i = 1, #v do
 			local job, gang = v[i].gang and nil or k, v[i].gang and k or nil
             createBoxTarget({"CustomRegister: "..k..i, v[i].coords.xyz, 0.47, 0.34, { name="CustomRegister: "..k..i, heading = v[i].coords[4], debugPoly=Config.Debug, minZ=v[i].coords.z-0.1, maxZ=v[i].coords.z+0.4}}, {
-                { onSelect = function() TriggerEvent("jim-payments:client:Charge", { job = job, gang = gang, img = ""}) end, icon = "fas fa-credit-card", label = Loc[Config.Lan].target["charge"], }
+                { onSelect = function() TriggerEvent(getScript()..":client:Charge", { job = job, gang = gang, img = ""}) end, icon = "fas fa-credit-card", label = Loc[Config.Lan].target["charge"], }
             }, 2.0)
 			if v[i].prop then makeProp({prop = "prop_till_03", coords = v[i].coords}, 1, false) end
 		end
 	end
 end
-onPlayerLoaded(function() spawnCustomRegisters() end)
 
---Keeps track of duty on script restarts
-AddEventHandler('onResourceStart', function(r) if GetCurrentResourceName() ~= r then return end
-    spawnCustomRegisters()
-end)
+onPlayerLoaded(function() spawnCustomRegisters() end, true)
 
 local billPrev = "cash"
-RegisterNetEvent('jim-payments:client:Charge', function(data, outside)
+RegisterNetEvent(getScript()..":client:Charge", function(data, outside)
 	--Check if player is using /cashregister command
 	local dialog
 	--if not outside and not onDuty and data.gang == nil then triggerNotify(nil, Loc[Config.Lan].error["not_onduty"], "error") return end
@@ -28,13 +24,13 @@ RegisterNetEvent('jim-payments:client:Charge', function(data, outside)
     local nearbyList = {}
     if Config.General.List then -- If nearby player list is wanted:
 		--Retrieve a list of nearby players from server
-		local onlineList = triggerCallback("jim-payments:MakePlayerList")
+		local onlineList = triggerCallback(getScript()..":MakePlayerList")
 		--Convert list of players nearby into one qb-input understands + add distance info
 		for _, v in pairs(Core.Functions.GetPlayersFromCoords(GetEntityCoords(PlayerPedId()), Config.General.PaymentRadius)) do
 			local dist = #(GetEntityCoords(GetPlayerPed(v)) - GetEntityCoords(PlayerPedId()))
 			for i = 1, #onlineList do
 				if onlineList[i].value == GetPlayerServerId(v) then
-					if v ~= PlayerId() or Config.System.Debug then
+					if v ~= PlayerId() or debugMode then
 						nearbyList[#nearbyList+1] = { value = onlineList[i].value, label = onlineList[i].text..' ('..math.floor(dist+0.05)..'m)', text = onlineList[i].text..' ('..math.floor(dist+0.05)..'m)' }
 					end
 				end
@@ -75,11 +71,11 @@ RegisterNetEvent('jim-payments:client:Charge', function(data, outside)
             dialog.price = dialog[3]
         end
         billPrev = dialog.billtype
-        TriggerServerEvent('jim-payments:server:Charge', dialog.citizen, dialog.price, dialog.billtype, data.img, outside, gang)
+        TriggerServerEvent(getScript()..":server:Charge", dialog.citizen, dialog.price, dialog.billtype, data.img, outside, gang)
     end
 end)
 
-RegisterNetEvent("jim-payments:client:PayPopup", function(amount, biller, billtype, img, billerjob, gang, outside)
+RegisterNetEvent(getScript()..":client:PayPopup", function(amount, biller, billtype, img, billerjob, gang, outside)
     local setimage = ""
     if Config.System.Menu == "qb" then
         setimage = "<center><img src="..(img and img or "").." width=200px></center>"
@@ -103,7 +99,7 @@ RegisterNetEvent("jim-payments:client:PayPopup", function(amount, biller, billty
         header = Loc[Config.Lan].menu["yes"],
         txt = "",
         onSelect = function()
-            TriggerServerEvent("jim-payments:server:PayPopup", {
+            TriggerServerEvent(getScript()..":server:PayPopup", {
                 accept = true,
                 amount = amount,
                 biller = biller,
@@ -116,7 +112,7 @@ RegisterNetEvent("jim-payments:client:PayPopup", function(amount, biller, billty
         icon = "fas fa-circle-xmark",
         header = Loc[Config.Lan].menu["no"],
         onSelect = function()
-            TriggerServerEvent("jim-payments:server:PayPopup", {
+            TriggerServerEvent(getScript()..":server:PayPopup", {
                 accept = false,
                 amount = amount,
                 biller = biller,
@@ -128,7 +124,7 @@ RegisterNetEvent("jim-payments:client:PayPopup", function(amount, biller, billty
     openMenu(Menu, {
         header = setimage,
         onExit = function()
-            TriggerServerEvent("jim-payments:server:PayPopup", {
+            TriggerServerEvent(getScript()..":server:PayPopup", {
                 accept = false,
                 amount = amount,
                 biller = biller,

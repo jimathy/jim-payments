@@ -14,15 +14,14 @@ shared_scripts {
 
     -- Required core scripts
     '@ox_lib/init.lua',
-    '@ox_core/imports/client.lua',
+    '@ox_core/lib/init.lua',
+
     '@es_extended/imports.lua',
+
     '@qbx_core/modules/playerdata.lua',
 
     --Jim Bridge
-    '@jim_bridge/exports.lua',
-    '@jim_bridge/functions.lua',
-    '@jim_bridge/wrapper.lua',
-    '@jim_bridge/crafting.lua',
+    '@jim_bridge/starter.lua',
 	'shared/*.lua',
 }
 client_scripts {

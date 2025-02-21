@@ -1,6 +1,9 @@
-RegisterNetEvent('jim-payments:Tickets:Menu', function(data)
+RegisterNetEvent(getScript()..":Tickets:Menu", function(data)
     local hasItem, hasTable = hasItem("payticket", 1)
-    if not hasItem then triggerNotify(nil, Loc[Config.Lan].error["no_ticket"], "error") return end
+    if not hasItem then
+        triggerNotify(nil, Loc[Config.Lan].error["no_ticket"], "error")
+        return
+    end
     local amount, sellable, name, label = hasTable["payticket"].count, false, "", ""
 	for k, v in pairs(Config.Receipts.Jobs) do
         sellable = (data.gang and v.gang and k == PlayerGang.name) or (not data.gang and not v.gang and k == PlayerJob.name)
@@ -13,7 +16,7 @@ RegisterNetEvent('jim-payments:Tickets:Menu', function(data)
         }
         Menu[#Menu+1] = {
             icon = "fas fa-circle-check", header = Loc[Config.Lan].menu["yes"],
-            onSelect = function() TriggerServerEvent('jim-payments:Tickets:Sell') end,
+            onSelect = function() TriggerServerEvent(getScript()..":Tickets:Sell") end,
         }
         openMenu(Menu, { header = "🧾 "..label..Loc[Config.Lan].menu["receipt"], headertxt = Loc[Config.Lan].menu["trade_confirm"], canClose = true, })
     end

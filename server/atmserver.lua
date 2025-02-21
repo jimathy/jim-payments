@@ -1,49 +1,60 @@
-RegisterServerEvent('jim-payments:server:ATM:use', function(amount, billtype, baccount, account, society, gsociety)
+Core.Commands.Add("cashgive",
+	Loc[Config.Lan].command["pay_user"], {}, false, function(source) TriggerClientEvent(getScript()..":client:ATM:give", source) end)
+
+registerCommand("polcharge", {
+	Loc[Config.Lan].command["pay_user"], {}, false,
+	function(source)
+		TriggerClientEvent(getScript()..":client:ATM:give", source)
+	end
+})
+
+RegisterServerEvent(getScript()..":server:ATM:use", function(amount, billtype, baccount, account, society, gsociety)
 	local src = source
-	local Player = Core.Functions.GetPlayer(src)
-	local cashB = Player.Functions.GetMoney("cash")
-	local bankB = Player.Functions.GetMoney("bank")
+	local Player = getPlayer(src)
 	local amount = tonumber(amount)
+	local bankScript, newAmount = "", 0
 
 	--Simple transfers from bank to wallet --
 	if account == "bank" or account == "atm" then
 		if billtype == "withdraw" then
-			if bankB < amount then triggerNotify(nil, Loc[Config.Lan].error["bank_low"], "error", src)
-			elseif bankB >= tonumber(amount) then
+			if Player.bank < amount then
+				triggerNotify(nil, Loc[Config.Lan].error["bank_low"], "error", src)
+			elseif Player.bank >= tonumber(amount) then
 				triggerNotify(nil, Loc[Config.Lan].success["draw"]..cv(amount)..Loc[Config.Lan].success["from_bank"], "success") -- Don't really need this as phone gets notified when money is withdrawn
-				Player.Functions.RemoveMoney('bank', amount) Wait(1500)
-				Player.Functions.AddMoney('cash', amount)
+				chargePlayer(amount, "bank", src) Wait(1500)
+				fundPlayer(amount, "cash", src)
 			end
 		elseif billtype == "deposit" then
-			if cashB < amount then triggerNotify(nil, Loc[Config.Lan].error["no_cash"], "error", src)
-			elseif cashB >= amount then
-				Player.Functions.RemoveMoney('cash', amount) Wait(1500)
-				Player.Functions.AddMoney('bank', amount)
+			if Player.cash < amount then
+				triggerNotify(nil, Loc[Config.Lan].error["no_cash"], "error", src)
+			elseif Player.cash >= amount then
+				chargePlayer(amount, "cash", src) Wait(1500)
+				fundPlayer(amount, "bank", src)
 				triggerNotify(nil, Loc[Config.Lan].success["deposited"]..cv(amount)..Loc[Config.Lan].success["into_bank"], "success", src)
 			end
 		end
 	-- Transfers from bank to savings account --
 	elseif account == "savings" then
-		local getSavingsAccount = MySQL.Sync.fetchAll('SELECT * FROM bank_accounts WHERE citizenid = ? AND account_name = ?', { Player.PlayerData.citizenid, 'Savings_'..Player.PlayerData.citizenid, })
+		local getSavingsAccount = MySQL.Sync.fetchAll('SELECT * FROM bank_accounts WHERE citizenid = ? AND account_name = ?', { Player.citizenId, 'Savings_'..Player.citizenId, })
 		if getSavingsAccount[1] ~= nil then savbal = tonumber(getSavingsAccount[1].account_balance) aid = getSavingsAccount[1].citizenid end
 
 		if billtype == "withdraw" then
 			if savbal >= amount then
 				savbal -= amount
-				Player.Functions.AddMoney('bank', amount)
+				fundPlayer(amount, "cash", src)
 				triggerNotify(nil, "$"..cv(amount)..Loc[Config.Lan].success["draw_save"], "success", src)
-				MySQL.Async.execute('UPDATE bank_accounts SET account_balance = ? WHERE citizenid = ?', { savbal, Player.PlayerData.citizenid}, function(success)
+				MySQL.Async.execute('UPDATE bank_accounts SET account_balance = ? WHERE citizenid = ?', { savbal, Player.citizenId}, function(success)
 					if success then	return true	else return false end
 				end)
 			elseif savbal < amount then
 				triggerNotify(nil, Loc[Config.Lan].error["saving_low"], "error")
 			end
 		elseif billtype == "deposit" then
-			if amount < bankB then
+			if amount < Player.bank then
 				savbal += amount
-				Player.Functions.RemoveMoney('bank', amount)
+				chargePlayer(amount, "bank", src)
 				triggerNotify(nil, "$"..cv(amount)..Loc[Config.Lan].success["depos_save"], "success", src)
-				MySQL.Async.execute('UPDATE bank_accounts SET account_balance = ? WHERE citizenid = ?', { savbal, Player.PlayerData.citizenid}, function(success)
+				MySQL.Async.execute('UPDATE bank_accounts SET account_balance = ? WHERE citizenid = ?', { savbal, Player.citizenId}, function(success)
 					if success then	return true	else return false end
 				end)
 			else triggerNotify(nil, Loc[Config.Lan].error["bank_low"], "error", src)
@@ -52,27 +63,60 @@ RegisterServerEvent('jim-payments:server:ATM:use', function(amount, billtype, ba
 	--Simple transfers from society account to bank --
 	elseif account == "society" then
 		if billtype == "withdraw" then
-			if tonumber(society) < amount then triggerNotify(nil, Loc[Config.Lan].error["soc_low"], "error", src)
+			if tonumber(society) < amount then
+				triggerNotify(nil, Loc[Config.Lan].error["soc_low"], "error", src)
 			elseif tonumber(society) >= amount then
-				triggerNotify(nil, Loc[Config.Lan].success["draw"]..cv(amount)..Loc[Config.Lan].success["fromthe"]..Player.PlayerData.job.label..Loc[Config.Lan].success["account"], "success", src)
-				Player.Functions.AddMoney('bank', amount)
-				if Config.Banking == "renewed" then exports['Renewed-Banking']:removeAccountMoney(tostring(Player.PlayerData.job.name), amount)
-				elseif Config.Banking == "qb-management" then exports["qb-management"]:RemoveMoney(tostring(Player.PlayerData.job.name), amount)
-				elseif Config.Banking == "qb-banking" then exports["qb-banking"]:RemoveMoney(tostring(Player.PlayerData.job.name), amount)
-				elseif Config.Banking == "fd" then exports.fd_banking:RemoveMoney(tostring(Player.PlayerData.job.name), amount) end
+
+				if isStarted("Renewed-Banking") then
+					bankScript = "Renewed-Banking"
+					exports['Renewed-Banking']:removeAccountMoney(Player.job, amount)
+					newAmount = exports["Renewed-Banking"]:getAccountMoney(Player.job)
+				elseif isStarted("qb-banking") then
+					bankScript = "qb-banking"
+					exports["qb-banking"]:RemoveMoney(Player.job, amount)
+					newAmount = exports["qb-banking"]:GetAccountBalance(Player.job)
+				elseif isStarted("fd_banking") then
+					bankScript = "fd_banking"
+					exports["fd_banking"]:RemoveMoney(Player.job, amount)
+					newAmount = exports["fd_banking"]:GetAccount(Player.job)
+				elseif isStarted("okokBanking") then
+					bankScript = "okokBanking"
+					exports['okokBanking']:RemoveMoney(Player.job, amount)
+					newAmount = exports['okokBanking']:GetAccount(Player.job)
+				end
+
+				fundPlayer(amount, "bank", src)
+				debugPrint("^5Debug^7: ^3"..bankScript.."^7(^3Job^7): ^2Removing ^7$"..amount.." ^2from account ^7'^6"..Player.job.."^7' ($"..newAmount..")")
+				triggerNotify(nil, Loc[Config.Lan].success["draw"]..cv(amount)..Loc[Config.Lan].success["fromthe"]..Jobs[Player.job].label..Loc[Config.Lan].success["account"], "success", src)
 			end
 		elseif billtype == "deposit" then
-			if bankB < amount then triggerNotify(nil, Loc[Config.Lan].error["nomoney_bank"], "error", src)
-			elseif bankB >= amount then
-				if Config.Banking == "renewed" then exports['Renewed-Banking']:addAccountMoney(tostring(Player.PlayerData.job.name), amount)
-				elseif Config.Banking == "qb-management" then exports["qb-management"]:AddMoney(tostring(Player.PlayerData.job.name), amount)
-				elseif Config.Banking == "qb-banking" then exports["qb-banking"]:AddMoney(tostring(Player.PlayerData.job.name), amount)
-				elseif Config.Banking == "fd" then exports.fd_banking:AddMoney(tostring(Player.PlayerData.job.name), amount) end
-				Player.Functions.RemoveMoney('bank', amount) Wait(1500)
-				triggerNotify(nil, Loc[Config.Lan].success["deposited"]..cv(amount)..Loc[Config.Lan].success["into"]..Player.PlayerData.job.label..Loc[Config.Lan].success["account"], "success", src)
+			if Player.bank < amount then triggerNotify(nil, Loc[Config.Lan].error["nomoney_bank"], "error", src)
+			elseif Player.bank >= amount then
+				if isStarted("Renewed-Banking") then
+					bankScript = "Renewed-Banking"
+					exports['Renewed-Banking']:addAccountMoney(Player.job, amount)
+					newAmount = exports["Renewed-Banking"]:getAccountMoney(Player.job)
+
+				elseif isStarted("qb-banking") then
+					bankScript = "qb-banking"
+					exports["qb-banking"]:AddMoney(Player.job, amount)
+					newAmount = exports["qb-banking"]:GetAccountBalance(Player.job)
+				elseif isStarted("fd_banking") then
+					bankScript = "fd_banking"
+					exports.fd_banking:AddMoney(Player.job, amount)
+					newAmount = exports["fd_banking"]:GetAccount(Player.job)
+				elseif isStarted("okokBanking") then
+					bankScript = "okokBanking"
+					exports['okokBanking']:AddMoney(Player.job, amount)
+					newAmount = exports['okokBanking']:GetAccount(Player.job)
+				end
+				chargePlayer(amount, "bank", src) Wait(1500)
+				debugPrint("^5Debug^7: ^3"..bankScript.."^7(^3Job^7): ^2Adding ^7$"..amount.." ^2to account ^7'^6"..Player.job.."^7' ($"..newAmount..")")
+				triggerNotify(nil, Loc[Config.Lan].success["deposited"]..cv(amount)..Loc[Config.Lan].success["into"]..Jobs[Player.job].label..Loc[Config.Lan].success["account"], "success", src)
 			end
 		end
 	-- Transfer from boss account to players --
+	--[[ disabled until i work out a system for other frameworks
 	elseif account == "societytransfer" then
 		local bannedCharacters = {'%','$',';'}
 		local newAmount = tostring(amount)
@@ -90,10 +134,15 @@ RegisterServerEvent('jim-payments:server:ATM:use', function(amount, billtype, ba
 			local result = MySQL.Sync.fetchAll('SELECT * FROM players WHERE charinfo LIKE ?', {query})
 			if result[1] then
 				local Reciever = Core.Functions.GetPlayerByCitizenId(result[1].citizenid)
-				if Config.Banking == "renewed" then exports['Renewed-Banking']:removeAccountMoney(tostring(Player.PlayerData.job.name), amount)
-				elseif Config.Banking == "qb-management" then exports["qb-management"]:RemoveMoney(tostring(Player.PlayerData.job.name), amount)
-				elseif Config.Banking == "qb-banking" then exports["qb-banking"]:RemoveMoney(tostring(Player.PlayerData.job.name), amount)
-				elseif Config.Banking == "fd" then exports.fd_banking:RemoveMoney(tostring(Player.PlayerData.job.name), amount) end
+				if Config.Banking == "renewed" then
+					exports['Renewed-Banking']:removeAccountMoney(tostring(Player.PlayerData.job.name), amount)
+				elseif Config.Banking == "qb-management" then
+					exports["qb-management"]:RemoveMoney(tostring(Player.PlayerData.job.name), amount)
+				elseif Config.Banking == "qb-banking" then
+					exports["qb-banking"]:RemoveMoney(tostring(Player.PlayerData.job.name), amount)
+				elseif Config.Banking == "fd" then
+					exports.fd_banking:RemoveMoney(tostring(Player.PlayerData.job.name), amount)
+				end
 				if Reciever then
 					Reciever.Functions.AddMoney('bank', amount)
 					triggerNotify(nil, Loc[Config.Lan].success["sent"]..amount..Loc[Config.Lan].success["to"]..Reciever.PlayerData.charinfo.firstname.." "..Reciever.PlayerData.charinfo.lastname, "success", src)
@@ -105,29 +154,43 @@ RegisterServerEvent('jim-payments:server:ATM:use', function(amount, billtype, ba
 				end
 			elseif not result[1] then triggerNotify(nil, Loc[Config.Lan].error["error_start"]..baccount..Loc[Config.Lan].error["error_end"], "error", src)
 			end
-		end
+		end]]
 
 	--Simple transfers from gang society account to bank --
 	elseif account == "gang" then
 		if billtype == "withdraw" then
-			if tonumber(gsociety) < amount then triggerNotify(nil, Loc[Config.Lan].error["soc_low"], "error", src)
+			if tonumber(gsociety) < amount then
+				triggerNotify(nil, Loc[Config.Lan].error["soc_low"], "error", src)
 			elseif tonumber(gsociety) >= amount then
-				triggerNotify(nil, Loc[Config.Lan].success["draw"]..cv(amount)..Loc[Config.Lan].success["fromthe"]..Player.PlayerData.gang.label..Loc[Config.Lan].success["account"], "success", src)
-				Player.Functions.AddMoney('bank', amount)
-				if Config.Banking == "renewed" then exports['Renewed-Banking']:removeAccountMoney(tostring(Player.PlayerData.gang.name), amount)
-				elseif Config.Banking == "qb-management" then exports["qb-management"]:RemoveGangMoney(tostring(Player.PlayerData.gang.name), amount)
-				elseif Config.Banking == "qb-banking" then exports["qb-banking"]:RemoveGangMoney(tostring(Player.PlayerData.gang.name), amount)
-				elseif Config.Banking == "fd" then exports.fd_banking:RemoveGangMoney(tostring(Player.PlayerData.gang.name), amount) end
+				if isStarted("Renewed-Banking") then
+					exports['Renewed-Banking']:removeAccountMoney(Player.gang, amount)
+				elseif isStarted("qb-banking") then
+					exports["qb-banking"]:RemoveMoney(Player.gang, amount)
+				elseif isStarted("fd_banking") then
+					exports["fd_banking"]:RemoveGangMoney(Player.gang, amount)
+				elseif isStarted("okokBanking") then
+					exports["okokBanking"]:RemoveMoney(Player.gang, amount)
+				end
 			end
+
+			fundPlayer(amount, "bank", src)
+			triggerNotify(nil, Loc[Config.Lan].success["draw"]..cv(amount)..Loc[Config.Lan].success["fromthe"]..Gangs[Player.gang].label..Loc[Config.Lan].success["account"], "success", src)
+
 		elseif billtype == "deposit" then
-			if bankB < amount then triggerNotify(nil, Loc[Config.Lan].error["nomoney_bank"], "error", src)
-			elseif bankB >= amount then
-				if Config.Banking == "rewnewed" then exports['Renewed-Banking']:addAccountMoney(tostring(Player.PlayerData.gang.name), amount)
-				elseif Config.Banking == "qb-management" then exports["qb-management"]:AddGangMoney(tostring(Player.PlayerData.gang.name), amount)
-				elseif Config.Banking == "qb-banking" then exports["qb-banking"]:AddGangMoney(tostring(Player.PlayerData.gang.name), amount)
-				elseif Config.Banking == "fd" then exports.fd_banking:AddGangMoney(tostring(Player.PlayerData.gang.name), amount) end
+			if Player.bank < amount then
+				triggerNotify(nil, Loc[Config.Lan].error["nomoney_bank"], "error", src)
+			elseif Player.bank >= amount then
+				if isStarted("Renewed-Banking") then
+					exports['Renewed-Banking']:addAccountMoney(Player.gang, amount)
+				elseif isStarted("qb-banking") then
+					exports["qb-banking"]:AddGangMoney(Player.gang, amount)
+				elseif isStarted("fd_banking") then
+					exports["fd_banking"]:AddGangMoney(Player.gang, amount)
+				elseif isStarted("okokBanking") then
+					exports["okokBanking"]:AddMoney(Player.gang, amount)
+				end
 				Player.Functions.RemoveMoney('bank', amount) Wait(1500)
-				triggerNotify(nil, Loc[Config.Lan].success["deposited"]..cv(amount)..Loc[Config.Lan].success["into"]..Player.PlayerData.gang.label..Loc[Config.Lan].success["account"], "success", src)
+				triggerNotify(nil, Loc[Config.Lan].success["deposited"]..cv(amount)..Loc[Config.Lan].success["into"]..Gangs[Player.gang].label..Loc[Config.Lan].success["account"], "success", src)
 			end
 		end
 	-- Transfer from gang account to players --
@@ -200,68 +263,69 @@ RegisterServerEvent('jim-payments:server:ATM:use', function(amount, billtype, ba
 	end
 end)
 
-createCallback('jim-payments:GetInfo', function(source, cb)
-	local Player = Core.Functions.GetPlayer(source)
-	local name = Player.PlayerData.charinfo.firstname..' '..Player.PlayerData.charinfo.lastname
-	local cid = Player.PlayerData.citizenid.." ["..source.."]"
-	local cash = Player.Functions.GetMoney("cash")
-	local bank = Player.Functions.GetMoney("bank")
-	local account = Player.PlayerData.charinfo.account
-	local society = 0
-	local gsociety = 0
+createCallback(getScript()..":GetInfo", function(source)
+	local Player = getPlayer(source)
+	local society, gsociety = 0, 0
 
-	if Config.General.Banking == "qb-banking" then
-		local result = MySQL.Sync.fetchAll('SELECT * FROM bank_accounts')
-		for _, v in pairs(result) do
-			if Player.PlayerData.job.name == v.account_name then society = v.account_balance end
+	if isStarted("Renewed-Banking") then
+		society = exports["Renewed-Banking"]:getAccountMoney(Player.job)
+		if Player.gang ~= "none" then
+			gsociety = exports["Renewed-Banking"]:getAccountMoney(Player.gang)
 		end
-		if Player.PlayerData.gang.name ~= "none" then
-			for _, v in pairs(result) do
-				if Player.PlayerData.gang.name ==  v.account_name then gsociety = v.account_balance end
+
+	elseif isStarted("qb-banking") then
+		if not exports["qb-banking"]:GetAccount(Player.job) then
+			print("Making new bank account in qb-banking for "..Player.job)
+			exports["qb-banking"]:CreateJobAccount(Player.job, 0) Wait(150) -- make new account if return "null"
+		end
+		society = exports["qb-banking"]:GetAccountBalance(Player.job)
+		if Player.gang ~= "none" then
+			if not exports["qb-banking"]:GetAccount(Player.gang) then
+				print("Making new bank account in qb-banking for "..Player.gang)
+				exports["qb-banking"]:CreateGangAccount(Player.gang, 0) Wait(150) -- make new account if return "null"
+				society = exports["qb-banking"]:GetAccountBalance(Player.gang)
 			end
+			society = exports["qb-banking"]:GetAccountBalance(Player.gang)
 		end
-
-	-- If qb-management, grab info directly from database
-	elseif not Config.General.Banking == "renewed" then
-		local result = MySQL.Sync.fetchAll('SELECT * FROM management_funds')
-		for _, v in pairs(result) do
-			if Player.PlayerData.job.name == v.job_name then society = v.amount end
+	elseif isStarted("fd_banking") then
+		society = exports["fd_banking"]:GetAccount(Player.job)
+		if Player.gang ~= "none" then
+			gsociety = exports["fd_banking"]:GetGangAccount(Player.gang)
 		end
-		if Player.PlayerData.gang.name ~= "none" then
-			for _, v in pairs(result) do
-				if Player.PlayerData.gang.name == v.job_name then gsociety = v.amount end
-			end
+	elseif isStarted("okokBanking") then
+		society = exports["okokBanking"]:GetAccount(Player.job)
+		if Player.gang ~= "none" then
+			gsociety = exports["okokBanking"]:GetAccount(Player.gang)
 		end
-	else
-
 	end
+
 	-- Grab Savings account info
-	local result = MySQL.Sync.fetchAll('SELECT * FROM bank_accounts WHERE citizenid = ? AND account_name = ?', { Player.PlayerData.citizenid, 'Savings_'..Player.PlayerData.citizenid, })
+	local result = MySQL.Sync.fetchAll('SELECT * FROM bank_accounts WHERE citizenid = ? AND account_name = ?', { Player.citizenId, 'Savings_'..Player.citizenId, })
     if result[1] then
         accountID = result[1].citizenid
         savingBalance = result[1].account_balance
 	else
-		MySQL.Async.insert('INSERT INTO bank_accounts (citizenid, account_name, account_balance) VALUES (?, ?, ?)', { Player.PlayerData.citizenid, 'Savings_'..Player.PlayerData.citizenid, 0}, function() completed = true end) repeat Wait(0) until completed == true
-		local result = MySQL.Sync.fetchAll('SELECT * FROM bank_accounts WHERE citizenid = ? AND account_name = ?', { Player.PlayerData.citizenid, 'Savings_'..Player.PlayerData.citizenid, })
+		MySQL.Async.insert('INSERT INTO bank_accounts (citizenid, account_name, account_balance) VALUES (?, ?, ?)', { Player.citizenId, 'Savings_'..Player.citizenId, 0}, function() completed = true end) repeat Wait(0) until completed == true
+		local result = MySQL.Sync.fetchAll('SELECT * FROM bank_accounts WHERE citizenid = ? AND account_name = ?', { Player.citizenId, 'Savings_'..Player.citizenId, })
 		accountID = result[1].citizenid
 		savingBalance = result[1].account_balance
     end
-	local retTable = {name = name,
-	cash = cash,
-	bank = bank,
-	account = account,
-	cid = cid,
-	savbal = savingBalance,
-	aid = accountID,
-	society = society,
-	gsociety = gsociety}
-	if GetResourceState(OXLibExport):find("start") then return retTable
-	else return cb(retTable) end
+	local retTable = {
+		name = Player.firstname..' '..Player.lastname,
+		cash = Player.cash,
+		bank = Player.bank,
+		account = Player.account,
+		cid = Player.citizenId.." ["..source.."]",
+		savbal = savingBalance,
+		aid = accountID,
+		society = society,
+		gsociety = gsociety
+	}
+
+	return retTable
 end)
 
-Core.Commands.Add("cashgive", Loc[Config.Lan].command["pay_user"], {}, false, function(source) TriggerClientEvent("jim-payments:client:ATM:give", source) end)
-
-RegisterServerEvent("jim-payments:server:ATM:give", function(citizen, price)
+RegisterServerEvent(getScript()..":server:ATM:give", function(citizen, price)
     local Player = Core.Functions.GetPlayer(source)
     local Reciever = Core.Functions.GetPlayer(tonumber(citizen))
     local amount = tonumber(price)

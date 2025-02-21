@@ -7,21 +7,22 @@ print("^2Jim^7-^2Payments ^7v^4"..GetResourceMetadata(GetCurrentResourceName(), 
 Config = {
 	Lan = "en",
 	System = {
-		Debug = true,
+		Debug = false,
+		EventDebug = false,
 
 		Menu = "qb",  			-- "qb", "ox", "gta"
-		Notify = "gta",			-- "qb", "ox", "gta", "esx"
-		ProgressBar = "gta", 	-- "qb", "ox", "gta", "esx"
+		Notify = "qb",			-- "qb", "ox", "gta", "esx"
+		ProgressBar = "qb", 	-- "qb", "ox", "gta", "esx"
+	},
+
+	Crafting = {
+		craftCam = true,
+		MultiCraft = true,
+		MultiCraftAmounts = { [1], [5], [10] },
+		showItemBox = true,
 	},
 
 	General = {
-		Banking = "qb-banking",
-								-- "qb-management" 	-- This is for the older version of QBCore
-								-- "qb-banking" 	-- This is for the latest QBCore updates
-								-- "renewed"
-								-- "fd" 			-- currently default supported
-								-- "okok"			-- make sure to add societies to Config.Societies in okokBanking, This is for the latest QBCore updates
-
 		ApGov = false, 			-- Toggle support for AP-Goverment Tax
 
 		List = true, 			-- "true" to use nearby player list feature in the cash registers, "false" for manual id entry
@@ -57,11 +58,8 @@ Config = {
 								-- "qb" for qb-phone
 								-- "gks" for GKSPhone
 
-		useBanks = false, -- Enable this to use my banking stuff
 
-		BankBlips = false, -- Enable this if you disabled qb-banking and need bank locations
-
-		Gabz = true, 	-- "true" to enable Gabz Bank locations
+		Gabz = false, 	-- "true" to enable Gabz Bank locations
 						-- this corrects the ATM/Bank Cashier + Ticket Cash in locations
 
 		menuLogo = "https://static.wikia.nocookie.net/gtawiki/images/b/bd/Fleeca-GTAV-Logo.png",
@@ -69,7 +67,7 @@ Config = {
 	},
 
 	ATMs = {
-		enable = true,
+		enable = true,			-- Enable this if wanting to use jim-payments atm systems
 		showBlips = true,
 
 		ATMModels = { `prop_atm_01`, `prop_atm_02`, `prop_atm_03`, `prop_fleeca_atm`, `gabz_sm_pb_atmframe` },
@@ -77,7 +75,7 @@ Config = {
 	},
 
 	Banks = {
-		enable = true,
+		enable = true,			-- Enable this if wanting to use jim-payments banking systems
 		showBlips = true,
 
 	},
@@ -103,7 +101,7 @@ Config = {
 			vec4(252.23, 223.11, 106.29, 159.2), -- Default Third Window along in Pacific Bank
 		},
 
-		CashInAnywhere = true,
+		CashInAnywhere = true,	-- enable this to add cash ticket option to any banking location
 
 		-- MinAmountforTicket should be your cheapest item
 		-- PayPerTicket should never be higher than MinAmountforTicket
@@ -156,3 +154,13 @@ Config = {
 }
 
 PlayerGang, PlayerJob, onDuty = {}, {}, nil
+
+-- Test function for locales
+function locale(section, string)
+    if not Config.Lan or Config.Lan == "" then return print("Error, no langauge set") end
+    local localTable = Loc[Config.Lan]
+    if not localTable then return "Locale Table Not Found" end
+    if not localTable[section] then return "["..section.."] Invalid" end
+    if not localTable[section][string] then return "["..string.."] Invalid" end
+    return localTable[section][string]
+end

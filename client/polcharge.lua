@@ -1,4 +1,4 @@
-RegisterNetEvent('jim-payments:client:PolCharge', function()
+RegisterNetEvent(getScript()..":client:PolCharge", function()
 	--Check if player is allowed to use /cashregister command
 	local allowed = false
 	for k in pairs(Config.PolCharge.FineJobs) do if k == PlayerJob.name then allowed = true end end
@@ -8,13 +8,13 @@ RegisterNetEvent('jim-payments:client:PolCharge', function()
     local nearbyList = {}
     if Config.PolCharge.FineJobList then -- If nearby player list is wanted:
         --Retrieve a list of nearby players from server
-		local onlineList = triggerCallback("jim-payments:MakePlayerList")
+		local onlineList = triggerCallback(getScript()..":MakePlayerList")
 		--Convert list of players nearby into one qb-input understands + add distance info
 		for _, v in pairs(Core.Functions.GetPlayersFromCoords(GetEntityCoords(PlayerPedId()), Config.General.PaymentRadius)) do
 			local dist = #(GetEntityCoords(GetPlayerPed(v)) - GetEntityCoords(PlayerPedId()))
 			for i = 1, #onlineList do
 				if onlineList[i].value == GetPlayerServerId(v) then
-					if v ~= PlayerId() or Config.System.Debug then
+					if v ~= PlayerId() or debugMode then
 						nearbyList[#nearbyList+1] = { value = onlineList[i].value, label = onlineList[i].text..' ('..math.floor(dist+0.05)..'m)', text = onlineList[i].text..' ('..math.floor(dist+0.05)..'m)' }
 					end
 				end
@@ -37,11 +37,11 @@ RegisterNetEvent('jim-payments:client:PolCharge', function()
             dialog.citizen = dialog[1]
             dialog.price = dialog[2]
         end
-		TriggerServerEvent('jim-payments:server:PolCharge', dialog.citizen, dialog.price)
+		TriggerServerEvent(getScript()..":server:PolCharge", dialog.citizen, dialog.price)
     end
 end)
 
-RegisterNetEvent("jim-payments:client:PolPopup", function(amount, biller, billerjob)
+RegisterNetEvent(getScript()..":client:PolPopup", function(amount, biller, billerjob)
     local Menu = {}
     Menu[#Menu+1] = { isMenuHeader = true, header = "", txt = Loc[Config.Lan].menu["bank_charge"]..amount }
     Menu[#Menu+1] = {
@@ -49,7 +49,7 @@ RegisterNetEvent("jim-payments:client:PolPopup", function(amount, biller, biller
         header = Loc[Config.Lan].menu["yes"],
         txt = "",
         onSelect = function()
-            TriggerServerEvent("jim-payments:server:PolPopup", {
+            TriggerServerEvent(getScript()..":server:PolPopup", {
                 accept = true,
                 amount = amount,
                 biller = biller,
@@ -60,7 +60,7 @@ RegisterNetEvent("jim-payments:client:PolPopup", function(amount, biller, biller
         icon = "fas fa-circle-xmark",
         header = Loc[Config.Lan].menu["no"],
         onSelect = function()
-            TriggerServerEvent("jim-payments:server:PolPopup", {
+            TriggerServerEvent(getScript()..":server:PolPopup", {
                 accept = false,
                 amount = amount,
                 biller = biller,
@@ -71,7 +71,7 @@ RegisterNetEvent("jim-payments:client:PolPopup", function(amount, biller, biller
         header = "🧾 "..billerjob..Loc[Config.Lan].menu["payment"],
         headertxt = Loc[Config.Lan].menu["accept_payment"],
         onExit = function()
-            TriggerServerEvent("jim-payments:server:PolPopup", {
+            TriggerServerEvent(getScript()..":server:PolPopup", {
                 accept = false,
                 amount = amount,
                 biller = biller,

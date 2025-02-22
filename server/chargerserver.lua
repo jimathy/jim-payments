@@ -12,7 +12,7 @@ onResourceStart(function()
 end, true)
 
 registerCommand("cashregister", {
-	Loc[Config.Lan].command["cash_reg"], {}, false,
+	locale("command", "cash_reg"), {}, false,
 	function(source)
 		TriggerClientEvent(getScript()..":client:Charge", source, {}, true)
 	end
@@ -22,10 +22,7 @@ createCallback(getScript()..":MakePlayerList", function(source)
 	local onlineList = {}
 	for _, v in pairs(GetPlayers()) do
 		local Player = getPlayer(v)
-		onlineList[#onlineList+1] = {
-			value = tonumber(v),
-			text = "["..v.."] - "..Player.name
-		}
+		onlineList[#onlineList+1] = { value = tonumber(v), text = "["..v.."] - "..Player.name }
 	end
 	return onlineList
 end)
@@ -38,8 +35,8 @@ RegisterServerEvent(getScript()..":server:Charge", function(citizen, price, bill
 	local balance = billed[billtype]
 	if amount and amount > 0 then
 		if balance < amount then
-			triggerNotify(nil, Loc[Config.Lan].error["customer_nocash"], "error", src)
-			triggerNotify(nil, Loc[Config.Lan].error["you_nocash"], "error", tonumber(citizen))
+			triggerNotify(nil, locale("error", "customer_nocash"), "error", src)
+			triggerNotify(nil, locale("error", "you_nocash"), "error", tonumber(citizen))
 			return
 		end
 		local label = gang == true and Gangs[biller.gang].label or Jobs[biller.job].label
@@ -64,13 +61,13 @@ RegisterServerEvent(getScript()..":server:Charge", function(citizen, price, bill
 					['@sendercitizenid'] = biller.citizenid,
 					['@label'] = label,
 				})
-				TriggerClientEvent('gksphone:notifi', src, {title = 'Billing', message = Loc[Config.Lan].success["inv_succ"], img= '/html/static/img/icons/logo.png' })
-				TriggerClientEvent('gksphone:notifi', billed.source, {title = 'Billing', message = Loc[Config.Lan].success["inv_recieved"], img= '/html/static/img/icons/logo.png' })
+				TriggerClientEvent('gksphone:notifi', src, {title = 'Billing', message = locale("success", "inv_succ"), img= '/html/static/img/icons/logo.png' })
+				TriggerClientEvent('gksphone:notifi', billed.source, {title = 'Billing', message = locale("success", "inv_recieved"), img= '/html/static/img/icons/logo.png' })
 			end
-			triggerNotify(nil, Loc[Config.Lan].success["inv_succ"], 'success', src)
-			triggerNotify(nil, Loc[Config.Lan].success["inv_recieved"], nil, billed.source)
+			triggerNotify(nil, locale("success", "inv_succ"), 'success', src)
+			triggerNotify(nil, locale("success", "inv_recieved"), nil, billed.source)
 		end
-	else triggerNotify(nil, Loc[Config.Lan].error["charge_zero"], 'error', source) return end
+	else triggerNotify(nil, locale("error", "charge_zero"), 'error', source) return end
 end)
 
 RegisterServerEvent(getScript()..":server:PayPopup", function(data)
@@ -88,10 +85,10 @@ RegisterServerEvent(getScript()..":server:PayPopup", function(data)
 			exports['ap-government']:chargeCityTax(billed.source, "Item", data.amount)
 		end
 		TriggerEvent(getScript()..":Tickets:Give", newdata, biller, data.gang)
-		triggerNotify(nil, billed.firstname..Loc[Config.Lan].success["accepted_pay"]..data.amount..Loc[Config.Lan].success["payment"], "success", data.biller)
+		triggerNotify(nil, billed.firstname..locale("success", "accepted_pay")..data.amount..locale("success", "payment"), "success", data.biller)
 	elseif not data.accept then
-		triggerNotify(nil, Loc[Config.Lan].success["declined"], "error", src)
-		triggerNotify(nil, billed.firstname..Loc[Config.Lan].error["decline_pay"]..data.amount..Loc[Config.Lan].success["payment"], "error", data.biller)
+		triggerNotify(nil, locale("success", "declined"), "error", src)
+		triggerNotify(nil, billed.firstname..locale("error", "decline_pay")..data.amount..locale("success", "payment"), "error", data.biller)
 	end
 end)
 

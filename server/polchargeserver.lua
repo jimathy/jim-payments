@@ -1,5 +1,5 @@
 registerCommand("polcharge", {
-	Loc[Config.Lan].command["charge"], {}, false,
+	locale("command", "charge"), {}, false,
 	function(source)
 		TriggerClientEvent(getScript()..":client:PolCharge", source)
 	end
@@ -31,12 +31,12 @@ RegisterServerEvent(getScript()..":server:PolCharge", function(citizen, price)
 				amountChange = (price - commission)
 			})
 
-			triggerNotify(nil, billed.firstname..Loc[Config.Lan].success["charged"]..(price - commission), "success", src)
-			triggerNotify(nil, Loc[Config.Lan].success["you_charged"]..(price - commission), nil, billed.source)
+			triggerNotify(nil, billed.firstname..locale("success", "charged")..(price - commission), "success", src)
+			triggerNotify(nil, locale("success", "you_charged")..(price - commission), nil, billed.source)
 		else
 			TriggerClientEvent(getScript()..":client:PolPopup", billed.source, price, src, biller.job, commPercent)
 		end
-	else triggerNotify(nil, Loc[Config.Lan].error["charge_zero"], 'error', source) return end
+	else triggerNotify(nil, locale("error", "charge_zero"), 'error', source) return end
 end)
 
 RegisterServerEvent(getScript()..":server:PolPopup", function(data)
@@ -55,8 +55,8 @@ RegisterServerEvent(getScript()..":server:PolPopup", function(data)
 			amountChange = (price - commission)
 		})
 	elseif not data.accept then
-		triggerNotify(nil, Loc[Config.Lan].error["declined_payment"], nil, src)
-		triggerNotify(nil, billed.PlayerData.charinfo.firstname.." declined the $"..data.amount..Loc[Config.Lan].success["charge_end"], "error", data.biller)
+		triggerNotify(nil, locale("error", "declined_payment"), nil, src)
+		triggerNotify(nil, billed.PlayerData.charinfo.firstname.." declined the $"..data.amount..locale("success", "charge_end"), "error", data.biller)
 	end
 end)
 

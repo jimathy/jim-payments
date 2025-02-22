@@ -109,3 +109,62 @@ function atmWithdrawl(info)
     end
 end
 
+RegisterNetEvent(getScript()..":client:ATM:give", function()
+
+	local newinputs = {} -- Begin qb-input creation here.
+    local nearbyList = {}
+    if Config.General.List then -- If nearby player list is wanted:
+		--Retrieve a list of nearby players from server
+		local onlineList = triggerCallback(getScript()..":MakePlayerList")
+		--Convert list of players nearby into one qb-input understands + add distance info
+        local playerCoords = GetEntityCoords(PlayerPedId())
+
+        for _, v in ipairs(GetPlayersFromCoords(playerCoords, Config.General.PaymentRadius)) do
+            local ped = GetPlayerPed(v)
+            local dist = #(GetEntityCoords(ped) - playerCoords)
+            for i = 1, #onlineList do
+                if onlineList[i].value == GetPlayerServerId(v) then
+                    if v ~= PlayerId() or debugMode then
+                        nearbyList[#nearbyList+1] = {
+                            value = onlineList[i].value,
+                            label = onlineList[i].text .. ' (' .. math.floor(dist+0.05) .. 'm)',
+                            text = onlineList[i].text .. ' (' .. math.floor(dist+0.05) .. 'm)'
+                        }
+                    end
+                end
+            end
+        end
+		--If list is empty(no one nearby) show error and stop
+		if not nearbyList[1] then triggerNotify(nil, locale("error" ,"no_one"), "error") return end
+	else -- If Config.List is false, create input text box for ID's
+		newinputs[#newinputs+1] = { type = 'text', isRequired = true, required = true, name = 'citizen', label = locale("menu" ,"person_id"), text = locale("menu" ,"person_id") }
+	end
+
+    if Config.General.List then
+        newinputs[#newinputs+1] = { type = "select", text = locale("menu" ,"cus_id"), name = "citizen", label = locale("menu" ,"cus_id"), default = 1, options = nearbyList }
+    else
+        newinputs[#newinputs+1] = { type = 'text', isRequired = true, name = 'citizen',  text = locale("menu" ,"cus_id") }
+    end
+    newinputs[#newinputs+1] = {
+        type = 'select',
+        name = 'billtype',
+        text = locale("menu" ,"type"),
+        default = billPrev,
+        options = {
+            { value = "cash", text = locale("menu" ,"cash"), label = locale("menu" ,"cash") },
+        }
+    }
+    newinputs[#newinputs+1] = { type = 'number', isRequired = true, name = 'price', text = locale("menu" ,"amount_charge") }
+
+    local dialog = createInput(locale("menu", "give_cash"), newinputs)
+
+	if dialog then
+        if dialog[1] then
+            dialog.citizen = dialog[1]
+            dialog.billtype = dialog[2]
+            dialog.price = dialog[3]
+        end
+        billPrev = dialog.billtype
+        TriggerServerEvent('jim-payments:server:ATM:give', dialog.citizen, dialog.price)
+    end
+end)

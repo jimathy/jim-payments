@@ -47,7 +47,7 @@ RegisterServerEvent(getScript()..":Tickets:Give", function(data, biller, gang)
 				biller = Player
 			end
 		end
-		triggerNotify(nil, data.sender..Loc[Config.Lan].success["invoice_start"]..data.amount..Loc[Config.Lan].success["invoice_end"], "success", biller.source)
+		triggerNotify(nil, data.sender..locale("success", "invoice_start")..data.amount..locale("success", "invoice_end"), "success", biller.source)
 	end
 
 	-- If ticket system enabled, do this
@@ -60,21 +60,21 @@ RegisterServerEvent(getScript()..":Tickets:Give", function(data, biller, gang)
 						if gang then
 							if Player.gang == data.society then
 								addItem("payticket", 1, nil, Player.source)
-								triggerNotify(nil, Loc[Config.Lan].success["rec_rec"], 'success', Player.source)
+								triggerNotify(nil, locale("success", "rec_rec"), 'success', Player.source)
 							end
 						else
 							print("player found")
 							if Player.job == data.society and Player.onDuty then
 								print("player on duty, giving tickets")
                                 addItem("payticket", 1, nil, Player.source)
-								triggerNotify(nil, Loc[Config.Lan].success["rec_rec"], 'success', Player.source)
+								triggerNotify(nil, locale("success", "rec_rec"), 'success', Player.source)
 							end
 						end
 					end
 				end
 			else
                 addItem("payticket", 1, nil, biller.source)
-				triggerNotify(nil, Loc[Config.Lan].success["rec_rec"], 'success', biller.source)
+				triggerNotify(nil, locale("success", "rec_rec"), 'success', biller.source)
 			end
 		end
 	end
@@ -85,10 +85,10 @@ RegisterServerEvent(getScript()..":Tickets:Give", function(data, biller, gang)
 		if Config.Receipts.CommissionLimit and data.amount < Config.Receipts.Jobs[data.society].MinAmountforTicket then return end
 		if Config.Receipts.CommissionDouble then
             fundPlayer(math.floor(tonumber(data.amount) * (comm *2)), "bank", biller.source)
-			triggerNotify(nil, Loc[Config.Lan].success["recieved"]..math.floor(tonumber(data.amount) * (comm *2))..Loc[Config.Lan].success["commission"], "success", biller.source)
+			triggerNotify(nil, locale("success", "recieved")..math.floor(tonumber(data.amount) * (comm *2))..locale("success", "commission"), "success", biller.source)
 		else
             fundPlayer(math.floor(tonumber(data.amount) *comm), "bank", biller.source)
-			triggerNotify(nil, Loc[Config.Lan].success["recieved"]..math.floor(tonumber(data.amount) * comm)..Loc[Config.Lan].success["commission"], "success", biller.source)
+			triggerNotify(nil, locale("success", "recieved")..math.floor(tonumber(data.amount) * comm)..locale("success", "commission"), "success", biller.source)
 		end
 		if Config.Receipts.CommissionAll then
 			for _, v in pairs(activePlayers) do
@@ -96,7 +96,7 @@ RegisterServerEvent(getScript()..":Tickets:Give", function(data, biller, gang)
 				if v ~= biller.source then
 					if Player.job == data.society and Player.onDuty then
                         fundPlayer(math.floor(tonumber(data.amount) * comm), "bank", Player.source)
-						triggerNotify(nil, Loc[Config.Lan].success["recieved"]..math.floor(tonumber(data.amount) * comm)..Loc[Config.Lan].success["commission"], "success", Player.source)
+						triggerNotify(nil, locale("success", "recieved")..math.floor(tonumber(data.amount) * comm)..locale("success", "commission"), "success", Player.source)
 					end
 				end
 			end
@@ -108,13 +108,13 @@ RegisterServerEvent(getScript()..":Tickets:Sell", function() local src = source
     local Player = getPlayer(src)
     local hasItem, hasTable = hasItem("payticket", 1, src)
     if not hasItem then
-		triggerNotify(nil, Loc[Config.Lan].error["no_ticket_to"], 'error', src)
+		triggerNotify(nil, locale("error", "no_ticket_to"), 'error', src)
         return
     else
 		local tickets = hasTable["payticket"].count
         removeItem("payticket", tickets, src)
 		local pay = (tickets * Config.Receipts.Jobs[Player.job].PayPerTicket)
         fundPlayer(pay, "bank", src)
-        triggerNotify(nil, Loc[Config.Lan].success["trade_ticket_start"]..tickets..Loc[Config.Lan].success["trade_ticket_end"]..cv(pay), 'success', src)
+        triggerNotify(nil, locale("success", "trade_ticket_start")..tickets..locale("success", "trade_ticket_end")..cv(pay), 'success', src)
 	end
 end)

@@ -1,5 +1,3 @@
-print("^2Jim^7-^2Payments ^7v^4"..GetResourceMetadata(GetCurrentResourceName(), 'version', nil):gsub("%.", "^7.^4").."^7 - ^2Payments Script by ^1Jimathy^7")
-
 -- If you need support I now have a discord available, it helps me keep track of issues and give better support.
 
 -- https://discord.gg/xKgQZ6wZvS

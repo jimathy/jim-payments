@@ -103,7 +103,7 @@ RegisterNetEvent(getScript()..":Client:Bank", function(data) local setheader = n
                     bankTransaction(info, bankinfo)
                 end,
             }
-            if isStarted(QBExport) then
+            if isStarted(QBExport) then -- only supports qbcore account transfers
                 Menu[#Menu+1] = {
                     header = locale("target", "soc_trans"),
                     txt = Jobs[info.job].label or "Error",

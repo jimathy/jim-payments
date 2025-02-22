@@ -1,8 +1,9 @@
 RegisterNetEvent(getScript()..":client:PolCharge", function()
+    local Playerinfo = getPlayer()
 	--Check if player is allowed to use /cashregister command
 	local allowed = false
-	for k in pairs(Config.PolCharge.FineJobs) do if k == PlayerJob.name then allowed = true end end
-	if not allowed then triggerNotify(nil, Loc[Config.Lan].error["no_job"], "error") return end
+	for k in pairs(Config.PolCharge.FineJobs) do if k == Playerinfo.job then allowed = true end end
+	if not allowed then triggerNotify(nil, locale("error", "no_job"), "error") return end
 
 	local newinputs = {} -- Begin qb-input creation here.
     local nearbyList = {}
@@ -21,17 +22,17 @@ RegisterNetEvent(getScript()..":client:PolCharge", function()
 			end
 		end
 		--If list is empty(no one nearby) show error and stop
-		if not nearbyList[1] then triggerNotify(nil, Loc[Config.Lan].error["no_one"], "error") return end
+		if not nearbyList[1] then triggerNotify(nil, locale("error" ,"no_one"), "error") return end
 	end
 
     if Config.PolCharge.FineJobList then
-        newinputs[#newinputs+1] = { type = "select", text = Loc[Config.Lan].menu["cus_id"], name = "citizen", label = Loc[Config.Lan].menu["cus_id"], default = 1, options = nearbyList }
+        newinputs[#newinputs+1] = { type = "select", text = locale("menu" ,"cus_id"), name = "citizen", label = locale("menu" ,"cus_id"), default = 1, options = nearbyList }
     else
-        newinputs[#newinputs+1] = { type = 'text', isRequired = true, name = 'citizen',  text = Loc[Config.Lan].menu["cus_id"] }
+        newinputs[#newinputs+1] = { type = 'text', isRequired = true, name = 'citizen',  text = locale("menu" ,"cus_id") }
     end
-    newinputs[#newinputs+1] = { type = 'number', isRequired = true, name = 'price', text = Loc[Config.Lan].menu["amount_charge"] }
+    newinputs[#newinputs+1] = { type = 'number', isRequired = true, name = 'price', text = locale("menu" ,"amount_charge") }
 
-    local dialog = createInput(img, newinputs)
+    local dialog = createInput(Jobs[Playerinfo.job].label, newinputs)
 	if dialog then
         if dialog[1] then
             dialog.citizen = dialog[1]
@@ -43,10 +44,10 @@ end)
 
 RegisterNetEvent(getScript()..":client:PolPopup", function(amount, biller, billerjob)
     local Menu = {}
-    Menu[#Menu+1] = { isMenuHeader = true, header = "", txt = Loc[Config.Lan].menu["bank_charge"]..amount }
+    Menu[#Menu+1] = { isMenuHeader = true, header = "", txt = locale("menu" ,"bank_charge")..amount }
     Menu[#Menu+1] = {
         icon = "fas fa-circle-check",
-        header = Loc[Config.Lan].menu["yes"],
+        header = locale("menu" ,"yes"),
         txt = "",
         onSelect = function()
             TriggerServerEvent(getScript()..":server:PolPopup", {
@@ -58,7 +59,7 @@ RegisterNetEvent(getScript()..":client:PolPopup", function(amount, biller, bille
     }
     Menu[#Menu+1] = {
         icon = "fas fa-circle-xmark",
-        header = Loc[Config.Lan].menu["no"],
+        header = locale("menu" ,"no"),
         onSelect = function()
             TriggerServerEvent(getScript()..":server:PolPopup", {
                 accept = false,
@@ -68,8 +69,8 @@ RegisterNetEvent(getScript()..":client:PolPopup", function(amount, biller, bille
         end,
     }
     openMenu(Menu, {
-        header = "🧾 "..billerjob..Loc[Config.Lan].menu["payment"],
-        headertxt = Loc[Config.Lan].menu["accept_payment"],
+        header = "🧾 "..billerjob..locale("menu" ,"payment"),
+        headertxt = locale("menu" ,"accept_payment"),
         onExit = function()
             TriggerServerEvent(getScript()..":server:PolPopup", {
                 accept = false,

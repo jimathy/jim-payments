@@ -298,7 +298,7 @@ createCallback(getScript()..":GetInfo", function(source)
 	end
 
 	-- Savings account is only QBCore for now
-	if isStarted(QBExport) then
+	if isStarted(QBExport) and not isStarted(QBXExport) then
 	-- Grab Savings account info
 		local result = MySQL.Sync.fetchAll('SELECT * FROM bank_accounts WHERE citizenid = ? AND account_name = ?', { Player.citizenId, 'Savings_'..Player.citizenId, })
 		if result[1] then

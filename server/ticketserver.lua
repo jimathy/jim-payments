@@ -52,6 +52,10 @@ RegisterServerEvent(getScript()..":Tickets:Give", function(data, biller, gang)
 
 	-- If ticket system enabled, do this
 	if (biller.onDuty or gang) and Config.Receipts.TicketSystem then
+		if not Config.Receipts.Jobs[data.society] then
+			print("^1Error^7: Failed to find job "..data.society.." in ^2Config.Receipts.Jobs^7")
+			return
+		end
 		if data.amount >= Config.Receipts.Jobs[data.society].MinAmountforTicket then
 			if Config.Receipts.TicketSystemAll then
 				for _, v in pairs(activePlayers) do
@@ -63,7 +67,6 @@ RegisterServerEvent(getScript()..":Tickets:Give", function(data, biller, gang)
 								triggerNotify(nil, locale("success", "rec_rec"), 'success', Player.source)
 							end
 						else
-							print("player found")
 							if Player.job == data.society and Player.onDuty then
 								print("player on duty, giving tickets")
                                 addItem("payticket", 1, nil, Player.source)

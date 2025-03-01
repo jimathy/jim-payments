@@ -8,9 +8,9 @@ Config = {
 		Debug = false,
 		EventDebug = false,
 
-		Menu = "qb",  			-- "qb", "ox", "gta"
-		Notify = "qb",			-- "qb", "ox", "gta", "esx"
-		ProgressBar = "qb", 	-- "qb", "ox", "gta", "esx"
+		Menu = "ox",  			-- "qb", "ox", "gta"
+		Notify = "gta",			-- "qb", "ox", "gta", "esx"
+		ProgressBar = "gta", 	-- "qb", "ox", "gta", "esx"
 	},
 
 	Crafting = {

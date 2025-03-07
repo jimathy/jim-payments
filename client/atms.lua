@@ -37,7 +37,7 @@ end
 RegisterNetEvent(getScript()..":Client:ATM", function() local setheader = nil
 	--this grabs all the info from names to savings account numbers in the databases
     local info = triggerCallback(getScript()..":GetInfo")
-    jsonPrint(info)
+
     playAnim("amb@prop_human_atm@male@enter", "enter", 2000, 1)
 
 	if progressBar({ label = locale("menu", "acc_atm"), time = 3000 }) then

@@ -65,51 +65,16 @@ RegisterServerEvent(getScript()..":server:ATM:use", function(amount, billtype, b
 				triggerNotify(nil, locale("error" ,"soc_low"), "error", src)
 			elseif tonumber(society) >= amount then
 
-				if isStarted("Renewed-Banking") then
-					bankScript = "Renewed-Banking"
-					exports['Renewed-Banking']:removeAccountMoney(Player.job, amount)
-					newAmount = exports["Renewed-Banking"]:getAccountMoney(Player.job)
-				elseif isStarted("qb-banking") then
-					bankScript = "qb-banking"
-					exports["qb-banking"]:RemoveMoney(Player.job, amount)
-					newAmount = exports["qb-banking"]:GetAccountBalance(Player.job)
-				elseif isStarted("fd_banking") then
-					bankScript = "fd_banking"
-					exports["fd_banking"]:RemoveMoney(Player.job, amount)
-					newAmount = exports["fd_banking"]:GetAccount(Player.job)
-				elseif isStarted("okokBanking") then
-					bankScript = "okokBanking"
-					exports['okokBanking']:RemoveMoney(Player.job, amount)
-					newAmount = exports['okokBanking']:GetAccount(Player.job)
-				end
-
+				chargeSociety(Player.job, amount)
 				fundPlayer(amount, "bank", src)
-				debugPrint("^5Debug^7: ^3"..bankScript.."^7(^3Job^7): ^2Removing ^7$"..amount.." ^2from account ^7'^6"..Player.job.."^7' ($"..newAmount..")")
+
 				triggerNotify(nil, locale("success", "draw")..cv(amount)..locale("success", "fromthe")..Jobs[Player.job].label..locale("success" ,"account"), "success", src)
 			end
 		elseif billtype == "deposit" then
 			if Player.bank < amount then triggerNotify(nil, locale("error", "nomoney_bank"), "error", src)
 			elseif Player.bank >= amount then
-				if isStarted("Renewed-Banking") then
-					bankScript = "Renewed-Banking"
-					exports['Renewed-Banking']:addAccountMoney(Player.job, amount)
-					newAmount = exports["Renewed-Banking"]:getAccountMoney(Player.job)
-
-				elseif isStarted("qb-banking") then
-					bankScript = "qb-banking"
-					exports["qb-banking"]:AddMoney(Player.job, amount)
-					newAmount = exports["qb-banking"]:GetAccountBalance(Player.job)
-				elseif isStarted("fd_banking") then
-					bankScript = "fd_banking"
-					exports.fd_banking:AddMoney(Player.job, amount)
-					newAmount = exports["fd_banking"]:GetAccount(Player.job)
-				elseif isStarted("okokBanking") then
-					bankScript = "okokBanking"
-					exports['okokBanking']:AddMoney(Player.job, amount)
-					newAmount = exports['okokBanking']:GetAccount(Player.job)
-				end
+				fundSociety(Player.job, amount)
 				chargePlayer(amount, "bank", src) Wait(1500)
-				debugPrint("^5Debug^7: ^3"..bankScript.."^7(^3Job^7): ^2Adding ^7$"..amount.." ^2to account ^7'^6"..Player.job.."^7' ($"..newAmount..")")
 				triggerNotify(nil, locale("success", "deposited")..cv(amount)..locale("success", "into")..Jobs[Player.job].label..locale("success", "account"), "success", src)
 			end
 		end
@@ -160,15 +125,7 @@ RegisterServerEvent(getScript()..":server:ATM:use", function(amount, billtype, b
 			if tonumber(gsociety) < amount then
 				triggerNotify(nil, locale("error" ,"soc_low"), "error", src)
 			elseif tonumber(gsociety) >= amount then
-				if isStarted("Renewed-Banking") then
-					exports['Renewed-Banking']:removeAccountMoney(Player.gang, amount)
-				elseif isStarted("qb-banking") then
-					exports["qb-banking"]:RemoveMoney(Player.gang, amount)
-				elseif isStarted("fd_banking") then
-					exports["fd_banking"]:RemoveGangMoney(Player.gang, amount)
-				elseif isStarted("okokBanking") then
-					exports["okokBanking"]:RemoveMoney(Player.gang, amount)
-				end
+				chargeSociety(Player.gang, amount)
 			end
 
 			fundPlayer(amount, "bank", src)
@@ -178,16 +135,8 @@ RegisterServerEvent(getScript()..":server:ATM:use", function(amount, billtype, b
 			if Player.bank < amount then
 				triggerNotify(nil, locale("error" ,"nomoney_bank"), "error", src)
 			elseif Player.bank >= amount then
-				if isStarted("Renewed-Banking") then
-					exports['Renewed-Banking']:addAccountMoney(Player.gang, amount)
-				elseif isStarted("qb-banking") then
-					exports["qb-banking"]:AddGangMoney(Player.gang, amount)
-				elseif isStarted("fd_banking") then
-					exports["fd_banking"]:AddGangMoney(Player.gang, amount)
-				elseif isStarted("okokBanking") then
-					exports["okokBanking"]:AddMoney(Player.gang, amount)
-				end
-				Player.Functions.RemoveMoney('bank', amount) Wait(1500)
+				fundSociety(Player.gang, amount)
+				chargePlayer(amount, "bank", Player.source) Wait(1500)
 				triggerNotify(nil, locale("success" ,"deposited")..cv(amount)..locale("success" ,"into")..Gangs[Player.gang].label..locale("success" ,"account"), "success", src)
 			end
 		end
@@ -209,10 +158,7 @@ RegisterServerEvent(getScript()..":server:ATM:use", function(amount, billtype, b
 			local result = MySQL.Sync.fetchAll('SELECT * FROM players WHERE charinfo LIKE ?', {query})
 			if result[1] then
 				local Reciever = Core.Functions.GetPlayerByCitizenId(result[1].citizenid)
-				if Config.Banking == "renewed" then exports['Renewed-Banking']:removeAccountMoney(tostring(Player.PlayerData.gang.name), amount)
-				elseif Config.Banking == "qb-management" then exports["qb-management"]:RemoveGangMoney(tostring(Player.PlayerData.gang.name), amount)
-				elseif Config.Banking == "qb-banking" then exports["qb-banking"]:RemoveGangMoney(tostring(Player.PlayerData.gang.name), amount)
-				elseif Config.Banking == "fd" then exports.fd_banking:RemoveGangMoney(tostring(Player.PlayerData.gang.name), amount) end
+				chargeSociety(Player.PlayerData.gang.nameg, amount)
 				if not Reciever then
 					Reciever.Functions.AddMoney('bank', amount)
 					triggerNotify(nil, locale("success" ,"sent")..amount..locale("success" ,"to")..Reciever.PlayerData.charinfo.firstname.." "..Reciever.PlayerData.charinfo.lastname, "success", src)
@@ -265,36 +211,9 @@ createCallback(getScript()..":GetInfo", function(source)
 	local Player = getPlayer(source)
 	local society, gsociety = 0, 0
 
-	if isStarted("Renewed-Banking") then
-		society = exports["Renewed-Banking"]:getAccountMoney(Player.job)
-		if Player.gang ~= "none" then
-			gsociety = exports["Renewed-Banking"]:getAccountMoney(Player.gang)
-		end
-
-	elseif isStarted("qb-banking") then
-		if not exports["qb-banking"]:GetAccount(Player.job) then
-			print("Making new bank account in qb-banking for "..Player.job)
-			exports["qb-banking"]:CreateJobAccount(Player.job, 0) Wait(150) -- make new account if return "null"
-		end
-		society = exports["qb-banking"]:GetAccountBalance(Player.job)
-		if Player.gang ~= "none" then
-			if not exports["qb-banking"]:GetAccount(Player.gang) then
-				print("Making new bank account in qb-banking for "..Player.gang)
-				exports["qb-banking"]:CreateGangAccount(Player.gang, 0) Wait(150) -- make new account if return "null"
-				society = exports["qb-banking"]:GetAccountBalance(Player.gang)
-			end
-			society = exports["qb-banking"]:GetAccountBalance(Player.gang)
-		end
-	elseif isStarted("fd_banking") then
-		society = exports["fd_banking"]:GetAccount(Player.job)
-		if Player.gang ~= "none" then
-			gsociety = exports["fd_banking"]:GetGangAccount(Player.gang)
-		end
-	elseif isStarted("okokBanking") then
-		society = exports["okokBanking"]:GetAccount(Player.job)
-		if Player.gang ~= "none" then
-			gsociety = exports["okokBanking"]:GetAccount(Player.gang)
-		end
+	society = getSocietyAccount(Player.job)
+	if Player.gang ~= "none" then
+		gsociety = getSocietyAccount(Player.gang)
 	end
 
 	-- Savings account is only QBCore for now

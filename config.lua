@@ -8,9 +8,11 @@ Config = {
 		Debug = false,
 		EventDebug = false,
 
-		Menu = "ox",  			-- "qb", "ox", "gta"
+		Menu = "qb",  			-- "qb", "ox", "gta"
 		Notify = "gta",			-- "qb", "ox", "gta", "esx"
 		ProgressBar = "gta", 	-- "qb", "ox", "gta", "esx"
+
+		DontUseTarget = false,	-- uses drawtext targets instead of alt targets
 	},
 
 	Crafting = {

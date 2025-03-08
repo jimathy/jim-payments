@@ -60,7 +60,7 @@ RegisterNetEvent(getScript()..":Client:Bank", function(data) local setheader = n
         Menu[#Menu+1] = {
             isMenuHeader = true,
             header = locale("menu", "welcome")..info.name,
-            txt = locale("menu", "header_acc").." "..info.account..br..info.citizenId,
+            txt = locale("menu", "header_acc").." "..info.account..br..locale("menu", "citizenid").." "..info.citizenId,
         }
         Menu[#Menu+1] = {
             isMenuHeader = true,
@@ -75,7 +75,7 @@ RegisterNetEvent(getScript()..":Client:Bank", function(data) local setheader = n
                 bankTransaction(info, bankinfo)
             end,
         }
-        if isStarted(QBExport) then -- only supports qbcore account transfers
+        if isStarted(QBExport) and not isStarted(QBXExport) then -- only supports qbcore account transfers
             Menu[#Menu+1] = {
                 header = locale("target", "transfer"),
                 icon = "fas fa-arrow-right-arrow-left",
@@ -84,26 +84,27 @@ RegisterNetEvent(getScript()..":Client:Bank", function(data) local setheader = n
                     bankTransaction(info, bankinfo)
                 end,
             }
+
+            Menu[#Menu+1] = {
+                header = locale("target", "saving"),
+                icon = "fas fa-money-check-dollar",
+                onSelect = function()
+                    info.id = "savings"
+                    bankTransaction(info, bankinfo)
+                end,
+            }
         end
-        Menu[#Menu+1] = {
-            header = locale("target", "saving"),
-            icon = "fas fa-money-check-dollar",
-            onSelect = function()
-                info.id = "savings"
-                bankTransaction(info, bankinfo)
-            end,
-        }
         if info.jobBoss then
             Menu[#Menu+1] = {
                 header = locale("target", "soc_saving"),
-                txt = Jobs[info.job].label or "Error",
+                txt = Jobs[info.job].label..br.." 🏦 $"..bankinfo.society or "Error",
                 icon = "fas fa-building",
                 onSelect = function()
                     info.id = "society"
                     bankTransaction(info, bankinfo)
                 end,
             }
-            if isStarted(QBExport) then -- only supports qbcore account transfers
+            if isStarted(QBExport) and not isStarted(QBXExport) then -- only supports qbcore account transfers
                 Menu[#Menu+1] = {
                     header = locale("target", "soc_trans"),
                     txt = Jobs[info.job].label or "Error",

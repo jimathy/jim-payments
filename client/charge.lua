@@ -2,6 +2,7 @@ local BankPed = nil
 local Till = {}
 
 function spawnCustomRegisters()
+    Wait(1000)
 	for k, v in pairs(Config.CustomCashRegisters) do
 		for i = 1, #v do
 			local job, gang = v[i].gang and nil or k, v[i].gang and k or nil

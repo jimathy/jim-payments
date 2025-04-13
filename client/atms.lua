@@ -1,7 +1,8 @@
 local Targets = {}
 
 if Config.ATMs.enable then
-    CreateThread(function() -- Automatic detection of models and make targets and blips
+    onPlayerLoaded(function() -- Automatic detection of models and make targets and blips
+        Wait(2000)
         while true do
             local pedCoords = GetEntityCoords(PlayerPedId())
             for _, v in pairs(GetGamePool('CObject')) do
@@ -31,7 +32,7 @@ if Config.ATMs.enable then
             end
             Wait(5000)
         end
-    end)
+    end, true)
 end
 
 RegisterNetEvent(getScript()..":Client:ATM", function() local setheader = nil

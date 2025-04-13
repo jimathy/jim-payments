@@ -3,47 +3,49 @@ Peds = {}
 RegisterNetEvent('QBCore:Client:SetDuty', function(duty) onDuty = duty end)
 
 if Config.Banks.enable then
-    for k, v in pairs(BankLocations) do
-        for i = 1, #v do
-            local name = getScript()..":BankLocation:"..k..i
-            if Config.General.Peds then
-                if not Config.Gabz then CreateModelHide(v[i].xyz, 1.0, `v_corp_bk_chair3`, true) end
-                if not Peds[name] then
-                    Peds[name] = makePed(Config.General.PedPool[math.random(1, #Config.General.PedPool)], v[i], false, false)
-                    if isStarted("jim-talktonpc") then
-                        exports["jim-talktonpc"]:createDistanceMessage("hi", Peds[name], 3.0, false)
+    onPlayerLoaded(function()
+        for k, v in pairs(BankLocations) do
+            for i = 1, #v do
+                local name = getScript()..":BankLocation:"..k..i
+                if Config.General.Peds then
+                    if not Config.Gabz then CreateModelHide(v[i].xyz, 1.0, `v_corp_bk_chair3`, true) end
+                    if not Peds[name] then
+                        Peds[name] = makePed(Config.General.PedPool[math.random(1, #Config.General.PedPool)], v[i], false, false)
+                        if isStarted("jim-talktonpc") then
+                            exports["jim-talktonpc"]:createDistanceMessage("hi", Peds[name], 3.0, false)
+                        end
                     end
                 end
-            end
-            local jobroles = {} local gangroles = {}
-            for k, v in pairs(Config.Receipts.Jobs) do
-                if v.gang then
-                    gangroles[k] = 0
-                else
-                    jobroles[k] = 0
+                local jobroles = {} local gangroles = {}
+                for k, v in pairs(Config.Receipts.Jobs) do
+                    if v.gang then
+                        gangroles[k] = 0
+                    else
+                        jobroles[k] = 0
+                    end
+                end
+                createCircleTarget(
+                    { name, vec3(v[i].x, v[i].y, v[i].z+0.2), 2.0, { name = name, debugPoly = debugMode, useZ = true, }, }, {
+                        {   action = function()
+                            if Config.General.Peds and isStarted("jim-talktonpc") then
+                                exports["jim-talktonpc"]:createCam(Peds[name], true, "generic", true)
+                            end
+                            TriggerEvent(getScript()..":Client:Bank", { ped = Config.General.Peds and Peds[name] })
+                        end,
+                            icon = "fas fa-piggy-bank", label = locale("target", "bank") },
+                        {   action = function() TriggerEvent(getScript()..":Tickets:Menu", { gang = false }) end,
+                            icon = "fas fa-receipt", label = locale("target", "cashin_boss"), job = jobroles,
+                        },
+                        {   action = function() TriggerEvent(getScript()..":Tickets:Menu", { gang = true }) end,
+                            icon = "fas fa-receipt", label = locale("target", "cashin_gang"), gang = gangroles,
+                        },
+                    }, 2.5)
+                if Config.Banks.showBlips then
+                    makeBlip({coords = v[i], sprite = 814, col = 2, scale = 0.7, disp = 6, name = locale("blip", "blip_bank") })
                 end
             end
-            createCircleTarget(
-                { name, vec3(v[i].x, v[i].y, v[i].z+0.2), 2.0, { name = name, debugPoly = debugMode, useZ = true, }, }, {
-                    {   action = function()
-                        if Config.General.Peds and isStarted("jim-talktonpc") then
-                            exports["jim-talktonpc"]:createCam(Peds[name], true, "generic", true)
-                        end
-                        TriggerEvent(getScript()..":Client:Bank", { ped = Config.General.Peds and Peds[name] })
-                    end,
-                        icon = "fas fa-piggy-bank", label = locale("target", "bank") },
-                    {   action = function() TriggerEvent(getScript()..":Tickets:Menu", { gang = false }) end,
-                        icon = "fas fa-receipt", label = locale("target", "cashin_boss"), job = jobroles,
-                    },
-                    {   action = function() TriggerEvent(getScript()..":Tickets:Menu", { gang = true }) end,
-                        icon = "fas fa-receipt", label = locale("target", "cashin_gang"), gang = gangroles,
-                    },
-                }, 2.5)
-            if Config.Banks.showBlips then
-                makeBlip({coords = v[i], sprite = 814, col = 2, scale = 0.7, disp = 6, name = locale("blip", "blip_bank") })
-            end
         end
-    end
+    end, true)
 end
 
 RegisterNetEvent(getScript()..":Client:Bank", function(data) local setheader = nil

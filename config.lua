@@ -8,7 +8,7 @@ Config = {
 	Lan = "en",
 	Debug = false,
 	Notify = "qb",		-- "qb" | "okok" | "t" | "infinity" | "rr"
-	Menu = "ox",
+	Menu = "ox",            -- "qb" or "ox"
 
 	---------------------------------
 	-- Default Job Payment Systems --

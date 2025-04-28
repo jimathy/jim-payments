@@ -38,8 +38,8 @@ ensure [vehicles]
 ensure [jim]
 ```
 
---- 
-## BZZ Terminal Instructions 
+---
+## BZZ Terminal Instructions
 Free Package https://bzzz.tebex.io/package/5551076
 
 Stream the prop and add the emote that is provided to rpemotes or dpemotes
@@ -52,7 +52,7 @@ Stream the prop and add the emote that is provided to rpemotes or dpemotes
 - To make use of the ticket reward system for workers you need to add the ticket item to your shared items lua
 - Naviage to `[qb] > qb-core / shared / items.lua` and add this line
 ```lua
-["payticket"] 					 = {["name"] = "payticket", 				["label"] = "Receipt", 	     			["weight"] = 150, 		["type"] = "item", 		["image"] = "ticket.png", 				["unique"] = false,   	["useable"] = false,    ["shouldClose"] = false,    ["combinable"] = nil,   ["description"] = "Cash these in at the bank!"},
+    payticket 					 = { name = "payticket", label = "Receipt", weight = 10, type = "item", image = "ticket.png", unique = false, useable = false, shouldClose = false, description = "Cash these in at the bank!" },
 ```
 
 - Add the ticket image to your inventory script:
@@ -199,10 +199,6 @@ FineJobList = true, -- "true" to use nearby player list feature in the cash regi
   - `ATMBlips` Enable this if you are a pyscho and need every ATM to be on the map too
   - `Gabz` Enable to change to Gabz Bank locations, this corrects the ATM/Bank Cashier + Ticket Cash in
 ---
-## Support for other scripts
-### Renewed-Banking
-  - Support for renewed banking added
-  - Toggle `RenewedBanking` in the config.lua to enable this
 
 ### Renewed's qb-phone
   - Simply leave the Config.PhoneType as `"qb"`

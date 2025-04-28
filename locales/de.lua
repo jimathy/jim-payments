@@ -1,3 +1,5 @@
+Loc = Loc or {}
+
 Loc["de"] = {
     error = {
         ["cancel"] = "Abgebrochen",
@@ -94,21 +96,20 @@ Loc["de"] = {
         ["acc_boss_trans"] = "Zugang zu Firmenkontotransfers",
         ["acc_gang"] = "Zugriff auf das Gangkonto",
         ["acc_gang_trans"] = "Zugang zu Gangkontotransfers",
-        ["header_soc"] = "<br><br>- Firmenkonto -<br>",
-        ["header_balance"] = "<br><br>- Kontostand -<br>🏢",
+        ["header_soc"] = "- Firmenkonto -",
         ["header_soc_bank"] = "🏢 Firmen Banking 🏢",
         ["amount_pay"] = "💵  Zu zahlender Betrag'",
         ["give_cash"] = "Jemandem Bargeld geben",
         ["give"] = "Geben",
         ["welcome"] = "Willkommen zurück, ",
-        ["citizenid"] = "<br><br>- Ausweisnummer -<br>",
-        ["header_acc"] = "<br><br>- Konto -<br>",
-        ["header_info"] = "<br><br>- Konto Info -<br>Ersparnis-ID: ",
-        ["header_balance_bank"] = "<br><br>- Kontostand -<br>🏦Bank - $",
-        ["header_option"] = "<br><br>- Optionen -",
-        ["cash_balance"] = "<br>💵Bargeld - $",
-        ["bank_balance"] = "<br>🏦Bank - $",
-        ["saving_balance"] = "<br><br>- Kontostand -<br>💰Ersparnisses - $",
+        ["citizenid"] = "- Ausweisnummer -",
+        ["header_acc"] = "- Konto -",
+        ["header_info"] = "- Konto Info -Ersparnis-ID: ",
+        ["header_balance_bank"] = "- Kontostand -🏦Bank - $",
+        ["header_option"] = "- Optionen -",
+        ["cash_balance"] = "💵Bargeld - $",
+        ["bank_balance"] = "🏦Bank - $",
+        ["saving_balance"] = "- Kontostand -💰Ersparnisses - $",
         ["cus_id"] = "# Kunden ID #",
         ["type"] = "Zahlungsart",
         ["amount_charge"] = "💵  Zu berechnender Betrag",
@@ -122,7 +123,8 @@ Loc["de"] = {
         ["accept_payment"] = "Möchten Sie die Zahlung akzeptieren?",
         ["accept_charge"] = "Möchten Sie die Gebühr akzeptieren?",
         ["ticket_amount"] = "Anzahl der Tickets: ",
-        ["total_pay"] = "<br>Gesamte Zahlung: $",
+        ["total_pay"] = "Gesamte Zahlung: $",
+        ["confirm"] = "Ja",
         ["yes"] = "Ja",
         ["no"] = "Nein",
         ["cash"] = "Bargeld",
@@ -130,4 +132,4 @@ Loc["de"] = {
         ["payment_amount"] = " Zahlung: $",
         ["bank_charge"] = "Bankgebühr: $",
     },
-} 
+}

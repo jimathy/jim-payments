@@ -21,8 +21,11 @@ registerCommand("cashregister", {
 createCallback(getScript()..":MakePlayerList", function(source)
 	local onlineList = {}
 	for _, v in pairs(GetPlayers()) do
-		local Player = getPlayer(v)
-		onlineList[#onlineList+1] = { value = tonumber(v), text = "["..v.."] - "..Player.name }
+		if v ~= nil or type(v) ~= "number" then
+			local Player = getPlayer(v)
+			onlineList[#onlineList+1] = { value = tonumber(v), text = "["..v.."] - "..Player.name }
+			Wait(10)
+		end
 	end
 	return onlineList
 end)

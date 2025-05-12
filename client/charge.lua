@@ -43,9 +43,34 @@ RegisterNetEvent(getScript()..":client:Charge", function(data, outside)
             end
         end
 		--If list is empty(no one nearby) show error and stop
-		if not nearbyList[1] then triggerNotify(nil, locale("error" ,"no_one"), "error") return end
+		if not nearbyList[1] then
+            triggerNotify(nil, locale("error" ,"no_one"), "error")
+            return
+        end
+
+        newinputs[#newinputs+1] = {
+            type = "select",
+            text = locale("menu" ,"cus_id"),
+            name = "citizen",
+            label = locale("menu" ,"cus_id"),
+            default = 1,
+            options = nearbyList
+        }
 	else -- If Config.List is false, create input text box for ID's
-		newinputs[#newinputs+1] = { type = 'text', isRequired = true, required = true, name = 'citizen', label = locale("menu" ,"person_id"), text = locale("menu" ,"person_id") }
+		newinputs[#newinputs+1] = {
+            type = 'text',
+            isRequired = true,
+            required = true,
+            name = 'citizen',
+            label = locale("menu" ,"person_id"),
+            text = locale("menu" ,"person_id")
+        }
+        newinputs[#newinputs+1] = {
+            type = 'text',
+            isRequired = true,
+            name = 'citizen',
+            text = locale("menu" ,"cus_id")
+        }
 	end
 
 	--Grab Player Job name or Gang Name if needed
@@ -53,11 +78,6 @@ RegisterNetEvent(getScript()..":client:Charge", function(data, outside)
 	--Check if image was given when opening the regsiter
 	local img = data.img ~= nil and (Config.System.Menu == "qb" and "<center><img src="..(data.img).." width=200px></center>") or Jobs[getInfo.job].label
 
-    if Config.General.List then
-        newinputs[#newinputs+1] = { type = "select", text = locale("menu" ,"cus_id"), name = "citizen", label = locale("menu" ,"cus_id"), default = 1, options = nearbyList }
-    else
-        newinputs[#newinputs+1] = { type = 'text', isRequired = true, name = 'citizen',  text = locale("menu" ,"cus_id") }
-    end
     newinputs[#newinputs+1] = {
         type = 'select',
         name = 'billtype',
@@ -73,7 +93,7 @@ RegisterNetEvent(getScript()..":client:Charge", function(data, outside)
     local dialog = createInput(img, newinputs)
 
 	if dialog then
-        if dialog[1] then
+        if dialog[1] then   -- if ox menu, auto adjust values
             dialog.citizen = dialog[1]
             dialog.billtype = dialog[2]
             dialog.price = dialog[3]
@@ -134,7 +154,7 @@ RegisterNetEvent(getScript()..":client:PayPopup", function(amount, biller, billt
             })
         end,
     }
-    debugPrint(setimage)
+
     openMenu(Menu, {
         header = setimage,
         onExit = function()

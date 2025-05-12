@@ -1,9 +1,11 @@
-registerCommand("polcharge", {
-	locale("command", "charge"), {}, false,
-	function(source)
-		TriggerClientEvent(getScript()..":client:PolCharge", source)
-	end
-})
+onResourceStart(function()
+	registerCommand("polcharge", {
+		locale("command", "charge"), {}, false,
+		function(source)
+			TriggerClientEvent(getScript()..":client:PolCharge", source)
+		end
+	})
+end, true)
 
 RegisterServerEvent(getScript()..":server:PolCharge", function(citizen, price)
 	local src = source
@@ -19,7 +21,7 @@ RegisterServerEvent(getScript()..":server:PolCharge", function(citizen, price)
 		print("^3Warning^7: ^2Can't find player's job in ^7'Config.Polcharge.FineJobs', ^2defaulting to 0.25 (25% commission)^7")
 	end
 	local commission = math.floor(price * commPercent)
-	print(commission)
+
 	if price > 0 then
 		if not Config.PolCharge.FineJobConfirmation then
 			polCharge({

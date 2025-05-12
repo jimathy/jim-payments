@@ -1,10 +1,49 @@
-registerCommand("cashgive", {
-	locale("command" , "pay_user"), {}, false,
-	function(source)
-		TriggerClientEvent(getScript()..":client:ATM:give", source)
-	end
-})
+onResourceStart(function()
+	registerCommand("cashgive", {
+		locale("command" , "pay_user"), {}, false,
+		function(source)
+			TriggerClientEvent(getScript()..":client:ATM:give", source)
+		end
+	})
 
+	createCallback(getScript()..":GetInfo", function(source)
+		local Player = getPlayer(source)
+		local society, gsociety = 0, 0
+
+		society = getSocietyAccount(Player.job)
+		if Player.gang ~= "none" then
+			gsociety = getSocietyAccount(Player.gang)
+		end
+
+		-- Savings account is only QBCore for now
+		if isStarted(QBExport) and not isStarted(QBXExport) then
+		-- Grab Savings account info
+			local result = MySQL.Sync.fetchAll('SELECT * FROM bank_accounts WHERE citizenid = ? AND account_name = ?', { Player.citizenId, 'Savings_'..Player.citizenId, })
+			if result[1] then
+				accountID = result[1].citizenid
+				savingBalance = result[1].account_balance
+			else
+				MySQL.Async.insert('INSERT INTO bank_accounts (citizenid, account_name, account_balance) VALUES (?, ?, ?)', { Player.citizenId, 'Savings_'..Player.citizenId, 0}, function() completed = true end) repeat Wait(0) until completed == true
+				local result = MySQL.Sync.fetchAll('SELECT * FROM bank_accounts WHERE citizenid = ? AND account_name = ?', { Player.citizenId, 'Savings_'..Player.citizenId, })
+				accountID = result[1].citizenid
+				savingBalance = result[1].account_balance
+			end
+		end
+		local retTable = {
+			name = Player.firstname..' '..Player.lastname,
+			cash = Player.cash,
+			bank = Player.bank,
+			account = Player.account,
+			cid = Player.citizenId.." ["..source.."]",
+			savbal = savingBalance,
+			aid = accountID,
+			society = society,
+			gsociety = gsociety
+		}
+
+		return retTable
+	end)
+end, true)
 
 RegisterServerEvent(getScript()..":server:ATM:use", function(amount, billtype, baccount, account, society, gsociety)
 	local src = source
@@ -205,44 +244,6 @@ RegisterServerEvent(getScript()..":server:ATM:use", function(amount, billtype, b
 			end
 		end
 	end
-end)
-
-createCallback(getScript()..":GetInfo", function(source)
-	local Player = getPlayer(source)
-	local society, gsociety = 0, 0
-
-	society = getSocietyAccount(Player.job)
-	if Player.gang ~= "none" then
-		gsociety = getSocietyAccount(Player.gang)
-	end
-
-	-- Savings account is only QBCore for now
-	if isStarted(QBExport) and not isStarted(QBXExport) then
-	-- Grab Savings account info
-		local result = MySQL.Sync.fetchAll('SELECT * FROM bank_accounts WHERE citizenid = ? AND account_name = ?', { Player.citizenId, 'Savings_'..Player.citizenId, })
-		if result[1] then
-			accountID = result[1].citizenid
-			savingBalance = result[1].account_balance
-		else
-			MySQL.Async.insert('INSERT INTO bank_accounts (citizenid, account_name, account_balance) VALUES (?, ?, ?)', { Player.citizenId, 'Savings_'..Player.citizenId, 0}, function() completed = true end) repeat Wait(0) until completed == true
-			local result = MySQL.Sync.fetchAll('SELECT * FROM bank_accounts WHERE citizenid = ? AND account_name = ?', { Player.citizenId, 'Savings_'..Player.citizenId, })
-			accountID = result[1].citizenid
-			savingBalance = result[1].account_balance
-		end
-	end
-	local retTable = {
-		name = Player.firstname..' '..Player.lastname,
-		cash = Player.cash,
-		bank = Player.bank,
-		account = Player.account,
-		cid = Player.citizenId.." ["..source.."]",
-		savbal = savingBalance,
-		aid = accountID,
-		society = society,
-		gsociety = gsociety
-	}
-
-	return retTable
 end)
 
 RegisterServerEvent(getScript()..":server:ATM:give", function(citizen, price)

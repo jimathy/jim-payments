@@ -9,26 +9,33 @@ onResourceStart(function()
 	if Items and not Items["payticket"] then
 		debugPrint("^1Error^7: ^2Unable to find ^7'^3payticket^7' ^2item  it in the Shared^7")
 	end
-end, true)
 
-registerCommand("cashregister", {
-	locale("command", "cash_reg"), {}, false,
-	function(source)
-		TriggerClientEvent(getScript()..":client:Charge", source, {}, true)
-	end
-})
-
-createCallback(getScript()..":MakePlayerList", function(source)
-	local onlineList = {}
-	for _, v in pairs(GetPlayers()) do
-		if v ~= nil or type(v) ~= "number" then
-			local Player = getPlayer(v)
-			onlineList[#onlineList+1] = { value = tonumber(v), text = "["..v.."] - "..Player.name }
-			Wait(10)
+	registerCommand("cashregister", {
+		locale("command", "cash_reg"), {}, false,
+		function(source)
+			TriggerClientEvent(getScript()..":client:Charge", source, {}, true)
 		end
+	})
+
+	createCallback(getScript()..":MakePlayerList", function(source)
+		local onlineList = {}
+		for _, v in pairs(GetPlayers()) do
+			if v ~= nil or type(v) ~= "number" then
+				local Player = getPlayer(v)
+				onlineList[#onlineList+1] = { value = tonumber(v), text = "["..v.."] - "..Player.name }
+				Wait(10)
+			end
+		end
+		return onlineList
+	end)
+
+
+	if Config.General.Usebzzz then
+		createUseableItem('terminal', function(source, item)
+			TriggerClientEvent(getScript()..":client:Charge", source, {}, true)
+		end)
 	end
-	return onlineList
-end)
+end, true)
 
 RegisterServerEvent(getScript()..":server:Charge", function(citizen, price, billtype, img, outside, gang)
 	local src = source
@@ -92,13 +99,5 @@ RegisterServerEvent(getScript()..":server:PayPopup", function(data)
 	elseif not data.accept then
 		triggerNotify(nil, locale("success", "declined"), "error", src)
 		triggerNotify(nil, billed.firstname..locale("error", "decline_pay")..data.amount..locale("success", "payment"), "error", data.biller)
-	end
-end)
-
-CreateThread(function()
-	if Config.General.Usebzzz then
-		createUseableItem('terminal', function(source, item)
-			TriggerClientEvent(getScript()..":client:Charge", source, {}, true)
-		end)
 	end
 end)

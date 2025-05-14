@@ -50,9 +50,9 @@ RegisterNetEvent(getScript()..":client:Charge", function(data, outside)
 
         newinputs[#newinputs+1] = {
             type = "select",
-            text = locale("menu" ,"cus_id"),
+            text = locale("menu", "cus_id"),
             name = "citizen",
-            label = locale("menu" ,"cus_id"),
+            label = locale("menu", "cus_id"),
             default = 1,
             options = nearbyList
         }
@@ -62,14 +62,8 @@ RegisterNetEvent(getScript()..":client:Charge", function(data, outside)
             isRequired = true,
             required = true,
             name = 'citizen',
-            label = locale("menu" ,"person_id"),
-            text = locale("menu" ,"person_id")
-        }
-        newinputs[#newinputs+1] = {
-            type = 'text',
-            isRequired = true,
-            name = 'citizen',
-            text = locale("menu" ,"cus_id")
+            label = locale("menu", "cus_id"),
+            text = locale("menu", "cus_id")
         }
 	end
 
@@ -94,6 +88,10 @@ RegisterNetEvent(getScript()..":client:Charge", function(data, outside)
 
 	if dialog then
         if dialog[1] then   -- if ox menu, auto adjust values
+            if dialog[1] == "" then
+                TriggerEvent(getScript()..":client:Charge", data, outside)
+                return
+            end
             dialog.citizen = dialog[1]
             dialog.billtype = dialog[2]
             dialog.price = dialog[3]
@@ -105,7 +103,7 @@ end)
 
 RegisterNetEvent(getScript()..":client:PayPopup", function(amount, biller, billtype, img, billerjob, gang, outside)
     local setimage = ""
-    print(billerjob)
+
     if not img then
         setimage = billerjob
     else

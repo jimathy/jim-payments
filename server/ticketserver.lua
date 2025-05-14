@@ -3,11 +3,9 @@ RegisterServerEvent(getScript()..":Tickets:Give", function(data, biller, gang)
 	local activePlayers = GetPlayers()
 	local commPercent = 0
 	jsonPrint(data)
-	if Config.Receipts.Jobs[data.society] then
-		commPercent = Config.Receipts.Jobs[data.society].Commission
-	else commPercent = 0.25
-        print("^1Error^7: ^2Can't find job in ^7'^3Config^7.^3Receipts^7.^3Jobs^7', ^2defaulting to 0.25 (25% commission)^7")
-	end
+
+	local commPercent = Config.PolCharge.FineJobs[data.society] and Config.PolCharge.FineJobs[data.society].Commission or 0.25
+
 	local takecomm = math.floor(data.amount * commPercent)
 
 	if biller ~= nil then -- If this is found, it ISN'T a phone payment, so add money to society here

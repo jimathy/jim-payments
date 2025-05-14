@@ -14,12 +14,7 @@ RegisterServerEvent(getScript()..":server:PolCharge", function(citizen, price)
 	local price = math.floor(tonumber(price))
 
 	local commPercent = Config.PolCharge.FineJobs[biller.job] and Config.PolCharge.FineJobs[biller.job].Commission or 0.25
-	if Config.PolCharge.FineJobs[biller.job] then
-		commPercent = Config.PolCharge.FineJobs[biller.job].Commission
-	else
-		commPercent = 0.25
-		print("^3Warning^7: ^2Can't find player's job in ^7'Config.Polcharge.FineJobs', ^2defaulting to 0.25 (25% commission)^7")
-	end
+
 	local commission = math.floor(price * commPercent)
 
 	if price > 0 then

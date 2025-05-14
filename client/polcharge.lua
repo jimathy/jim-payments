@@ -73,7 +73,7 @@ RegisterNetEvent(getScript()..":client:PolCharge", function()
     end
 end)
 
-RegisterNetEvent(getScript()..":client:PolPopup", function(amount, biller, billerjob)
+RegisterNetEvent(getScript()..":client:PolPopup", function(amount, biller, billerjob, commPercent)
     local Menu = {}
     Menu[#Menu+1] = {
         isMenuHeader = true,
@@ -89,6 +89,7 @@ RegisterNetEvent(getScript()..":client:PolPopup", function(amount, biller, bille
                 accept = true,
                 amount = amount,
                 biller = biller,
+                commPercent = commPercent,
             })
         end,
     }

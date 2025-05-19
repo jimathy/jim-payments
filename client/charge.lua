@@ -108,8 +108,10 @@ RegisterNetEvent(getScript()..":client:Charge", function(data, outside)
         billPrev = dialog.billtype
         TriggerServerEvent(getScript()..":server:Charge", dialog.citizen, dialog.price, dialog.billtype, data.img, outside, gang)
     end
-    destroyProp(prop)
-    stopAnim('cellphone@', 'cellphone_text_read_base')
+    if Config.General.Usebzzz then
+        destroyProp(prop)
+        stopAnim('cellphone@', 'cellphone_text_read_base')
+    end
 end)
 
 RegisterNetEvent(getScript()..":client:PayPopup", function(amount, biller, billtype, img, billerjob, gang, outside)

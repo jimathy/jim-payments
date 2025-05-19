@@ -40,12 +40,12 @@ ensure [jim]
 
 ---
 ## BZZ Terminal Instructions
-Free Package https://bzzz.tebex.io/package/5551076
 
-Stream the prop and add the emote that is provided to rpemotes or dpemotes
-```lua
-	['terminal'] 			 = {['name'] = 'terminal', 				['label'] = 'Wireless Terminal', 				['weight'] = 5000, 		["type"] = "item", 		["image"] = 'terminal.png', 		['unique'] = true, 		['useable'] = true, 	["shouldClose"] = true,	   ["combinable"] = nil,   ['description'] = ''},
-```
+If you enable Config.General.Usebzzz then the script will use `bzzz_terminal` to automatically create a prop and animation when using the commands:
+- `/cashregister`
+- `/terminal`
+
+This payment terminal is available as a Free Package from https://bzzz.tebex.io/package/5551076
 
 ---
 ## Item installation

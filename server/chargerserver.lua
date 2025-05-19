@@ -10,12 +10,14 @@ onResourceStart(function()
 		debugPrint("^1Error^7: ^2Unable to find ^7'^3payticket^7' ^2item  it in the Shared^7")
 	end
 
-	registerCommand("cashregister", {
-		locale("command", "cash_reg"), {}, false,
-		function(source)
-			TriggerClientEvent(getScript()..":client:Charge", source, {}, true)
-		end
-	})
+	for _, v in pairs({"cashregister", "terminal"}) do
+		registerCommand(v, {
+			locale("command", "cash_reg"), {}, false,
+			function(source)
+				TriggerClientEvent(getScript()..":client:Charge", source, {}, true)
+			end
+		})
+	end
 
 	createCallback(getScript()..":MakePlayerList", function(source)
 		local onlineList = {}
@@ -29,12 +31,6 @@ onResourceStart(function()
 		return onlineList
 	end)
 
-
-	if Config.General.Usebzzz then
-		createUseableItem('terminal', function(source, item)
-			TriggerClientEvent(getScript()..":client:Charge", source, {}, true)
-		end)
-	end
 end, true)
 
 RegisterServerEvent(getScript()..":server:Charge", function(citizen, price, billtype, img, outside, gang)

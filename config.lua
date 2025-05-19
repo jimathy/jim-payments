@@ -28,7 +28,7 @@ Config = {
 		List = true, 			-- "true" to use nearby player list feature in the cash registers, "false" for manual id entry
 		PaymentRadius = 15, 	-- This is how far the playerlist will check for nearby players (based on the person charging)
 
-		Usebzzz = false, 		-- enable if you're using the prop from bzzz
+		Usebzzz = true, 		-- enable if you're using the prop from bzzz
 
 		Enablecommand = true, 	-- Enables the /cashregister command
 

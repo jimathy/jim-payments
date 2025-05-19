@@ -16,8 +16,8 @@ end
 
 onPlayerLoaded(function() spawnCustomRegisters() end, true)
 
-local billPrev = "cash"
 RegisterNetEvent(getScript()..":client:Charge", function(data, outside)
+    local billPrev = "cash"
 	--if not outside and not onDuty and data.gang == nil then triggerNotify(nil, locale("error", "not_onduty") return end
 	local newinputs = {} -- Begin qb-input creation here.
     local nearbyList = {}
@@ -42,6 +42,7 @@ RegisterNetEvent(getScript()..":client:Charge", function(data, outside)
                 end
             end
         end
+
 		--If list is empty(no one nearby) show error and stop
 		if not nearbyList[1] then
             triggerNotify(nil, locale("error" ,"no_one"), "error")
@@ -66,6 +67,14 @@ RegisterNetEvent(getScript()..":client:Charge", function(data, outside)
             text = locale("menu", "cus_id")
         }
 	end
+
+    local prop = nil
+    if Config.General.Usebzzz then
+        local Ped = PlayerPedId()
+        prop = makeProp({ prop = 'bzzz_prop_payment_terminal', coords = vec4(0,0,0,0)}, false, true)
+        AttachEntityToEntity(prop, Ped, GetPedBoneIndex(Ped, 57005), 0.17, 0.04, 0.01, 340.0, 200.0, 50.0, true, true, false, false, 1, true)
+        playAnim('cellphone@', 'cellphone_text_read_base', -1, 49)
+    end
 
 	--Grab Player Job name or Gang Name if needed
     local getInfo = getPlayer()
@@ -99,6 +108,8 @@ RegisterNetEvent(getScript()..":client:Charge", function(data, outside)
         billPrev = dialog.billtype
         TriggerServerEvent(getScript()..":server:Charge", dialog.citizen, dialog.price, dialog.billtype, data.img, outside, gang)
     end
+    destroyProp(prop)
+    stopAnim('cellphone@', 'cellphone_text_read_base')
 end)
 
 RegisterNetEvent(getScript()..":client:PayPopup", function(amount, biller, billtype, img, billerjob, gang, outside)

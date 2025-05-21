@@ -7,7 +7,7 @@ function spawnCustomRegisters()
 		for i = 1, #v do
 			local job, gang = v[i].gang and nil or k, v[i].gang and k or nil
             createBoxTarget({"CustomRegister: "..k..i, v[i].coords.xyz, 0.47, 0.34, { name="CustomRegister: "..k..i, heading = v[i].coords[4], debugPoly=debugMode, minZ=v[i].coords.z-0.1, maxZ=v[i].coords.z+0.4}}, {
-                { onSelect = function() TriggerEvent(getScript()..":client:Charge", { job = job, gang = gang, img = ""}) end, icon = "fas fa-credit-card", label = locale("target", "charge"), }
+                { action = function() TriggerEvent(getScript()..":client:Charge", { job = job, gang = gang, img = ""}) end, icon = "fas fa-credit-card", label = locale("target", "charge"), }
             }, 2.0)
 			if v[i].prop then makeProp({prop = "prop_till_03", coords = v[i].coords}, 1, false) end
 		end

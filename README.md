@@ -45,14 +45,19 @@ If you enable Config.General.Usebzzz then the script will use `bzzz_terminal` to
 - `/cashregister`
 - `/terminal`
 
-This payment terminal is available as a Free Package from https://bzzz.tebex.io/package/5551076
+This is also available as an item users can use by adding this to your shared items
+```lua
+terminal = { name = 'terminal', label = 'Wireless Terminal', weight = 5000, ["type"] = "item", ["image"] = 'terminal.png', unique = true, useable = true, ["shouldClose"] = true, ["combinable"] = nil, description = '' },
+```
+
+This payment terminal prop is available as a Free Package from https://bzzz.tebex.io/package/5551076
 
 ---
 ## Item installation
 - To make use of the ticket reward system for workers you need to add the ticket item to your shared items lua
 - Naviage to `[qb] > qb-core / shared / items.lua` and add this line
 ```lua
-    payticket 					 = { name = "payticket", label = "Receipt", weight = 10, type = "item", image = "ticket.png", unique = false, useable = false, shouldClose = false, description = "Cash these in at the bank!" },
+payticket = { name = "payticket", label = "Receipt", weight = 10, type = "item", image = "ticket.png", unique = false, useable = false, shouldClose = false, description = "Cash these in at the bank!" },
 ```
 
 - Add the ticket image to your inventory script:

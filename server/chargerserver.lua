@@ -19,6 +19,12 @@ onResourceStart(function()
 		})
 	end
 
+	if Items["terminal"] then
+		createUseableItem("terminal", function(source, item)
+			TriggerClientEvent(getScript()..":client:Charge", source, {}, true)
+		end)
+	end
+
 	createCallback(getScript()..":MakePlayerList", function(source)
 		local onlineList = {}
 		for _, v in pairs(GetPlayers()) do

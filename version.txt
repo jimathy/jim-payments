@@ -1,1 +1,7 @@
-3.0.02
+3.0.03
+
+- Adjust commands to unify /cashregister and /terminal
+- If "Usebzzz = true" both commands will trigger the emote
+- Updated readme to explain this
+
+https://github.com/jimathy/jim-payments

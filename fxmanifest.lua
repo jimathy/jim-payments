@@ -1,6 +1,6 @@
 name "Jim-Payments"
 author "Jimathy"
-version "3.0.02"
+version "3.0.03"
 description "Payment Script"
 fx_version "cerulean"
 game "gta5"
@@ -12,7 +12,7 @@ shared_scripts {
 	'locales/*.lua',
 	'config.lua',
 
-    --Jim Bridge - https://github.com/jimathy/jim-bridge
+    --Jim Bridge - https://github.com/jimathy/jim_bridge
     '@jim_bridge/starter.lua',
 
 	'shared/*.lua',

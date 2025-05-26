@@ -9,7 +9,7 @@ function spawnCustomRegisters()
             createBoxTarget({"CustomRegister: "..k..i, v[i].coords.xyz, 0.47, 0.34, { name="CustomRegister: "..k..i, heading = v[i].coords[4], debugPoly=debugMode, minZ=v[i].coords.z-0.1, maxZ=v[i].coords.z+0.4}}, {
                 { action = function() TriggerEvent(getScript()..":client:Charge", { job = job, gang = gang, img = ""}) end, icon = "fas fa-credit-card", label = locale("target", "charge"), }
             }, 2.0)
-			if v[i].prop then makeProp({prop = "prop_till_03", coords = v[i].coords}, 1, false) end
+			if v[i].prop then makeProp({prop = "prop_till_03", coords = v[i].coords + vec4(0,0,1.0, 0.0)}, 1, false) end
 		end
 	end
 end

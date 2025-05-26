@@ -33,7 +33,12 @@ RegisterNetEvent(getScript()..":client:Charge", function(data, outside)
 		--Retrieve a list of nearby players from server
 		local onlineList = triggerCallback(getScript()..":MakePlayerList")
 		--Convert list of players nearby into one qb-input understands + add distance info
+
         local playerCoords = GetEntityCoords(PlayerPedId())
+
+        if onlineList == nil or #onlineList == 0 then
+            goto failed
+        end
 
         for _, v in ipairs(GetPlayersFromCoords(playerCoords, Config.General.PaymentRadius)) do
             local ped = GetPlayerPed(v)
@@ -50,6 +55,7 @@ RegisterNetEvent(getScript()..":client:Charge", function(data, outside)
                 end
             end
         end
+        ::failed::
 
 		--If list is empty(no one nearby) show error and stop
 		if not nearbyList[1] then

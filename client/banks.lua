@@ -24,22 +24,29 @@ if Config.Banks.enable then
                         jobroles[k] = 0
                     end
                 end
-                createCircleTarget(
-                    { name, vec3(v[i].x, v[i].y, v[i].z+0.2), 2.0, { name = name, debugPoly = debugMode, useZ = true, }, }, {
-                        {   action = function()
+                local options = {
+                    {   action = function()
                             if Config.General.Peds and isStarted("jim-talktonpc") then
                                 exports["jim-talktonpc"]:createCam(Peds[name], true, "generic", true)
                             end
                             TriggerEvent(getScript()..":Client:Bank", { ped = Config.General.Peds and Peds[name] })
                         end,
-                            icon = "fas fa-piggy-bank", label = locale("target", "bank") },
+                        icon = "fas fa-piggy-bank", label = locale("target", "bank")
+                    },
+                }
+                if Config.Receipts.CashInAnywhere then
+                    options[#options+1] =
                         {   action = function() TriggerEvent(getScript()..":Tickets:Menu", { gang = false }) end,
                             icon = "fas fa-receipt", label = locale("target", "cashin_boss"), job = jobroles,
-                        },
+                        }
+                    options[#options+1] =
                         {   action = function() TriggerEvent(getScript()..":Tickets:Menu", { gang = true }) end,
                             icon = "fas fa-receipt", label = locale("target", "cashin_gang"), gang = gangroles,
-                        },
-                    }, 2.5)
+                        }
+                end
+                jsonPrint(options)
+                createCircleTarget(
+                    { name, vec3(v[i].x, v[i].y, v[i].z+0.2), 2.0, { name = name, debugPoly = debugMode, useZ = true, }, }, options, 2.5)
                 if Config.Banks.showBlips then
                     makeBlip({coords = v[i], sprite = 814, col = 2, scale = 0.7, disp = 6, name = locale("blip", "blip_bank") })
                 end

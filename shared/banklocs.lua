@@ -27,7 +27,9 @@ BankLocations = {
 }
 
 if Config.General.Gabz then
-	Config.Receipts.CashInLocation = vec4(269.28, 217.24, 106.28, 69.0)
+	Config.Receipts.CashInLocations = {
+		vec4(269.28, 217.24, 106.28, 69.0)
+	}
 	BankLocations = {
 		["legion"] = {
 			vec4(149.5, -1042.08, 29.37, 342.74), -- Legion Fleeca

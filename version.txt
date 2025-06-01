@@ -1,7 +1,9 @@
-3.0.03
+3.0.04
 
-- Adjust commands to unify /cashregister and /terminal
-- If "Usebzzz = true" both commands will trigger the emote
-- Updated readme to explain this
+- Fix custom cash register spawn offset locations
+- Fix job/gang lock on custom registers
+- Add workaround for if `onlineList` is `nil`
+- Fix type for Gabz default ticket cash in location
+- Separate and fix ped creation for banks and tickets
 
 https://github.com/jimathy/jim-payments

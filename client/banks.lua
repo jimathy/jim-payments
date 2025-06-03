@@ -44,7 +44,7 @@ if Config.Banks.enable then
                             icon = "fas fa-receipt", label = locale("target", "cashin_gang"), gang = gangroles,
                         }
                 end
-                jsonPrint(options)
+
                 createCircleTarget(
                     { name, vec3(v[i].x, v[i].y, v[i].z+0.2), 2.0, { name = name, debugPoly = debugMode, useZ = true, }, }, options, 2.5)
                 if Config.Banks.showBlips then

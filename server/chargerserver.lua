@@ -30,7 +30,9 @@ onResourceStart(function()
 		for _, v in pairs(GetPlayers()) do
 			if v ~= nil or type(v) ~= "number" then
 				local Player = getPlayer(v)
-				onlineList[#onlineList+1] = { value = tonumber(v), text = "["..v.."] - "..Player.name }
+				if Player.name then
+					onlineList[#onlineList+1] = { value = tonumber(v), text = "["..v.."] - "..Player.name }
+				end
 				Wait(10)
 			end
 		end

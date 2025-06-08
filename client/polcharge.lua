@@ -47,6 +47,116 @@ RegisterNetEvent(getScript()..":client:PolCharge", function()
             default = 1,
             options = nearbyList
         }
+
+    elseif Config.General.lookAtCharge then
+        local selectedPed = nil
+        local highlightedPed = nil
+        local running = true
+
+        CreateThread(function()
+            while running do
+                Wait(0)
+
+                -- Raycast to get entity being looked at
+                local camCoord = GetGameplayCamCoord()
+                local direction = RotationToDirection(GetGameplayCamRot(2))
+                local targetCoord = camCoord + direction * 6.0
+
+                local hit, _ , hitCoords, _, entityHit = PerformRaycast(camCoord, targetCoord, PlayerPedId(), 4)
+                if hit then
+                    DrawSphere(hitCoords.x, hitCoords.y, hitCoords.z, 0.05, 0, 0, 255, 0.5)
+                end
+                if entityHit and IsEntityAPed(entityHit) and entityHit ~= PlayerPedId() then
+                    if highlightedPed ~= entityHit then
+                        if highlightedPed and DoesEntityExist(highlightedPed) then
+                            SetEntityAlpha(highlightedPed, 255, false)
+                            ResetEntityAlpha(highlightedPed)
+                        end
+                        highlightedPed = entityHit
+                        SetEntityAlpha(highlightedPed, 200, false)
+                    end
+                elseif highlightedPed then
+                    SetEntityAlpha(highlightedPed, 255, false)
+                    ResetEntityAlpha(highlightedPed)
+                    highlightedPed = nil
+                end
+
+                local loc = vec2(0.89+0.037, 0.9)
+                DrawSprite("timerbars", "all_black_bg", loc.x, loc.y, 0.12, 0.05, 0.0, 255, 255, 255, 255)
+                SetTextScale(0.80, 0.80)
+                SetTextWrap(0.75, 0.985)
+                SetTextJustification(2)
+                SetTextFont(4)
+                SetTextColour(255, 255, 255, 255)
+                BeginTextCommandDisplayText("STRING")
+                AddTextComponentSubstringKeyboardDisplay(highlightedPed and "~s~Selected ID: ~b~"..GetPlayerServerId(NetworkGetPlayerIndexFromPed(highlightedPed)) or "~s~No Selection")
+                EndTextCommandDisplayText(loc.x+0.06, loc.y - 0.026)
+
+                -- Show instructional UI
+                local buttons = {
+                    { keys = { 194 }, text = "Cancel" }
+                }
+                if highlightedPed then
+                    table.insert(buttons, { keys = { 86, 191 }, text = "Confirm" })
+                end
+                makeInstructionalButtons(buttons)
+
+                -- Handle controls
+                if IsControlJustPressed(0, 194) then -- Backspace
+                    if highlightedPed then
+                        SetEntityAlpha(highlightedPed, 255, false)
+                        ResetEntityAlpha(highlightedPed)
+                    end
+                    running = false
+                    return
+                end
+
+                if highlightedPed and (IsControlJustPressed(0, 191) or IsControlJustPressed(0, 86)) then
+                    local serverId = GetPlayerServerId(NetworkGetPlayerIndexFromPed(highlightedPed))
+                    if serverId then
+                        running = false
+                        SetEntityAlpha(highlightedPed, 255, false)
+                        ResetEntityAlpha(highlightedPed)
+
+                        local newinputs = {
+                            {
+                                type = 'select',
+                                name = 'billtype',
+                                text = locale("menu", "type"),
+                                default = billPrev,
+                                options = {
+                                    { value = "cash", text = locale("menu", "cash"), label = locale("menu", "cash") },
+                                    { value = "bank", text = locale("menu", "card"), label = locale("menu", "card") }
+                                }
+                            },
+                            {
+                                type = 'number',
+                                isRequired = true,
+                                name = 'price',
+                                text = locale("menu", "amount_charge")
+                            }
+                        }
+
+                        local dialog = createInput(Jobs[getPlayer().job].label, newinputs)
+
+                        if dialog then
+                            -- If ox_menu style input, fix indexes
+                            if dialog[1] then
+                                dialog.billtype = dialog[1]
+                                dialog.price = dialog[2]
+                            end
+
+                            billPrev = dialog.billtype
+
+                            TriggerServerEvent(getScript()..":server:PolCharge", serverId, dialog.price)
+
+                        end
+                    end
+                end
+            end
+        end)
+        return -- Skip continuing function until selection is made
+
     else
         newinputs[#newinputs+1] = {
             type = 'text',

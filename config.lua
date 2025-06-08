@@ -25,7 +25,9 @@ Config = {
 	General = {
 		ApGov = false, 			-- Toggle support for AP-Goverment Tax
 
+		lookAtCharge = false,	-- "true" to use the "look at charge" feature
 		List = true, 			-- "true" to use nearby player list feature in the cash registers, "false" for manual id entry
+
 		PaymentRadius = 15, 	-- This is how far the playerlist will check for nearby players (based on the person charging)
 
 		Usebzzz = true, 		-- enable if you're using the prop from bzzz
@@ -149,7 +151,8 @@ Config = {
 			['ambulance'] = { Commission = 0.25, },
 		},
 		FineJobConfirmation = false, --"true" makes it so fines need confirmation, "false" skips this ands just removes the money
-		FineJobList = true, -- "true" to use nearby player list feature in the cash registers, "false" for manual id entry
+		FineJobList = false, -- "true" to use nearby player list feature in the cash registers, "false" for manual id entry
+		lookAtCharge = true, -- "true" to use the "look at charge" feature
 	},
 }
 

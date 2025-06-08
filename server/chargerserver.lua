@@ -57,29 +57,21 @@ RegisterServerEvent(getScript()..":server:Charge", function(citizen, price, bill
 		if Config.General.PhoneBank == false or gang == true or billtype == "cash" then
 			TriggerClientEvent(getScript()..":client:PayPopup", billed.source, amount, src, billtype, img, label, gang, outside)
 		else
-			if Config.General.PhoneType == "qb" then
-				MySQL.Async.insert(
-					'INSERT INTO phone_invoices (citizenid, amount, society, sender, sendercitizenid) VALUES (?, ?, ?, ?, ?)',
-					{billed.citizenid, amount, biller.job, biller.firstname, biller.citizenid}, function(id)
-						if id then
-							TriggerClientEvent('qb-phone:client:AcceptorDenyInvoice', billed.source, id, biller.firstname, biller.job, biller.citizenid, amount, GetInvokingResource())
-						end
-					end)
-				TriggerClientEvent('qb-phone:RefreshPhone', billed.source)
-			elseif Config.General.PhoneType == "gks" then
-				MySQL.Async.execute('INSERT INTO gksphone_invoices (citizenid, amount, society, sender, sendercitizenid, label) VALUES (@citizenid, @amount, @society, @sender, @sendercitizenid, @label)', {
-					['@citizenid'] = billed.citizenid,
-					['@amount'] = amount,
-					['@society'] = biller.job,
-					['@sender'] = biller.firstname,
-					['@sendercitizenid'] = biller.citizenid,
-					['@label'] = label,
-				})
-				TriggerClientEvent('gksphone:notifi', src, {title = 'Billing', message = locale("success", "inv_succ"), img= '/html/static/img/icons/logo.png' })
-				TriggerClientEvent('gksphone:notifi', billed.source, {title = 'Billing', message = locale("success", "inv_recieved"), img= '/html/static/img/icons/logo.png' })
+			if sendPhoneInvoice({
+				src = billed.source,
+				amount = amount,
+				billedCitizenid = billed.citizenId,
+				job = biller.job,
+				name = biller.firstname,
+				billerCitizenid = biller.citizenId,
+				label = label,
+
+			}) then
+				triggerNotify(nil, locale("success", "inv_succ"), 'success', src)
+				triggerNotify(nil, locale("success", "inv_recieved"), nil, billed.source)
+			else
+
 			end
-			triggerNotify(nil, locale("success", "inv_succ"), 'success', src)
-			triggerNotify(nil, locale("success", "inv_recieved"), nil, billed.source)
 		end
 	else triggerNotify(nil, locale("error", "charge_zero"), 'error', source) return end
 end)

@@ -1,9 +1,6 @@
-3.0.04
+3.0.05
 
-- Fix custom cash register spawn offset locations
-- Fix job/gang lock on custom registers
-- Add workaround for if `onlineList` is `nil`
-- Fix type for Gabz default ticket cash in location
-- Separate and fix ped creation for banks and tickets
+- Add extra check for if playerData exists when getting player list
+- Add new lookAtCharge option to allow players to target who to charge
 
 https://github.com/jimathy/jim-payments

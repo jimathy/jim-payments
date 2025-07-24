@@ -1,6 +1,6 @@
 -- If you need support I now have a discord available, it helps me keep track of issues and give better support.
 
--- https://discord.gg/xKgQZ6wZvS
+-- https://discord.gg/9pCDHmjYwd
 
 Config = {
 	Lan = "en",

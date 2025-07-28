@@ -30,7 +30,7 @@ Config = {
 
 		PaymentRadius = 15, 	-- This is how far the playerlist will check for nearby players (based on the person charging)
 
-		Usebzzz = true, 		-- enable if you're using the prop from bzzz
+		Usebzzz = false, 		-- enable if you're using the prop from bzzz
 
 		Enablecommand = true, 	-- Enables the /cashregister command
 

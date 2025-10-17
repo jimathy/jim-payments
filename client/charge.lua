@@ -3,23 +3,24 @@ local Till = {}
 
 function spawnCustomRegisters()
     Wait(1000)
-	for k, v in pairs(Config.CustomCashRegisters) do
-		for i = 1, #v do
-			local job, gang = v[i].gang and nil or k, v[i].gang and k or nil
-            createBoxTarget({"CustomRegister: "..k..i, v[i].coords.xyz, 0.47, 0.34, { name="CustomRegister: "..k..i, heading = v[i].coords[4], debugPoly=debugMode, minZ=v[i].coords.z-0.1, maxZ=v[i].coords.z+0.4}}, {
-                {
-                    action = function()
-                        TriggerEvent(getScript()..":client:Charge", { job = job, gang = gang, img = ""})
-                    end,
-                    icon = "fas fa-credit-card",
-                    label = locale("target", "charge"),
-                    job = job,
-                    gang = gang
-                }
-            }, 2.0)
-			if v[i].prop then makeProp({prop = "prop_till_03", coords = v[i].coords + vec4(0,0,1.0, 0.0)}, 1, false) end
-		end
-	end
+    for k, v in pairs(Config.CustomCashRegisters) do
+        for i = 1, #v do
+            local job, gang = v[i].gang and nil or k, v[i].gang and k or nil
+            local img = v.img or v[i].img
+            createBoxTarget(
+                {"CustomRegister: "..k..i, v[i].coords.xyz, 0.47, 0.34, {name="CustomRegister: "..k..i, heading=v[i].coords[4], debugPoly=debugMode, minZ=v[i].coords.z-0.1, maxZ=v[i].coords.z+0.4}}, 
+                {{
+                    action=function() TriggerEvent(getScript()..":client:Charge", {job=job, gang=gang, img=img}) end,
+                    icon="fas fa-credit-card",
+                    label=locale("target","charge"),
+                    job=job,
+                    gang=gang
+                }},
+                2.0
+            )
+            if v[i].prop then makeProp({prop="prop_till_03", coords=v[i].coords+vec4(0,0,1.0,0.0)},1,false) end
+        end
+    end
 end
 
 onPlayerLoaded(function() spawnCustomRegisters() end, true)
@@ -311,4 +312,5 @@ RegisterNetEvent(getScript()..":client:PayPopup", function(amount, biller, billt
             })
         end,
     })
+
 end)

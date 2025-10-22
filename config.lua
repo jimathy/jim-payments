@@ -84,6 +84,7 @@ Config = {
 
 	CustomCashRegisters = {
 		--	["jobname"] = { -- Player job role restriction
+		--      img = "https://i.ibb.co/HfVy87fW/image.png", -- url to image file
 		--		{ coords = vector4(0, 0, 0, 0), }, -- vector4 to place the till and the way it faces
 		--		{ coords = vector4(0, 0, 0, 0), prop = true, }, -- "prop = true" spawns a prop at the coords
 		--	},
@@ -166,4 +167,5 @@ function locale(section, string)
     if not localTable[section] then return "["..section.."] Invalid" end
     if not localTable[section][string] then return "["..string.."] Invalid" end
     return localTable[section][string]
+
 end
